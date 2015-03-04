@@ -33,7 +33,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.4.0
-Release: 13%{?dist}
+Release: 14%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -92,6 +92,10 @@ Patch100: qtbase-opensource-src-5.4.0-QTBUG-43057.patch
 # https://bugreports.qt-project.org/browse/QTBUG-41590
 Patch109: 0009-Do-not-apply-subpixel-gamma-correction-on-XCB.patch
 Patch273: 0173-qimage_conversions.cpp-Fix-build-on-big-endian-syste.patch
+
+# http://lists.qt-project.org/pipermail/announce/2015-February/000059.html
+# CVE-2015-0295
+Patch349: 0149-Fix-a-division-by-zero-when-processing-malformed-BMP.patch
 
 # macros, be mindful to keep sync'd with macros.qt5
 Source1: macros.qt5
@@ -338,6 +342,8 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 
 %patch109 -p1 -b .0009
 %patch273 -p1 -b .0173
+
+%patch349 -p1 -b .0149
 
 # drop -fexceptions from $RPM_OPT_FLAGS
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
@@ -843,6 +849,10 @@ fi
 
 
 %changelog
+* Wed Mar 04 2015 Kevin Kofler <Kevin@tigcc.ticalc.org> - 5.4.0-14
+- fix division by zero on malformed BMP files (QTBUG-44547, CVE-2015-0295)
+- rebuild for fixed GCC in F22
+
 * Mon Feb 16 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.0-13
 - -no-use-gold-linker (f22+, #1193044)
 
