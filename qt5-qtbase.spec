@@ -484,12 +484,12 @@ pushd src/xml; ../../bin/qmake; popd
 # see also https://bugreports.qt-project.org/browse/QTBUG-42071
 QT_HASH_SEED=0; export QT_HASH_SEED
 %if 0%{?valgrind}
-mv bin/qdoc bin/qdoc.orig
-install %{SOURCE2} bin/qdoc
-%endif
+make html_docs || \
+  mv bin/qdoc bin/qdoc.orig && install %{SOURCE2} bin/qdoc && \
+  make html_docs && \
+  mv bin/qdoc.orig bin/qdoc -f
+%else
 make html_docs
-%if 0%{?valgrind}
-mv bin/qdoc.orig bin/qdoc -f
 %endif
 make qch_docs
 %endif
@@ -945,6 +945,7 @@ fi
 %changelog
 * Sat Aug 15 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.0-16
 - backport 0055-Respect-manual-set-icon-themes.patch (kde#344469)
+- conditionally use valgrind only if needed
 
 * Fri Aug 07 2015 Kevin Kofler <Kevin@tigcc.ticalc.org> - 5.5.0-15
 - use valgrind to debug qdoc HTML generation
