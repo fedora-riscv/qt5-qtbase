@@ -44,7 +44,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.5.0
-Release: 15%{?dist}
+Release: 16%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -110,7 +110,10 @@ Patch100: qtbase-opensource-src-5.4.0-QTBUG-43057.patch
 
 # https://bugreports.qt.io/browse/QTBUG-46310
 #SM_CLIENT_ID property is not set
-Patch123: 0123-xcb-set-SM_CLIENT_ID-property.patch
+Patch223: 0123-xcb-set-SM_CLIENT_ID-property.patch
+
+# https://bugs.kde.org/show_bug.cgi?id=344469
+Patch155: 0055-Respect-manual-set-icon-themes.patch
 
 # macros, be mindful to keep sync'd with macros.qt5
 Source1: macros.qt5
@@ -382,7 +385,8 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 %if 0%{?rhel} == 6
 %patch100 -p1 -b .QTBUG-43057
 %endif
-%patch123 -p1 -b .QTBUG-46310
+%patch155 -p1 -b .0055
+%patch223 -p1 -b .QTBUG-46310
 
 # drop -fexceptions from $RPM_OPT_FLAGS
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
@@ -939,6 +943,9 @@ fi
 
 
 %changelog
+* Sat Aug 15 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.0-16
+- backport 0055-Respect-manual-set-icon-themes.patch (kde#344469)
+
 * Fri Aug 07 2015 Kevin Kofler <Kevin@tigcc.ticalc.org> - 5.5.0-15
 - use valgrind to debug qdoc HTML generation
 
