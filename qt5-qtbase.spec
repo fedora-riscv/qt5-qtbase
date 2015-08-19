@@ -44,7 +44,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.5.0
-Release: 16%{?dist}
+Release: 17%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -486,7 +486,7 @@ QT_HASH_SEED=0; export QT_HASH_SEED
 %if 0%{?valgrind}
 make html_docs || \
   mv bin/qdoc bin/qdoc.orig && install %{SOURCE2} bin/qdoc && \
-  make html_docs && \
+  make html_docs
   mv bin/qdoc.orig bin/qdoc -f
 %else
 make html_docs
@@ -943,6 +943,9 @@ fi
 
 
 %changelog
+* Wed Aug 19 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.0-17
+- unconditionally undo valgrind hack when done (#1255054)
+
 * Sat Aug 15 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.0-16
 - backport 0055-Respect-manual-set-icon-themes.patch (kde#344469)
 - conditionally use valgrind only if needed
