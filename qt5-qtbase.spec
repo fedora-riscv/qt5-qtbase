@@ -484,10 +484,10 @@ pushd src/xml; ../../bin/qmake; popd
 # see also https://bugreports.qt-project.org/browse/QTBUG-42071
 QT_HASH_SEED=0; export QT_HASH_SEED
 %if 0%{?valgrind}
-make html_docs || \
+make html_docs || (\
   mv bin/qdoc bin/qdoc.orig && install %{SOURCE2} bin/qdoc && \
-  make html_docs
-  mv bin/qdoc.orig bin/qdoc -f
+  make html_docs)
+  [ -e bin/qdoc/orig ] && mv bin/qdoc.orig bin/qdoc -f
 %else
 make html_docs
 %endif
