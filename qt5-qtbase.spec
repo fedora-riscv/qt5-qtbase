@@ -116,6 +116,8 @@ Patch101: qt5-qtbase-QTBUG-47041.patch
 #SM_CLIENT_ID property is not set
 Patch223: 0123-xcb-set-SM_CLIENT_ID-property.patch
 
+Patch297: 0197-xcb-Ignore-disabling-of-outputs-in-the-middle-of-the.patch
+
 # https://bugs.kde.org/show_bug.cgi?id=344469
 Patch155: 0055-Respect-manual-set-icon-themes.patch
 
@@ -392,6 +394,7 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 %patch101 -p1 -b .QTBUG-47041
 %patch155 -p1 -b .0055
 %patch223 -p1 -b .QTBUG-46310
+%patch297 -p1 -b .0197
 
 # drop -fexceptions from $RPM_OPT_FLAGS
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
@@ -950,6 +953,7 @@ fi
 %changelog
 * Mon Oct 05 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.0-18
 - When a screen comes back online, the windows need to be told about it (QTBUG-47041)
+- xcb: Ignore disabling of outputs in the middle of the mode switch
 
 * Wed Aug 19 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.0-17
 - unconditionally undo valgrind hack when done (#1255054)
