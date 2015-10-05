@@ -39,12 +39,12 @@
 
 %define examples 1
 
-#define prerelease rc
+%define prerelease rc1
 
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
-Version: 5.5.0
-Release: 17%{?dist}
+Version: 5.5.1
+Release: 1%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -80,9 +80,6 @@ Patch12: qtbase-opensource-src-5.2.0-enable_ft_lcdfilter.patch
 # (often in kde apps), keep an eye on https://git.reviewboard.kde.org/r/103699/
 Patch25: qtbase-opensource-src-5.5.1-qdbusconnection_no_debug.patch
 
-# fix issue on big endian platform
-Patch13: qtbase-opensource-src-5.5.x-big-endian.patch
-
 # upstreamable patches
 # support poll
 # https://bugreports.qt-project.org/browse/QTBUG-27195
@@ -93,27 +90,10 @@ Patch50: qt5-poll.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1083664
 Patch51: qtbase-opensource-src-5.5-disconnect_displays.patch
 
-# https://bugzilla.redhat.com/show_bug.cgi?id=1219173
-# https://bugreports.qt.io/browse/QTBUG-33093
-# https://codereview.qt-project.org/#/c/95219/
-Patch52:  qtbase-opensource-src-5.4.1-QTBUG-33093.patch
-
-# https://bugreports.qt.io/browse/QTBUG-45484
-# QWidget::setWindowRole does nothing
-# adapted to apply on top of patch51
-Patch53: qtbase-opensource-src-5.4.1-QTBUG-45484.patch
-
 ## upstream patches
 # workaround https://bugreports.qt-project.org/browse/QTBUG-43057
 # 'make docs' crash on el6, use qSort instead of std::sort
 Patch100: qtbase-opensource-src-5.4.0-QTBUG-43057.patch
-
-# https://bugreports.qt.io/browse/QTBUG-46310
-#SM_CLIENT_ID property is not set
-Patch223: 0123-xcb-set-SM_CLIENT_ID-property.patch
-
-# https://bugs.kde.org/show_bug.cgi?id=344469
-Patch155: 0055-Respect-manual-set-icon-themes.patch
 
 # macros, be mindful to keep sync'd with macros.qt5
 Source1: macros.qt5
@@ -123,7 +103,6 @@ Source1: macros.qt5
 # -devel bindir items (still) conflict with qt4
 # at least until this is all implemented,
 # http://lists.qt-project.org/pipermail/development/2012-November/007990.html
-#define _qt5_bindir %{_bindir}
 %define _qt5_bindir %{_qt5_prefix}/bin
 %define _qt5_datadir %{_datadir}/qt5
 %define _qt5_docdir %{_docdir}/qt5
@@ -375,18 +354,13 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 %patch4 -p1 -b .QTBUG-35459
 %patch12 -p1 -b .enable_ft_lcdfilter
 %patch25 -p1 -b .qdbusconnection_no_debug
-%patch13 -p1 -b .big-endian
 
 #patch50 -p1 -b .poll
 %patch51 -p1 -b .disconnect_displays
-%patch52 -p1 -b .QTBUG-33093
-%patch53 -p1 -b .QTBUG-45484
 
 %if 0%{?rhel} == 6
 %patch100 -p1 -b .QTBUG-43057
 %endif
-%patch155 -p1 -b .0055
-%patch223 -p1 -b .QTBUG-46310
 
 # drop -fexceptions from $RPM_OPT_FLAGS
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
@@ -524,7 +498,7 @@ translationdir=%{_qt5_translationdir}
 
 Name: Qt5
 Description: Qt5 Configuration
-Version: %{version}
+Version: 5.5.1
 EOF
 
 # rpm macros
@@ -943,6 +917,10 @@ fi
 
 
 %changelog
+* Tue Sep 29 2015 Helio Chissini de Castro <helio@kde.org> - 5.5.1-1
+- Update to Qt 5.5.1 RC1
+- Patchs 13, 52, 53, 155, 223 removed due to inclusion upstream
+
 * Wed Aug 19 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.0-17
 - unconditionally undo valgrind hack when done (#1255054)
 
