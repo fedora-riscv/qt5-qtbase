@@ -44,7 +44,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.5.0
-Release: 17%{?dist}
+Release: 18%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -107,6 +107,10 @@ Patch53: qtbase-opensource-src-5.4.1-QTBUG-45484.patch
 # workaround https://bugreports.qt-project.org/browse/QTBUG-43057
 # 'make docs' crash on el6, use qSort instead of std::sort
 Patch100: qtbase-opensource-src-5.4.0-QTBUG-43057.patch
+
+# https://codereview.qt-project.org/#/c/120700/
+# http://bugreports.qt.io/browse/QTBUG-47041
+Patch101: qt5-qtbase-QTBUG-47041.patch
 
 # https://bugreports.qt.io/browse/QTBUG-46310
 #SM_CLIENT_ID property is not set
@@ -385,6 +389,7 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 %if 0%{?rhel} == 6
 %patch100 -p1 -b .QTBUG-43057
 %endif
+%patch101 -p1 -b .QTBUG-47041
 %patch155 -p1 -b .0055
 %patch223 -p1 -b .QTBUG-46310
 
@@ -943,6 +948,9 @@ fi
 
 
 %changelog
+* Mon Oct 05 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.0-18
+- When a screen comes back online, the windows need to be told about it (QTBUG-47041)
+
 * Wed Aug 19 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.0-17
 - unconditionally undo valgrind hack when done (#1255054)
 
