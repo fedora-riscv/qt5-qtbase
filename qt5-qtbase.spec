@@ -95,10 +95,6 @@ Patch51: qtbase-opensource-src-5.5-disconnect_displays.patch
 # 'make docs' crash on el6, use qSort instead of std::sort
 Patch100: qtbase-opensource-src-5.4.0-QTBUG-43057.patch
 
-# https://codereview.qt-project.org/#/c/120700/
-# http://bugreports.qt.io/browse/QTBUG-47041
-Patch101: qt5-qtbase-QTBUG-47041.patch
-
 # macros, be mindful to keep sync'd with macros.qt5
 Source1: macros.qt5
 %define _qt5 %{name}
@@ -365,7 +361,6 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 %if 0%{?rhel} == 6
 %patch100 -p1 -b .QTBUG-43057
 %endif
-%patch101 -p1 -b .QTBUG-47041
 
 # drop -fexceptions from $RPM_OPT_FLAGS
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
