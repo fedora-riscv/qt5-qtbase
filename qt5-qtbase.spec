@@ -919,10 +919,11 @@ fi
 %changelog
 * Mon Oct 05 2015 Helio Chissini de Castro <helio@kde.org> - 5.5.1-1
 - Update to Qt 5.5.1 RC1
-- Patchs 13, 52, 53, 155, 223 removed due to inclusion upstream
+- Patchs 13, 52, 53, 101, 155, 223, 297 removed due to inclusion upstream
 
 * Mon Oct 05 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.0-18
 - When a screen comes back online, the windows need to be told about it (QTBUG-47041)
+- xcb: Ignore disabling of outputs in the middle of the mode switch
 
 * Wed Aug 19 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.0-17
 - unconditionally undo valgrind hack when done (#1255054)
