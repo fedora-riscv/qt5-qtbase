@@ -44,7 +44,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.5.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -917,6 +917,9 @@ fi
 
 
 %changelog
+* Thu Oct 15 2015 Helio Chissini de Castro <helio@kde.org> - 5.5.1-2
+- Update to final release 5.5.1
+
 * Mon Oct 05 2015 Helio Chissini de Castro <helio@kde.org> - 5.5.1-1
 - Update to Qt 5.5.1 RC1
 - Patchs 13, 52, 53, 101, 155, 223, 297 removed due to inclusion upstream
