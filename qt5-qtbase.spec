@@ -44,7 +44,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.5.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -89,6 +89,8 @@ Patch50: qt5-poll.patch
 # Qt5 application crashes when connecting/disconnecting displays
 # https://bugzilla.redhat.com/show_bug.cgi?id=1083664
 Patch51: qtbase-opensource-src-5.5-disconnect_displays.patch
+# Followup https://codereview.qt-project.org/#/c/138201/ adapted for 5.5
+Patch52: https://smani.fedorapeople.org/138201.patch
 
 ## upstream patches
 # workaround https://bugreports.qt-project.org/browse/QTBUG-43057
@@ -357,6 +359,7 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 
 #patch50 -p1 -b .poll
 %patch51 -p1 -b .disconnect_displays
+%patch52 -p1 -b .138201
 
 %if 0%{?rhel} == 6
 %patch100 -p1 -b .QTBUG-43057
@@ -917,6 +920,9 @@ fi
 
 
 %changelog
+* Sat Oct 24 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.1-3
+- pull in more screen connect/disconnect fixes (code review 138201)
+
 * Thu Oct 15 2015 Helio Chissini de Castro <helio@kde.org> - 5.5.1-2
 - Update to final release 5.5.1
 
