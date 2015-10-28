@@ -44,7 +44,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.5.1
-Release: 4%{?dist}
+Release: 5%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -925,6 +925,9 @@ fi
 
 
 %changelog
+* Wed Oct 28 2015 David Tardon <dtardon@redhat.com> - 5.5.1-5
+- rebuild for ICU 56.1
+
 * Wed Oct 28 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.1-4
 - purge use of /usr/bin/env
 
