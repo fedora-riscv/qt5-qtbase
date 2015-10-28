@@ -44,7 +44,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.5.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -207,6 +207,7 @@ BuildRequires: libicu-devel
 %endif
 BuildRequires: pkgconfig(xcb) pkgconfig(xcb-glx) pkgconfig(xcb-icccm) pkgconfig(xcb-image) pkgconfig(xcb-keysyms) pkgconfig(xcb-renderutil)
 BuildRequires: pkgconfig(zlib)
+BuildRequires: sed
 
 %if 0%{?qtchooser}
 %if 0%{?fedora}
@@ -532,6 +533,10 @@ for i in * ; do
       ;;
   esac
 done
+# purge use of /usr/bin/env
+sed -i \
+  -e "s|^#!/usr/bin/env perl|#!/usr/bin/perl|g" \
+  *.pl ||:
 popd
 
 %ifarch %{multilib_archs}
@@ -920,6 +925,9 @@ fi
 
 
 %changelog
+* Wed Oct 28 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.1-4
+- purge use of /usr/bin/env
+
 * Sat Oct 24 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.1-3
 - pull in more screen connect/disconnect fixes (code review 138201)
 
