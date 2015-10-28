@@ -21,7 +21,7 @@
 %global rpm_macros_dir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
 ## set to 1 to enable bootstrap
-%global bootstrap 1
+#global bootstrap 1
 
 %if 0%{?fedora} > 21
 # use external qt_settings pkg
@@ -44,7 +44,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.5.1
-Release: 5%{?dist}
+Release: 6%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -925,6 +925,9 @@ fi
 
 
 %changelog
+* Wed Oct 28 2015 David Tardon <dtardon@redhat.com> - 5.5.1-6
+- full build
+
 * Wed Oct 28 2015 David Tardon <dtardon@redhat.com> - 5.5.1-5
 - rebuild for ICU 56.1
 
