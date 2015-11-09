@@ -44,7 +44,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.5.1
-Release: 6%{?dist}
+Release: 7%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -251,6 +251,7 @@ BuildArch: noarch
 Summary: Development files for %{name}
 Requires: %{name}%{?_isa} = %{version}-%{release}
 Requires: %{name}-gui%{?_isa}
+Requires: qt5-qdoc
 %if 0%{?egl}
 Requires: pkgconfig(egl)
 %endif
@@ -332,13 +333,17 @@ Recommends: mesa-dri-drivers
 %endif
 Obsoletes: qt5-qtbase-x11 < 5.2.0
 Provides:  qt5-qtbase-x11 = %{version}-%{release}
-
 # for Source6: 10-qt5-check-opengl2.sh:
 # glxinfo
 Requires: glx-utils
-
 %description gui
 Qt5 libraries used for drawing widgets and OpenGL items.
+
+%package -n qt5-qdoc
+Summary: Qt5 documentation generator 
+Requires: %{name}%{?_isa} = %{version}-%{release}
+%description -n qt5-qdoc
+%{summary}.
 
 
 %prep
@@ -721,7 +726,6 @@ fi
 %{_bindir}/moc*
 %{_bindir}/qdbuscpp2xml*
 %{_bindir}/qdbusxml2cpp*
-%{_bindir}/qdoc*
 %{_bindir}/qmake*
 %{_bindir}/rcc*
 %{_bindir}/syncqt*
@@ -730,7 +734,6 @@ fi
 %{_qt5_bindir}/moc*
 %{_qt5_bindir}/qdbuscpp2xml*
 %{_qt5_bindir}/qdbusxml2cpp*
-%{_qt5_bindir}/qdoc*
 %{_qt5_bindir}/qmake*
 %{_qt5_bindir}/rcc*
 %{_qt5_bindir}/syncqt*
@@ -923,8 +926,15 @@ fi
 %{_qt5_plugindir}/printsupport/libcupsprintersupport.so
 %{_qt5_libdir}/cmake/Qt5PrintSupport/Qt5PrintSupport_QCupsPrinterSupportPlugin.cmake
 
+%files -n qt5-qdoc
+%{_bindir}/qdoc*
+%{_qt5_bindir}/qdoc*
+
 
 %changelog
+* Mon Nov 09 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.1-7
+- qt5-qdoc subpkg
+
 * Wed Oct 28 2015 David Tardon <dtardon@redhat.com> - 5.5.1-6
 - full build
 
