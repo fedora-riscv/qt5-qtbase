@@ -44,7 +44,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.5.1
-Release: 7%{?dist}
+Release: 8%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -341,7 +341,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 
 %package -n qt5-qdoc
 Summary: Qt5 documentation generator 
-Requires: %{name}%{?_isa} = %{version}-%{release}
+Requires: %{name}%{?_isa} >= %{version}-%{release}
 %description -n qt5-qdoc
 %{summary}.
 
@@ -932,6 +932,9 @@ fi
 
 
 %changelog
+* Mon Nov 09 2015 Helio Chissini de Castro <helio@kde.org> - 5.5.1-8
+- qt5-qdoc need requires >= current version, otherwise will prevent the usage further when moved to qttools
+
 * Mon Nov 09 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.1-7
 - qt5-qdoc subpkg
 
