@@ -1,11 +1,6 @@
 # See http://bugzilla.redhat.com/223663
-%define multilib_archs x86_64 %{ix86} ppc64 ppc s390x s390 sparc64 sparcv9 ppc64le
+%define multilib_archs x86_64 %{ix86} ppc64 ppc ppc64le s390x s390 sparc64 sparcv9
 %define multilib_basearchs x86_64 ppc64 s390x sparc64 ppc64le
-
-# use valgrind to debug qdoc HTML generation
-%ifarch %{ix86} x86_64 ppc ppc64 ppc64le s390x armv7hl aarch64
-%global valgrind 1
-%endif
 
 # support qtchooser (adds qtchooser .conf file)
 %define qtchooser 1
@@ -20,38 +15,26 @@
 
 %global rpm_macros_dir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
-## set to 1 to enable bootstrap
-#global bootstrap 1
-
 %if 0%{?fedora} > 21
 # use external qt_settings pkg
 %global qt_settings 1
 %endif
 
-# define to build docs, need to undef this for bootstrapping
-# where qt5-qttools builds are not yet available
-# only primary archs (for now), allow secondary to bootstrap
-%if ! 0%{?bootstrap}
-%ifarch %{arm} %{ix86} x86_64
 %define docs 1
-%endif
-%endif
 
 %define examples 1
 
-## define prerelease rc1
+%define prerelease beta1
 
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
-Version: 5.5.1
-Release: 2%{?dist}
+Version: 5.6.0
+Release: 0.2%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
 Url: http://qt-project.org/
-Source0: http://download.qt.io/official_releases/qt/5.5/%{version}%{?prerelease:-%{prerelease}}/submodules/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}.tar.xz
-
-Source2: qdoc.valgrind
+Source0: http://download.qt.io/official_releases/qt/5.6/%{version}%{?prerelease:-%{prerelease}}/submodules/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}.tar.xz
 
 # header file to workaround multilib issue
 # https://bugzilla.redhat.com/show_bug.cgi?id=1036956
@@ -61,12 +44,6 @@ Source5: qconfig-multilib.h
 # QT_XCB_FORCE_SOFTWARE_OPENGL for them
 Source6: 10-qt5-check-opengl2.sh
 
-# support the old version of libxcb and the resulting lack of libxkbcommon-x11
-# in F19 and F20
-Patch0: qtbase-opensource-src-5.4.0-rc-old_xcb.patch
-# support the old version of libxkbcommon in F19
-Patch1: qtbase-opensource-src-5.4.0-rc-old_xkbcommon.patch
-
 # support multilib optflags
 Patch2: qtbase-multilib_optflags.patch
 
@@ -75,10 +52,6 @@ Patch4: qtbase-opensource-src-5.3.2-QTBUG-35459.patch
 
 # unconditionally enable freetype lcdfilter support
 Patch12: qtbase-opensource-src-5.2.0-enable_ft_lcdfilter.patch
-
-# hack out largely useless (to users) warnings about qdbusconnection
-# (often in kde apps), keep an eye on https://git.reviewboard.kde.org/r/103699/
-Patch25: qtbase-opensource-src-5.5.1-qdbusconnection_no_debug.patch
 
 # upstreamable patches
 # support poll
@@ -96,7 +69,7 @@ Patch51: qtbase-opensource-src-5.5-disconnect_displays.patch
 Patch100: qtbase-opensource-src-5.4.0-QTBUG-43057.patch
 
 # macros, be mindful to keep sync'd with macros.qt5
-Source1: macros.qt5
+Source10: macros.qt5
 %define _qt5 %{name}
 %define _qt5_prefix %{_libdir}/qt5
 %define _qt5_archdatadir %{_libdir}/qt5
@@ -123,10 +96,6 @@ Source1: macros.qt5
 # RPM drag in gtk2 as a dependency for the GTK+ 2 dialog support.
 %global __requires_exclude_from ^%{_qt5_plugindir}/platformthemes/.*$
 
-# for doc hacks
-%if 0%{?valgrind}
-BuildRequires: valgrind
-%endif
 # for %%check
 BuildRequires: cmake
 BuildRequires: cups-devel
@@ -146,6 +115,7 @@ BuildRequires: pkgconfig(fontconfig)
 BuildRequires: pkgconfig(gl)
 BuildRequires: pkgconfig(glib-2.0)
 BuildRequires: pkgconfig(gtk+-2.0)
+BuildRequires: pkgconfig(libproxy-1.0)
 # xcb-sm
 BuildRequires: pkgconfig(ice) pkgconfig(sm)
 BuildRequires: pkgconfig(libpng)
@@ -155,28 +125,10 @@ BuildRequires: pkgconfig(openssl)
 BuildRequires: pkgconfig(libpulse) pkgconfig(libpulse-mainloop-glib)
 %if 0%{?fedora}
 %global xkbcommon -system-xkbcommon
-%if 0%{?fedora} > 20
-# libinput is currently f21+ only
-%global libinput 1
 BuildRequires: pkgconfig(libinput)
 BuildRequires: pkgconfig(xcb-xkb) >= 1.10
 BuildRequires: pkgconfig(xkbcommon) >= 0.4.1
 BuildRequires: pkgconfig(xkbcommon-x11) >= 0.4.1
-%else
-# apply patch to support older version of xcb, resulting lack of xkbcommon-x11
-%global old_xcb 1
-%if 0%{?fedora} > 19
-# Fedora 20
-BuildRequires: pkgconfig(xkbcommon) >= 0.4.1
-%global xkbcommon_version %(pkg-config --modversion xkbcommon 2> /dev/null || echo '0.4.1')
-Requires: libxkbcommon%{?_isa} >= %{xkbcommon_version}
-%else
-# Fedora 19 and older
-BuildRequires: pkgconfig(xkbcommon)
-# apply patch to support older version of xkbcommon
-%global old_xkbcommon 1
-%endif
-%endif
 %else
 # not Fedora
 %global xkbcommon -qt-xkbcommon
@@ -190,11 +142,7 @@ BuildRequires: pkgconfig(egl)
 BuildRequires: pkgconfig(gbm)
 BuildRequires: pkgconfig(glesv2)
 BuildRequires: pkgconfig(sqlite3) >= 3.7
-%define sqlite -system-sqlite
-%if 0%{?fedora} > 20
-BuildRequires: pkgconfig(harfbuzz) >= 0.9.31
-%define harfbuzz -system-harfbuzz
-%endif
+BuildRequires: pkgconfig(harfbuzz) >= 1.0.6
 BuildRequires: pkgconfig(icu-i18n)
 BuildRequires: pkgconfig(libpcre) >= 8.30
 %define pcre -system-pcre
@@ -205,6 +153,9 @@ BuildRequires: libicu-devel
 %endif
 BuildRequires: pkgconfig(xcb) pkgconfig(xcb-glx) pkgconfig(xcb-icccm) pkgconfig(xcb-image) pkgconfig(xcb-keysyms) pkgconfig(xcb-renderutil)
 BuildRequires: pkgconfig(zlib)
+# For the very first bootstrap of 5.6 we need valgring for now, as qt5-qdoc brand new 
+# splitted package script still using it
+BuildRequires: valgrind
 
 %if 0%{?qtchooser}
 %if 0%{?fedora}
@@ -261,6 +212,7 @@ Summary: API documentation for %{name}
 License: GFDL
 Requires: %{name} = %{version}-%{release}
 BuildRequires: qt5-qhelpgenerator
+BuildRequires: qt5-qdoc
 BuildArch: noarch
 %description doc
 %{summary}.
@@ -341,19 +293,12 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %prep
 %setup -q -n %{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}
 
-%if 0%{?old_xcb}
-%patch0 -p1 -b .old_xcb
-%if 0%{?old_xkbcommon}
-%patch1 -p1 -b .old_xkbcommon
-%endif
-%endif
 %patch2 -p1 -b .multilib_optflags
 # drop backup file(s), else they get installed too, http://bugzilla.redhat.com/639463
 rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 
 %patch4 -p1 -b .QTBUG-35459
 %patch12 -p1 -b .enable_ft_lcdfilter
-%patch25 -p1 -b .qdbusconnection_no_debug
 
 #patch50 -p1 -b .poll
 %patch51 -p1 -b .disconnect_displays
@@ -376,13 +321,14 @@ sed -i -e "s|^\(QMAKE_LFLAGS_RELEASE.*\)|\1 $RPM_LD_FLAGS|" \
 # undefine QMAKE_STRIP (and friends), so we get useful -debuginfo pkgs (#1065636)
 sed -i -e 's|^\(QMAKE_STRIP.*=\).*$|\1|g' mkspecs/common/linux.conf
 
+%if %{prerelease}
+bin/syncqt.pl -version %{version}
+%endif
+
 # move some bundled libs to ensure they're not accidentally used
 pushd src/3rdparty
 mkdir UNUSED
-mv freetype libjpeg libpng zlib xcb UNUSED/
-%if "%{?sqlite}" == "-system-sqlite"
-mv sqlite UNUSED/
-%endif
+mv freetype libjpeg libpng zlib xcb sqlite UNUSED/
 popd
 
 # builds failing mysteriously on f20
@@ -390,6 +336,7 @@ popd
 # check to ensure that can't happen -- rex
 test -x configure || chmod +x configure
 
+# 
 
 %build
 # limit -reduce-relocations to %%ix86 x86_64 archs, https://bugreports.qt-project.org/browse/QTBUG-36129
@@ -401,7 +348,10 @@ test -x configure || chmod +x configure
   -bindir %{_qt5_bindir} \
   -datadir %{_qt5_datadir} \
   -docdir %{_qt5_docdir} \
+%if 0%{?examples}
   -examplesdir %{_qt5_examplesdir} \
+  -no-compile-examples \
+%endif
   -headerdir %{_qt5_headerdir} \
   -importdir %{_qt5_importdir} \
   -libdir %{_qt5_libdir} \
@@ -422,7 +372,6 @@ test -x configure || chmod +x configure
   -icu \
   -openssl-linked \
   -optimized-qmake \
-  %{!?examples:-nomake examples} \
   -nomake tests \
   -no-pch \
   -no-rpath \
@@ -434,11 +383,11 @@ test -x configure || chmod +x configure
 %ifarch %{ix86} x86_64
   -reduce-relocations \
 %endif
-  %{?harfbuzz} \
+  -system-harfbuzz \
   -system-libjpeg \
   -system-libpng \
+  -system-sqlite \
   %{?pcre} \
-  %{?sqlite} \
   %{?tds} \
   %{?xkbcommon} \
   -system-zlib \
@@ -448,23 +397,7 @@ test -x configure || chmod +x configure
 make %{?_smp_mflags}
 
 %if 0%{?docs}
-# qdoc
-# wierd but necessary, to force use of just-built qdoc
-rm -fv qmake/Makefile.qmake-docs src/corelib/Makefile
-pushd src; ../bin/qmake; make sub-qdoc; popd
-pushd src/corelib; ../../bin/qmake; popd
-pushd src/xml; ../../bin/qmake; popd
-# HACK to avoid multilib conflicts in noarch content
-# see also https://bugreports.qt-project.org/browse/QTBUG-42071
-QT_HASH_SEED=0; export QT_HASH_SEED
-%if 0%{?valgrind}
-make html_docs || (\
-  mv bin/qdoc bin/qdoc.orig && install %{SOURCE2} bin/qdoc && \
-  make html_docs)
-  [ -e bin/qdoc/orig ] && mv bin/qdoc.orig bin/qdoc -f
-%else
 make html_docs
-%endif
 make qch_docs
 %endif
 
@@ -498,11 +431,11 @@ translationdir=%{_qt5_translationdir}
 
 Name: Qt5
 Description: Qt5 Configuration
-Version: 5.5.1
+Version: 5.6.0
 EOF
 
 # rpm macros
-install -p -m644 -D %{SOURCE1} \
+install -p -m644 -D %{SOURCE10} \
   %{buildroot}%{rpm_macros_dir}/macros.qt5
 sed -i \
   -e "s|@@NAME@@|%{name}|g" \
@@ -648,8 +581,10 @@ fi
 %dir %{_qt5_libdir}/cmake/Qt5Test/
 %dir %{_qt5_libdir}/cmake/Qt5Widgets/
 %dir %{_qt5_libdir}/cmake/Qt5Xml/
+%if 0%{?docs}
 %dir %{_qt5_docdir}/
 %{_qt5_docdir}/global/
+%endif
 %{_qt5_importdir}/
 %{_qt5_translationdir}/
 %dir %{_qt5_prefix}/
@@ -685,11 +620,6 @@ fi
 %doc LICENSE.FDL
 %doc dist/README dist/changes-5.*
 %{_qt5_docdir}/*.qch
-%{_qt5_docdir}/qdoc/
-%if 0%{?examples}
-# included in -examples instead, see bug #1212750
-%exclude %{_qt5_docdir}/qdoc/examples-manifest.xml
-%endif
 %{_qt5_docdir}/qmake/
 %{_qt5_docdir}/qtconcurrent/
 %{_qt5_docdir}/qtcore/
@@ -713,7 +643,6 @@ fi
 %{_bindir}/moc*
 %{_bindir}/qdbuscpp2xml*
 %{_bindir}/qdbusxml2cpp*
-%{_bindir}/qdoc*
 %{_bindir}/qmake*
 %{_bindir}/rcc*
 %{_bindir}/syncqt*
@@ -722,7 +651,6 @@ fi
 %{_qt5_bindir}/moc*
 %{_qt5_bindir}/qdbuscpp2xml*
 %{_qt5_bindir}/qdbusxml2cpp*
-%{_qt5_bindir}/qdoc*
 %{_qt5_bindir}/qmake*
 %{_qt5_bindir}/rcc*
 %{_qt5_bindir}/syncqt*
@@ -820,10 +748,6 @@ fi
 
 %if 0%{?examples}
 %files examples
-%if 0%{?docs}
-%dir %{_qt5_docdir}/qdoc/
-%{_qt5_docdir}/qdoc/examples-manifest.xml
-%endif
 %{_qt5_examplesdir}/
 %endif
 
@@ -867,7 +791,7 @@ fi
 %{_qt5_plugindir}/generic/libqevdevmouseplugin.so
 %{_qt5_plugindir}/generic/libqevdevtabletplugin.so
 %{_qt5_plugindir}/generic/libqevdevtouchplugin.so
-%if 0%{?libinput}
+%if 0%{?fedora}
 %{_qt5_plugindir}/generic/libqlibinputplugin.so
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QLibInputPlugin.cmake
 %endif
@@ -917,6 +841,18 @@ fi
 
 
 %changelog
+* Fri Nov 13 2015 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.2
+- Valgrind still needed as buildreq due recent split qdoc package, but we can get rid of
+  specific arch set.
+- Added missing libproxy buildreq
+- Epel and RHEL doesn't have libinput, so a plugin need to be excluded for this distros
+
+* Tue Nov 03 2015 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.1
+- Start to implement 5.6.0 beta
+
+* Tue Nov 03 2015 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.1
+- Start to implement 5.6.0 beta
+
 * Thu Oct 15 2015 Helio Chissini de Castro <helio@kde.org> - 5.5.1-2
 - Update to final release 5.5.1
 
