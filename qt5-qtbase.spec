@@ -2,11 +2,6 @@
 %define multilib_archs x86_64 %{ix86} ppc64 ppc s390x s390 sparc64 sparcv9 ppc64le
 %define multilib_basearchs x86_64 ppc64 s390x sparc64 ppc64le
 
-# use valgrind to debug qdoc HTML generation
-%ifarch %{ix86} x86_64 ppc ppc64 ppc64le s390x armv7hl aarch64
-%global valgrind 1
-%endif
-
 # support qtchooser (adds qtchooser .conf file)
 %define qtchooser 1
 %if 0%{?qtchooser}
@@ -44,14 +39,12 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.5.1
-Release: 8%{?dist}
+Release: 9%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
 Url: http://qt-project.org/
 Source0: http://download.qt.io/official_releases/qt/5.5/%{version}%{?prerelease:-%{prerelease}}/submodules/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}.tar.xz
-
-Source2: qdoc.valgrind
 
 # header file to workaround multilib issue
 # https://bugzilla.redhat.com/show_bug.cgi?id=1036956
@@ -125,10 +118,6 @@ Source1: macros.qt5
 # RPM drag in gtk2 as a dependency for the GTK+ 2 dialog support.
 %global __requires_exclude_from ^%{_qt5_plugindir}/platformthemes/.*$
 
-# for doc hacks
-%if 0%{?valgrind}
-BuildRequires: valgrind
-%endif
 # for %%check
 BuildRequires: cmake
 BuildRequires: cups-devel
@@ -457,24 +446,21 @@ test -x configure || chmod +x configure
 make %{?_smp_mflags}
 
 %if 0%{?docs}
+
+# HACK to avoid multilib conflicts in noarch content
+# see also https://bugreports.qt-project.org/browse/QTBUG-42071
+QT_HASH_SEED=0; export QT_HASH_SEED
+
 # qdoc
-# wierd but necessary, to force use of just-built qdoc
+# weird but necessary, to force use of just-built qdoc
 rm -fv qmake/Makefile.qmake-docs src/corelib/Makefile
 pushd src; ../bin/qmake; make sub-qdoc; popd
 pushd src/corelib; ../../bin/qmake; popd
 pushd src/xml; ../../bin/qmake; popd
-# HACK to avoid multilib conflicts in noarch content
-# see also https://bugreports.qt-project.org/browse/QTBUG-42071
-QT_HASH_SEED=0; export QT_HASH_SEED
-%if 0%{?valgrind}
-make html_docs || (\
-  mv bin/qdoc bin/qdoc.orig && install %{SOURCE2} bin/qdoc && \
-  make html_docs)
-  [ -e bin/qdoc/orig ] && mv bin/qdoc.orig bin/qdoc -f
-%else
+
 make html_docs
-%endif
 make qch_docs
+
 %endif
 
 
@@ -932,6 +918,9 @@ fi
 
 
 %changelog
+* Wed Nov 18 2015 Helio Chissini de Castro <helio@kde.org> - 5.5.1-9
+- Get rid of valgrind hack. It sort out that we don't need it anymore
+
 * Mon Nov 09 2015 Helio Chissini de Castro <helio@kde.org> - 5.5.1-8
 - qt5-qdoc need requires >= current version, otherwise will prevent the usage further when moved to qttools
 
