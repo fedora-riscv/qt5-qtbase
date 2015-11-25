@@ -919,7 +919,7 @@ fi
 
 %changelog
 * Wed Nov 18 2015 Helio Chissini de Castro <helio@kde.org> - 5.5.1-9
-- Get rid of valgrind hack. It sort out that we don't need it anymore
+- Get rid of valgrind hack. It sort out that we don't need it anymore (#1211203)
 
 * Mon Nov 09 2015 Helio Chissini de Castro <helio@kde.org> - 5.5.1-8
 - qt5-qdoc need requires >= current version, otherwise will prevent the usage further when moved to qttools
