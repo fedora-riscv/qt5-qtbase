@@ -39,7 +39,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.5.1
-Release: 9%{?dist}
+Release: 10%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -245,6 +245,10 @@ Requires: qt5-qdoc
 Requires: pkgconfig(egl)
 %endif
 Requires: pkgconfig(gl)
+%if 0%{?fedora} > 22
+# https://bugzilla.redhat.com/show_bug.cgi?id=1248174
+Requires: redhat-rpm-config
+%endif
 %description devel
 %{summary}.
 
@@ -918,6 +922,9 @@ fi
 
 
 %changelog
+* Wed Nov 25 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.1-10
+- -devel: Requires: redhat-rpm-config (#1248174)
+
 * Wed Nov 18 2015 Helio Chissini de Castro <helio@kde.org> - 5.5.1-9
 - Get rid of valgrind hack. It sort out that we don't need it anymore (#1211203)
 
