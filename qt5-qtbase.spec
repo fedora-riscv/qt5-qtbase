@@ -309,6 +309,12 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 
 # drop -fexceptions from $RPM_OPT_FLAGS
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
+%ifarch %{ix86}
+%if 0%{?fedora} > 22
+RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fasynchronous-unwind-tables||g'`
+RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|--param=ssp-buffer-size=4||g'`
+%endif
+%endif
 
 %define platform linux-g++
 
@@ -617,7 +623,7 @@ fi
 
 %if 0%{?docs}
 %files doc
-%doc LICENSE.FDL
+%license LICENSE.FDL
 %doc dist/README dist/changes-5.*
 %{_qt5_docdir}/*.qch
 %{_qt5_docdir}/qmake/
@@ -648,6 +654,7 @@ fi
 %{_bindir}/syncqt*
 %{_bindir}/uic*
 %{_bindir}/qlalr
+%{_bindir}/fixqt4headers.pl
 %{_qt5_bindir}/moc*
 %{_qt5_bindir}/qdbuscpp2xml*
 %{_qt5_bindir}/qdbusxml2cpp*
@@ -656,6 +663,7 @@ fi
 %{_qt5_bindir}/syncqt*
 %{_qt5_bindir}/uic*
 %{_qt5_bindir}/qlalr
+%{_qt5_bindir}/fixqt4headers.pl
 %if "%{_qt5_headerdir}" != "%{_includedir}"
 %dir %{_qt5_headerdir}
 %endif
@@ -723,19 +731,16 @@ fi
 %{_qt5_libdir}/pkgconfig/Qt5Sql.pc
 %{_qt5_libdir}/pkgconfig/Qt5Test.pc
 %{_qt5_libdir}/pkgconfig/Qt5Widgets.pc
-%{_qt5_libdir}/pkgconfig/Qt5XcbQpa.pc
 %{_qt5_libdir}/pkgconfig/Qt5Xml.pc
 %if 0%{?egl}
 %{_qt5_libdir}/libQt5EglDeviceIntegration.prl
 %{_qt5_libdir}/libQt5EglDeviceIntegration.so
-%{_qt5_libdir}/pkgconfig/Qt5EglDeviceIntegration.pc
 %endif
 
 
 %files static
 %{_qt5_libdir}/libQt5Bootstrap.*a
 %{_qt5_libdir}/libQt5Bootstrap.prl
-%{_qt5_libdir}/pkgconfig/Qt5Bootstrap.pc
 %{_qt5_headerdir}/QtOpenGLExtensions/
 %{_qt5_libdir}/libQt5OpenGLExtensions.*a
 %{_qt5_libdir}/libQt5OpenGLExtensions.prl
@@ -744,7 +749,6 @@ fi
 %{_qt5_headerdir}/QtPlatformSupport/
 %{_qt5_libdir}/libQt5PlatformSupport.*a
 %{_qt5_libdir}/libQt5PlatformSupport.prl
-%{_qt5_libdir}/pkgconfig/Qt5PlatformSupport.pc
 
 %if 0%{?examples}
 %files examples
