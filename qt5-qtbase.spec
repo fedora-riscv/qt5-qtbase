@@ -22,14 +22,12 @@
 
 %define docs 1
 
-%define examples 1
-
-%define prerelease beta1
+%define prerelease beta2
 
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 0.2%{?dist}
+Release: 0.3%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -62,6 +60,10 @@ Patch50: qt5-poll.patch
 # Qt5 application crashes when connecting/disconnecting displays
 # https://bugzilla.redhat.com/show_bug.cgi?id=1083664
 Patch51: qtbase-opensource-src-5.5-disconnect_displays.patch
+
+# xcb: QScreen is a placeholder whenever there are no outputs connected
+# https://codereview.qt-project.org/#/c/138201/
+Patch52: qtbase-opensource-src-5.6.0-xcb-gerrit-138201.patch
 
 ## upstream patches
 # workaround https://bugreports.qt-project.org/browse/QTBUG-43057
@@ -203,6 +205,11 @@ Requires: %{name}-gui%{?_isa}
 Requires: pkgconfig(egl)
 %endif
 Requires: pkgconfig(gl)
+%if 0%{?fedora} > 22
+# https://bugzilla.redhat.com/show_bug.cgi?id=1248174
+Requires: redhat-rpm-config
+%endif
+
 %description devel
 %{summary}.
 
@@ -300,8 +307,9 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 %patch4 -p1 -b .QTBUG-35459
 %patch12 -p1 -b .enable_ft_lcdfilter
 
-#patch50 -p1 -b .poll
 %patch51 -p1 -b .disconnect_displays
+
+%patch52 -p1 -b .138201
 
 %if 0%{?rhel} == 6
 %patch100 -p1 -b .QTBUG-43057
@@ -309,12 +317,6 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 
 # drop -fexceptions from $RPM_OPT_FLAGS
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
-%ifarch %{ix86}
-%if 0%{?fedora} > 22
-RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fasynchronous-unwind-tables||g'`
-RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|--param=ssp-buffer-size=4||g'`
-%endif
-%endif
 
 %define platform linux-g++
 
@@ -354,10 +356,7 @@ test -x configure || chmod +x configure
   -bindir %{_qt5_bindir} \
   -datadir %{_qt5_datadir} \
   -docdir %{_qt5_docdir} \
-%if 0%{?examples}
   -examplesdir %{_qt5_examplesdir} \
-  -no-compile-examples \
-%endif
   -headerdir %{_qt5_headerdir} \
   -importdir %{_qt5_importdir} \
   -libdir %{_qt5_libdir} \
@@ -750,10 +749,8 @@ fi
 %{_qt5_libdir}/libQt5PlatformSupport.*a
 %{_qt5_libdir}/libQt5PlatformSupport.prl
 
-%if 0%{?examples}
 %files examples
 %{_qt5_examplesdir}/
-%endif
 
 %if "%{?ibase}" != "-no-sql-ibase"
 %files ibase
@@ -845,17 +842,39 @@ fi
 
 
 %changelog
-* Fri Nov 13 2015 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.2
+* Sat Dec 05 2015 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.3
+- Beta 3
+- Reintroduce xcb patch from https://codereview.qt-project.org/#/c/138201/
+
+* Fri Nov 27 2015 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.2
 - Valgrind still needed as buildreq due recent split qdoc package, but we can get rid of
   specific arch set.
 - Added missing libproxy buildreq
 - Epel and RHEL doesn't have libinput, so a plugin need to be excluded for this distros
 
+* Wed Nov 25 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.1-10
+- -devel: Requires: redhat-rpm-config (#1248174)
+
+* Wed Nov 18 2015 Helio Chissini de Castro <helio@kde.org> - 5.5.1-9
+- Get rid of valgrind hack. It sort out that we don't need it anymore (#1211203)
+
+* Mon Nov 09 2015 Helio Chissini de Castro <helio@kde.org> - 5.5.1-8
+- qt5-qdoc need requires >= current version, otherwise will prevent the usage further when moved to qttools
+
+* Mon Nov 09 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.1-7
+- qt5-qdoc subpkg
+
 * Tue Nov 03 2015 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.1
 - Start to implement 5.6.0 beta
 
 * Tue Nov 03 2015 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.1
 - Start to implement 5.6.0 beta
+
+* Wed Oct 28 2015 David Tardon <dtardon@redhat.com> - 5.5.1-6
+- full build
+
+* Wed Oct 28 2015 David Tardon <dtardon@redhat.com> - 5.5.1-5
+- rebuild for ICU 56.1
 
 * Thu Oct 15 2015 Helio Chissini de Castro <helio@kde.org> - 5.5.1-2
 - Update to final release 5.5.1
