@@ -15,19 +15,31 @@
 
 %global rpm_macros_dir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
+## set to 1 to enable bootstrap
+#global bootstrap 1
+
 %if 0%{?fedora} > 21
 # use external qt_settings pkg
 %global qt_settings 1
 %endif
 
+# define to build docs, need to undef this for bootstrapping
+# where qt5-qttools builds are not yet available
+# only primary archs (for now), allow secondary to bootstrap
+%if ! 0%{?bootstrap}
+%ifarch %{arm} %{ix86} x86_64
 %define docs 1
+%endif
+%endif
+
+%define examples 1
 
 %define prerelease beta2
 
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 0.3%{?dist}
+Release: 0.4%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -344,7 +356,6 @@ popd
 # check to ensure that can't happen -- rex
 test -x configure || chmod +x configure
 
-# 
 
 %build
 # limit -reduce-relocations to %%ix86 x86_64 archs, https://bugreports.qt-project.org/browse/QTBUG-36129
@@ -376,7 +387,8 @@ test -x configure || chmod +x configure
   -iconv \
   -icu \
   -openssl-linked \
-  -optimized-qmake \
+  -optimized-tools \
+  %{!?examples:-nomake examples} \
   -nomake tests \
   -no-pch \
   -no-rpath \
@@ -402,6 +414,10 @@ test -x configure || chmod +x configure
 make %{?_smp_mflags}
 
 %if 0%{?docs}
+# HACK to avoid multilib conflicts in noarch content
+# see also https://bugreports.qt-project.org/browse/QTBUG-42071
+QT_HASH_SEED=0; export QT_HASH_SEED
+
 make html_docs
 make qch_docs
 %endif
@@ -625,6 +641,10 @@ fi
 %license LICENSE.FDL
 %doc dist/README dist/changes-5.*
 %{_qt5_docdir}/*.qch
+%if 0%{?examples}
+# included in -examples instead, see bug #1212750
+%exclude %{_qt5_docdir}/*/examples-manifest.xml
+%endif
 %{_qt5_docdir}/qmake/
 %{_qt5_docdir}/qtconcurrent/
 %{_qt5_docdir}/qtcore/
@@ -749,8 +769,11 @@ fi
 %{_qt5_libdir}/libQt5PlatformSupport.*a
 %{_qt5_libdir}/libQt5PlatformSupport.prl
 
+%if 0%{?examples}
 %files examples
+%{_qt5_docdir}/*/examples-manifest.xml
 %{_qt5_examplesdir}/
+%endif
 
 %if "%{?ibase}" != "-no-sql-ibase"
 %files ibase
@@ -842,6 +865,12 @@ fi
 
 
 %changelog
+* Sun Dec 06 2015 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-0.4
+- re-introduce bootstrap/examples macros
+- put examples-manifest.xml in -examples
+- restore -doc multilib hack (to be on the safe side, can't hurt)
+- %%build: s/-optimized-qmake/-optimized-tools/
+
 * Sat Dec 05 2015 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.3
 - Beta 3
 - Reintroduce xcb patch from https://codereview.qt-project.org/#/c/138201/
