@@ -39,7 +39,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 0.4%{?dist}
+Release: 0.5%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -387,7 +387,7 @@ test -x configure || chmod +x configure
   -iconv \
   -icu \
   -openssl-linked \
-  -optimized-tools \
+  -optimized-qmake \
   %{!?examples:-nomake examples} \
   -nomake tests \
   -no-pch \
@@ -865,6 +865,9 @@ fi
 
 
 %changelog
+* Wed Dec 09 2015 Daniel Vratil <dvratil@fedoraproject.org> - 5.6.0-0.5
+- try reverting from -optimized-tools to -optimized-qmake
+
 * Sun Dec 06 2015 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-0.4
 - re-introduce bootstrap/examples macros
 - put examples-manifest.xml in -examples
