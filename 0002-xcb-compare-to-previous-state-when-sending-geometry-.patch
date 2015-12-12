@@ -1,0 +1,86 @@
+From 56f6252e7285c9c61a99416fa2a8571fd67c597f Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Tor=20Arne=20Vestb=C3=B8?=
+ <tor.arne.vestbo@theqtcompany.com>
+Date: Tue, 1 Dec 2015 16:27:09 +0100
+Subject: [PATCH 02/12] xcb: compare to previous state when sending geometry
+ and expose events
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+By calculating the previous geometry and passing it on when calling
+handleGeometryChange we can detect cases where setGeometry() on a
+QWindow didn't result in the expected geometry. The new (actual)
+geometry is delivered as a resize event.
+
+This also allows us to only send expose events when the size of the
+window has actually changed (instead of also sending when the window
+has just moved).
+
+Due to the async delivery of geometry changes on the xcb platform we
+need to avoid using QWindowPrivate's cached state of the geometry, as
+that will result in duplicate resize events when events are not flushed
+in between two system resize events coming in with the same size.
+
+Change-Id: I3d4abe4a1095dd96e6e354288d5b646c623c30dd
+Reviewed-by: Tor Arne Vestbø <tor.arne.vestbo@theqtcompany.com>
+---
+ src/plugins/platforms/xcb/qxcbwindow.cpp | 33 ++++++++++++++++++++++++++------
+ 1 file changed, 27 insertions(+), 6 deletions(-)
+
+diff --git a/src/plugins/platforms/xcb/qxcbwindow.cpp b/src/plugins/platforms/xcb/qxcbwindow.cpp
+index 6023ee6..98bcc62 100644
+--- a/src/plugins/platforms/xcb/qxcbwindow.cpp
++++ b/src/plugins/platforms/xcb/qxcbwindow.cpp
+@@ -2007,21 +2007,42 @@ void QXcbWindow::handleConfigureNotifyEvent(const xcb_configure_notify_event_t *
+         }
+     }
+ 
+-    const QRect rect = QRect(pos, QSize(event->width, event->height));
+-    QPlatformScreen *newScreen = parent() ? parent()->screen() : screenForGeometry(rect);
++    // The original geometry requested by setGeometry() might be different
++    // from what we end up with after applying window constraints.
++    QRect requestedGeometry = geometry();
++
++    const QRect actualGeometry = QRect(pos, QSize(event->width, event->height));
++    QPlatformScreen *newScreen = parent() ? parent()->screen() : screenForGeometry(actualGeometry);
+ 
+     QXcbScreen *currentScreen = m_xcbScreen;
+     m_xcbScreen = static_cast<QXcbScreen*>(newScreen);
+     if (!newScreen)
+         return;
+ 
+-    QPlatformWindow::setGeometry(rect);
+-    QWindowSystemInterface::handleGeometryChange(window(), rect);
++    // Persist the actual geometry so that QWindow::geometry() can
++    // be queried in the resize event.
++    QPlatformWindow::setGeometry(actualGeometry);
++
++    // As we're delivering the geometry change through QPA in n async fashion we can't
++    // pass on the current geometry of the QWindowPrivate, as that may have not been
++    // updated yet by a geometry change that's still in the QPA event queue. Instead
++    // we fall back to the default argument value of QRect(), which will result in
++    // QGuiApplication looking up the previous geometry from QWindowPrivate, but this
++    // time in sync with the even delivery/processing.
++    QWindowSystemInterface::handleGeometryChange(window(), actualGeometry,
++        requestedGeometry != actualGeometry ? requestedGeometry : QRect());
++
+     if (newScreen != currentScreen)
+         QWindowSystemInterface::handleWindowScreenChanged(window(), newScreen->screen());
+ 
+-    if (m_mapped)
+-        QWindowSystemInterface::handleExposeEvent(window(), QRect(QPoint(), geometry().size()));
++    // For expose events we have no way of telling QGuiApplication to used the locally
++    // cached version of the previous state, so we may in some situations end up with
++    // an additional expose event.
++    QRect previousGeometry = requestedGeometry != actualGeometry ?
++        requestedGeometry : qt_window_private(window())->geometry;
++
++    if (m_mapped && actualGeometry.size() != previousGeometry.size())
++        QWindowSystemInterface::handleExposeEvent(window(), QRect(QPoint(), actualGeometry.size()));
+ 
+     if (m_usingSyncProtocol && m_syncState == SyncReceived)
+         m_syncState = SyncAndConfigureReceived;
+-- 
+2.5.0
+
