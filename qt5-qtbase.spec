@@ -39,7 +39,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 0.7%{?dist}
+Release: 0.8%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -187,13 +187,6 @@ Requires: %{name}-common = %{version}-%{release}
 %if 0%{?rhel}
 %define ibase -no-sql-ibase
 %define tds -no-sql-tds
-%endif
-
-# workaround gold linker bug by not using it
-# https://bugzilla.redhat.com/show_bug.cgi?id=1193044
-#https://sourceware.org/bugzilla/show_bug.cgi?id=16992
-%if 0%{?fedora} > 21
-%define use_gold_linker -no-use-gold-linker
 %endif
 
 %description
@@ -358,7 +351,6 @@ test -x configure || chmod +x configure
 
 
 %build
-# limit -reduce-relocations to %%ix86 x86_64 archs, https://bugreports.qt-project.org/browse/QTBUG-36129
 ./configure -v \
   -confirm-license \
   -opensource \
@@ -397,9 +389,6 @@ test -x configure || chmod +x configure
   -no-sse2 \
 %endif
   -no-strip \
-%ifarch %{ix86} x86_64
-  -reduce-relocations \
-%endif
   -system-harfbuzz \
   -system-libjpeg \
   -system-libpng \
@@ -408,7 +397,6 @@ test -x configure || chmod +x configure
   %{?tds} \
   %{?xkbcommon} \
   -system-zlib \
-  %{?use_gold_linker} \
   -no-directfb
 
 make %{?_smp_mflags}
@@ -865,6 +853,10 @@ fi
 
 
 %changelog
+* Sun Dec 13 2015 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.8
+- We're back to gold linker
+- Remove reduce relocations
+
 * Thu Dec 10 2015 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.7
 - Official beta release
 
