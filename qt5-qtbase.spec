@@ -39,7 +39,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 0.8%{?dist}
+Release: 0.9%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -320,7 +320,7 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 %patch4 -p1 -b .QTBUG-35459
 %patch12 -p1 -b .enable_ft_lcdfilter
 
-%patch51 -p1 -b .disconnect_displays
+#patch51 -p1 -b .disconnect_displays
 
 %if 0%{?rhel} == 6
 %patch100 -p1 -b .QTBUG-43057
@@ -869,6 +869,9 @@ fi
 
 
 %changelog
+* Sat Dec 12 2015 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.9
+- drop disconnect_displays.patch so we can better test latest xcb/display work
+
 * Fri Dec 11 2015 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.8
 - sync latest xcb/screen/display related upstream commits
 
