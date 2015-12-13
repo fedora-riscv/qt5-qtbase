@@ -39,7 +39,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 0.8%{?dist}
+Release: 0.10%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -73,14 +73,15 @@ Patch50: qt5-poll.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1083664
 Patch51: qtbase-opensource-src-5.5-disconnect_displays.patch
 
-# xcb: QScreen is a placeholder whenever there are no outputs connected
-# https://codereview.qt-project.org/#/c/138201/
-Patch52: qtbase-opensource-src-5.6.0-xcb-gerrit-138201.patch
-
 ## upstream patches
 # workaround https://bugreports.qt-project.org/browse/QTBUG-43057
 # 'make docs' crash on el6, use qSort instead of std::sort
 Patch100: qtbase-opensource-src-5.4.0-QTBUG-43057.patch
+
+Patch101: 0001-XCB-prevent-a-fp-division-by-zero.patch
+Patch102: 0002-xcb-compare-to-previous-state-when-sending-geometry-.patch
+Patch111: 0011-xcb-Don-t-cache-the-screen-for-a-window.patch
+Patch112: 0012-xcb-Use-a-placeholder-QScreen-when-there-are-no-outp.patch
 
 # macros, be mindful to keep sync'd with macros.qt5
 Source10: macros.qt5
@@ -312,13 +313,16 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 %patch4 -p1 -b .QTBUG-35459
 %patch12 -p1 -b .enable_ft_lcdfilter
 
-%patch51 -p1 -b .disconnect_displays
-
-%patch52 -p1 -b .138201
+#patch51 -p1 -b .disconnect_displays
 
 %if 0%{?rhel} == 6
 %patch100 -p1 -b .QTBUG-43057
 %endif
+
+%patch101 -p1 -b .0001
+%patch102 -p1 -b .0002
+%patch111 -p1 -b .0011
+%patch112 -p1 -b .0012
 
 # drop -fexceptions from $RPM_OPT_FLAGS
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
@@ -853,9 +857,15 @@ fi
 
 
 %changelog
-* Sun Dec 13 2015 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.8
+* Sun Dec 13 2015 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.10
 - We're back to gold linker
 - Remove reduce relocations
+
+* Sat Dec 12 2015 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.9
+- drop disconnect_displays.patch so we can better test latest xcb/display work
+
+* Fri Dec 11 2015 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.8
+- sync latest xcb/screen/display related upstream commits
 
 * Thu Dec 10 2015 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.7
 - Official beta release

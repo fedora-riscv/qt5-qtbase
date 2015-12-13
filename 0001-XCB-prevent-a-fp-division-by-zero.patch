@@ -1,0 +1,58 @@
+From 40c927e7331ea4ac9ca50de48560b700e657cded Mon Sep 17 00:00:00 2001
+From: Giuseppe D'Angelo <giuseppe.dangelo@kdab.com>
+Date: Tue, 8 Dec 2015 18:28:24 +0100
+Subject: [PATCH 01/12] XCB: prevent a fp division by zero
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+For certain devices vci->resolution is zero, which causes a SIGFPE
+if FE_INVALID exceptions are enabled. Try to prevent that.
+
+Task-number: QTBUG-42717
+Change-Id: I388735f5dfb6218496787dbb74cf0c0f43cc928f
+Reviewed-by: Alexander Volkov <a.volkov@rusbitech.ru>
+Reviewed-by: Błażej Szczygieł <spaz16@wp.pl>
+Reviewed-by: Shawn Rutledge <shawn.rutledge@theqtcompany.com>
+---
+ src/plugins/platforms/xcb/qxcbconnection_xi2.cpp | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/src/plugins/platforms/xcb/qxcbconnection_xi2.cpp b/src/plugins/platforms/xcb/qxcbconnection_xi2.cpp
+index 8097cce..1a12370 100644
+--- a/src/plugins/platforms/xcb/qxcbconnection_xi2.cpp
++++ b/src/plugins/platforms/xcb/qxcbconnection_xi2.cpp
+@@ -406,6 +406,9 @@ XInput2TouchDeviceData *QXcbConnection::touchDeviceForId(int id)
+ #endif // XCB_USE_XINPUT22
+             case XIValuatorClass: {
+                 XIValuatorClassInfo *vci = reinterpret_cast<XIValuatorClassInfo *>(classinfo);
++                // Some devices (mice) report a resolution of 0; they will be excluded later,
++                // for now just prevent a division by zero
++                const int vciResolution = vci->resolution ? vci->resolution : 1;
+                 if (vci->label == atom(QXcbAtom::AbsMTPositionX))
+                     caps |= QTouchDevice::Position | QTouchDevice::NormalizedPosition;
+                 else if (vci->label == atom(QXcbAtom::AbsMTTouchMajor))
+@@ -414,16 +417,16 @@ XInput2TouchDeviceData *QXcbConnection::touchDeviceForId(int id)
+                     caps |= QTouchDevice::Pressure;
+                 else if (vci->label == atom(QXcbAtom::RelX)) {
+                     hasRelativeCoords = true;
+-                    dev->size.setWidth((vci->max - vci->min) * 1000.0 / vci->resolution);
++                    dev->size.setWidth((vci->max - vci->min) * 1000.0 / vciResolution);
+                 } else if (vci->label == atom(QXcbAtom::RelY)) {
+                     hasRelativeCoords = true;
+-                    dev->size.setHeight((vci->max - vci->min) * 1000.0 / vci->resolution);
++                    dev->size.setHeight((vci->max - vci->min) * 1000.0 / vciResolution);
+                 } else if (vci->label == atom(QXcbAtom::AbsX)) {
+                     caps |= QTouchDevice::Position;
+-                    dev->size.setHeight((vci->max - vci->min) * 1000.0 / vci->resolution);
++                    dev->size.setHeight((vci->max - vci->min) * 1000.0 / vciResolution);
+                 } else if (vci->label == atom(QXcbAtom::AbsY)) {
+                     caps |= QTouchDevice::Position;
+-                    dev->size.setWidth((vci->max - vci->min) * 1000.0 / vci->resolution);
++                    dev->size.setWidth((vci->max - vci->min) * 1000.0 / vciResolution);
+                 }
+                 break;
+             }
+-- 
+2.5.0
+
