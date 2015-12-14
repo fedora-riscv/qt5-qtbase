@@ -27,7 +27,7 @@
 # where qt5-qttools builds are not yet available
 # only primary archs (for now), allow secondary to bootstrap
 %if ! 0%{?bootstrap}
-%ifarch %{arm} %{ix86} x86_64
+%ifarch %{arm} %{ix86} x86_64 ppc64le ppc64 s390 s390x
 %define docs 1
 %endif
 %endif
@@ -39,7 +39,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 0.10%{?dist}
+Release: 0.11%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -857,6 +857,9 @@ fi
 
 
 %changelog
+* Mon Dec 14 2015 Than Ngo <than@redhat.com> - 5.6.0-0.11
+- fix build failure on secondary arch
+
 * Sun Dec 13 2015 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.10
 - We're back to gold linker
 - Remove reduce relocations
