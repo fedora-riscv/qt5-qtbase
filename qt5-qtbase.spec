@@ -170,7 +170,9 @@ BuildRequires: pkgconfig(xcb) pkgconfig(xcb-glx) pkgconfig(xcb-icccm) pkgconfig(
 BuildRequires: pkgconfig(zlib)
 # For the very first bootstrap of 5.6 we need valgring for now, as qt5-qdoc brand new 
 # splitted package script still using it
+%ifnarch s390
 BuildRequires: valgrind
+%endif
 
 %if 0%{?qtchooser}
 %if 0%{?fedora}
