@@ -39,7 +39,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 0.13%{?dist}
+Release: 0.15%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -87,6 +87,9 @@ Patch101: 0001-XCB-prevent-a-fp-division-by-zero.patch
 Patch102: 0002-xcb-compare-to-previous-state-when-sending-geometry-.patch
 Patch111: 0011-xcb-Don-t-cache-the-screen-for-a-window.patch
 Patch112: 0012-xcb-Use-a-placeholder-QScreen-when-there-are-no-outp.patch
+
+# recently passed code review, not integrated yet
+Patch150: moc-get-the-system-defines-from-the-compiler-itself.patch
 
 # macros, be mindful to keep sync'd with macros.qt5
 Source10: macros.qt5
@@ -331,6 +334,7 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 %patch102 -p1 -b .0002
 %patch111 -p1 -b .0011
 %patch112 -p1 -b .0012
+%patch150 -p1 -b .moc_system_defines
 
 # drop -fexceptions from $RPM_OPT_FLAGS
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
@@ -602,10 +606,8 @@ fi
 %dir %{_qt5_libdir}/cmake/Qt5Test/
 %dir %{_qt5_libdir}/cmake/Qt5Widgets/
 %dir %{_qt5_libdir}/cmake/Qt5Xml/
-%if 0%{?docs}
 %dir %{_qt5_docdir}/
 %{_qt5_docdir}/global/
-%endif
 %{_qt5_importdir}/
 %{_qt5_translationdir}/
 %dir %{_qt5_prefix}/
@@ -865,6 +867,10 @@ fi
 
 
 %changelog
+* Wed Dec 16 2015 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-0.15
+- pull in another upstream moc fix/improvement (#1290020,QTBUG-49972)
+- fix bootstrap/docs
+
 * Wed Dec 16 2015 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.13
 - workaround moc/qconfig-multilib issues (#1290020,QTBUG-49972)
 
