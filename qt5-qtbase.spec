@@ -1,6 +1,6 @@
 # See http://bugzilla.redhat.com/223663
-%define multilib_archs x86_64 %{ix86} ppc64 ppc ppc64le s390x s390 sparc64 sparcv9
-%define multilib_basearchs x86_64 ppc64 s390x sparc64 ppc64le
+%define multilib_archs x86_64 %{ix86} ppc64 ppc s390x s390 sparc64 sparcv9
+%define multilib_basearchs x86_64 ppc64 s390x sparc64
 
 # support qtchooser (adds qtchooser .conf file)
 %define qtchooser 1
@@ -27,7 +27,7 @@
 # where qt5-qttools builds are not yet available
 # only primary archs (for now), allow secondary to bootstrap
 %if ! 0%{?bootstrap}
-%ifarch %{arm} %{ix86} x86_64 ppc64le ppc64 s390 s390x
+%ifarch %{arm} %{ix86} x86_64 %{power64} s390 s390x aarch64
 %define docs 1
 %endif
 %endif
@@ -39,7 +39,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 0.11%{?dist}
+Release: 0.12%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -859,6 +859,11 @@ fi
 
 
 %changelog
+* Wed Dec 16 2015 Peter Robinson <pbrobinson@fedoraproject.org> 5.6.0-0.12
+- aarch64 is secondary arch too
+- ppc64le is NOT multilib
+- Fix Power 64 macro use
+
 * Mon Dec 14 2015 Than Ngo <than@redhat.com> - 5.6.0-0.11
 - fix build failure on secondary arch
 
