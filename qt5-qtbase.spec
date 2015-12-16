@@ -39,7 +39,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 0.12%{?dist}
+Release: 0.13%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -72,6 +72,11 @@ Patch50: qt5-poll.patch
 # Qt5 application crashes when connecting/disconnecting displays
 # https://bugzilla.redhat.com/show_bug.cgi?id=1083664
 Patch51: qtbase-opensource-src-5.5-disconnect_displays.patch
+
+# Workaround moc/multilib issues
+# https://bugzilla.redhat.com/show_bug.cgi?id=1290020
+# https://bugreports.qt.io/browse/QTBUG-49972
+Patch52: qtbase-opensource-src-5.6.0-moc_WORDSIZE.patch
 
 ## upstream patches
 # workaround https://bugreports.qt-project.org/browse/QTBUG-43057
@@ -316,6 +321,7 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 %patch12 -p1 -b .enable_ft_lcdfilter
 
 #patch51 -p1 -b .disconnect_displays
+%patch52 -p1 -b .moc_WORDSIZE
 
 %if 0%{?rhel} == 6
 %patch100 -p1 -b .QTBUG-43057
@@ -859,6 +865,9 @@ fi
 
 
 %changelog
+* Wed Dec 16 2015 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.13
+- workaround moc/qconfig-multilib issues (#1290020,QTBUG-49972)
+
 * Wed Dec 16 2015 Peter Robinson <pbrobinson@fedoraproject.org> 5.6.0-0.12
 - aarch64 is secondary arch too
 - ppc64le is NOT multilib
