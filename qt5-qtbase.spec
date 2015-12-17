@@ -89,6 +89,7 @@ Patch111: 0011-xcb-Don-t-cache-the-screen-for-a-window.patch
 Patch112: 0012-xcb-Use-a-placeholder-QScreen-when-there-are-no-outp.patch
 
 # recently passed code review, not integrated yet
+# https://codereview.qt-project.org/126102/
 Patch150: moc-get-the-system-defines-from-the-compiler-itself.patch
 
 # macros, be mindful to keep sync'd with macros.qt5
