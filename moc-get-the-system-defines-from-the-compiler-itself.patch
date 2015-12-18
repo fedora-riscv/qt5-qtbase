@@ -1,4 +1,4 @@
-From 7b2877325d398b28a3a99d29b7651a34c60237b1 Mon Sep 17 00:00:00 2001
+From fa0d02eedcacc22db1026b902801b29176755362 Mon Sep 17 00:00:00 2001
 From: Thiago Macieira <thiago.macieira@intel.com>
 Date: Fri, 21 Aug 2015 17:08:19 -0700
 Subject: [PATCH] moc: get the system #defines from the compiler itself
@@ -31,7 +31,7 @@ Change-Id: I7de033f80b0e4431b7f1ffff13fca02dbb60a0a6
  create mode 100644 tests/auto/tools/moc/subdir/extradefines.h
 
 diff --git a/mkspecs/features/moc.prf b/mkspecs/features/moc.prf
-index c0b5682..159c659 100644
+index c0b5682..af885c3 100644
 --- a/mkspecs/features/moc.prf
 +++ b/mkspecs/features/moc.prf
 @@ -24,8 +24,25 @@ win32:count(MOC_INCLUDEPATH, 40, >) {
@@ -53,7 +53,7 @@ index c0b5682..159c659 100644
 +    moc_predefs.input = MOC_PREDEF_FILE
 +    silent: moc_predefs.commands = @echo generating $$moc_predefs.output$$escape_expand(\n\t)@$$moc_predefs.commands
 +    QMAKE_EXTRA_COMPILERS += moc_predefs
-+    MOC_PREDEF_FILE = $$[QT_INSTALL_ARCHDATA/src]/mkspecs/features/data/dummy.cpp
++    MOC_PREDEF_FILE = $$[QT_HOST_DATA/src]/mkspecs/features/data/dummy.cpp
 +}
 +
  defineReplace(mocCmdBase) {
