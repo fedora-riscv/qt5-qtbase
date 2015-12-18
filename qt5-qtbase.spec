@@ -39,12 +39,16 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 0.15%{?dist}
+Release: 0.16%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
 Url: http://qt-project.org/
+%if 0%{?prerelease:1}
+Source0: http://download.qt.io/development_releases/qt/5.6/%{version}-%{prerelease}/submodules/%{qt_module}-opensource-src-%{version}-%{prerelease}.tar.gz
+%else
 Source0: http://download.qt.io/official_releases/qt/5.6/%{version}%{?prerelease:-%{prerelease}}/submodules/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}.tar.gz
+%endif
 
 # header file to workaround multilib issue
 # https://bugzilla.redhat.com/show_bug.cgi?id=1036956
@@ -82,11 +86,6 @@ Patch52: qtbase-opensource-src-5.6.0-moc_WORDSIZE.patch
 # workaround https://bugreports.qt-project.org/browse/QTBUG-43057
 # 'make docs' crash on el6, use qSort instead of std::sort
 Patch100: qtbase-opensource-src-5.4.0-QTBUG-43057.patch
-
-Patch101: 0001-XCB-prevent-a-fp-division-by-zero.patch
-Patch102: 0002-xcb-compare-to-previous-state-when-sending-geometry-.patch
-Patch111: 0011-xcb-Don-t-cache-the-screen-for-a-window.patch
-Patch112: 0012-xcb-Use-a-placeholder-QScreen-when-there-are-no-outp.patch
 
 # recently passed code review, not integrated yet
 # https://codereview.qt-project.org/126102/
@@ -331,10 +330,6 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 %patch100 -p1 -b .QTBUG-43057
 %endif
 
-%patch101 -p1 -b .0001
-%patch102 -p1 -b .0002
-%patch111 -p1 -b .0011
-%patch112 -p1 -b .0012
 %patch150 -p1 -b .moc_system_defines
 
 # drop -fexceptions from $RPM_OPT_FLAGS
@@ -868,6 +863,9 @@ fi
 
 
 %changelog
+* Fri Dec 18 2015 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.16
+- 5.6.0-beta (final)
+
 * Wed Dec 16 2015 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-0.15
 - pull in another upstream moc fix/improvement (#1290020,QTBUG-49972)
 - fix bootstrap/docs
