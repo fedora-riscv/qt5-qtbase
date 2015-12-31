@@ -1,14 +1,6 @@
 diff -rupN qtbase-opensource-src-5.5.1/src/plugins/platforms/xcb/qxcbconnection.cpp qtbase-opensource-src-5.5.1-new/src/plugins/platforms/xcb/qxcbconnection.cpp
 --- qtbase-opensource-src-5.5.1/src/plugins/platforms/xcb/qxcbconnection.cpp	2015-10-13 06:35:27.000000000 +0200
 +++ qtbase-opensource-src-5.5.1-new/src/plugins/platforms/xcb/qxcbconnection.cpp	2015-10-21 21:02:53.056198256 +0200
-@@ -229,7 +229,6 @@ void QXcbConnection::updateScreens(const
-             if (screen->mode() != crtc.mode)
-                 screen->updateRefreshRate(crtc.mode);
-         }
--
-     } else if (event->subCode == XCB_RANDR_NOTIFY_OUTPUT_CHANGE) {
-         xcb_randr_output_change_t output = event->u.oc;
-         QXcbVirtualDesktop *virtualDesktop = virtualDesktopForRootWindow(output.window);
 @@ -242,20 +241,18 @@ void QXcbConnection::updateScreens(const
  
          if (screen && output.connection == XCB_RANDR_CONNECTION_DISCONNECTED) {
@@ -318,15 +310,6 @@ diff -rupN qtbase-opensource-src-5.5.1/src/plugins/platforms/xcb/qxcbwindow.cpp 
      Q_XCB_CALL(xcb_send_event(xcb_connection(), 0, xcbScreen()->root(), XCB_EVENT_MASK_STRUCTURE_NOTIFY | XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT, (const char *)&event));
  }
  
-@@ -1493,8 +1496,6 @@ void QXcbWindow::setParent(const QPlatfo
-         xcb_parent_id = qXcbParent->xcb_window();
-         m_embedded = qXcbParent->window()->type() == Qt::ForeignWindow;
-     } else {
--        if (!xcbScreen())
--            return;
-         xcb_parent_id = xcbScreen()->root();
-         m_embedded = false;
-     }
 @@ -2323,8 +2324,6 @@ void QXcbWindow::handleEnterNotifyEvent(
  
      const int dpr = int(devicePixelRatio());

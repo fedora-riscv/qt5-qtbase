@@ -44,7 +44,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.5.1
-Release: 8%{?dist}
+Release: 9%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -932,6 +932,9 @@ fi
 
 
 %changelog
+* Thu Dec 31 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.1-9
+- qt-5.5 segfault on QFileDialog without parent (#1291003)
+
 * Mon Nov 09 2015 Helio Chissini de Castro <helio@kde.org> - 5.5.1-8
 - qt5-qdoc need requires >= current version, otherwise will prevent the usage further when moved to qttools
 
