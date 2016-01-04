@@ -39,7 +39,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 0.17.%{prerelease}%{?dist}
+Release: 0.18.%{prerelease}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -90,6 +90,10 @@ Patch100: qtbase-opensource-src-5.4.0-QTBUG-43057.patch
 # recently passed code review, not integrated yet
 # https://codereview.qt-project.org/126102/
 Patch150: moc-get-the-system-defines-from-the-compiler-itself.patch
+
+# https://bugreports.qt.io/browse/QTBUG-50081
+# https://codereview.qt-project.org/#/c/144896/
+Patch184: 0084-Fix-crash-because-of-NULL-screen-in-QXcbWindow.patch
 
 # macros, be mindful to keep sync'd with macros.qt5
 Source10: macros.qt5
@@ -863,6 +867,9 @@ fi
 
 
 %changelog
+* Mon Jan 04 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.18.beta
+- Crash in QXcbWindow::setParent() due to NULL xcbScreen (QTBUG-50081, #1291003)
+
 * Mon Dec 21 2015 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.17.beta
 - fix/update Release: tag
 
