@@ -44,7 +44,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.5.1
-Release: 9%{?dist}
+Release: 10%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -96,6 +96,9 @@ Patch52: https://smani.fedorapeople.org/138201.patch
 # workaround https://bugreports.qt-project.org/browse/QTBUG-43057
 # 'make docs' crash on el6, use qSort instead of std::sort
 Patch100: qtbase-opensource-src-5.4.0-QTBUG-43057.patch
+
+# Fix for https://bugreports.qt.io/browse/QTBUG-4246
+Patch101: qt5-qtbase-qlineedit-fix-visibility-of-side-widgets.patch
 
 # macros, be mindful to keep sync'd with macros.qt5
 Source1: macros.qt5
@@ -370,6 +373,8 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 %if 0%{?rhel} == 6
 %patch100 -p1 -b .QTBUG-43057
 %endif
+
+%patch101 -p1 -b .qlineedit-fix-visibility-of-side-widgets
 
 # drop -fexceptions from $RPM_OPT_FLAGS
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
@@ -932,6 +937,9 @@ fi
 
 
 %changelog
+* Tue Jan 05 2016 Jan Grulich <jgrulich@redhat.com> - 5.5.1-10
+- QLineEdit - fix visibility handling of side widgets
+
 * Thu Dec 31 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.1-9
 - qt-5.5 segfault on QFileDialog without parent (#1291003)
 
