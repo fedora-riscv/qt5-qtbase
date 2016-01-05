@@ -91,6 +91,7 @@ Patch50: qt5-poll.patch
 Patch51: qtbase-opensource-src-5.5-disconnect_displays.patch
 # Followup https://codereview.qt-project.org/#/c/138201/ adapted for 5.5
 Patch52: https://smani.fedorapeople.org/138201.patch
+Patch53: 0084-Fix-crash-because-of-NULL-screen-in-QXcbWindow.patch
 
 ## upstream patches
 # workaround https://bugreports.qt-project.org/browse/QTBUG-43057
@@ -369,6 +370,7 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 #patch50 -p1 -b .poll
 %patch51 -p1 -b .disconnect_displays
 %patch52 -p1 -b .138201
+%patch53 -p1 -b .0084
 
 %if 0%{?rhel} == 6
 %patch100 -p1 -b .QTBUG-43057
@@ -937,6 +939,9 @@ fi
 
 
 %changelog
+* Tue Jan 05 2016 Rex Dieter <rdieter@fedoraproject.org> 5.5.1-10
+- Crash in QXcbWindow::setParent() due to NULL xcbScreen (QTBUG-50081, #1291003)
+
 * Tue Jan 05 2016 Jan Grulich <jgrulich@redhat.com> - 5.5.1-10
 - QLineEdit - fix visibility handling of side widgets
 
