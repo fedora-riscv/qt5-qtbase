@@ -39,7 +39,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 0.18.%{prerelease}%{?dist}
+Release: 0.19.%{prerelease}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -335,6 +335,7 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 %endif
 
 %patch150 -p1 -b .moc_system_defines
+%patch184 -p1 -b .0084
 
 # drop -fexceptions from $RPM_OPT_FLAGS
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
@@ -867,7 +868,7 @@ fi
 
 
 %changelog
-* Mon Jan 04 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.18.beta
+* Mon Jan 04 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.19.beta
 - Crash in QXcbWindow::setParent() due to NULL xcbScreen (QTBUG-50081, #1291003)
 
 * Mon Dec 21 2015 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.17.beta
