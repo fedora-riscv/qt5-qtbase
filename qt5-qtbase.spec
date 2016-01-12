@@ -73,10 +73,6 @@ Patch12: qtbase-opensource-src-5.2.0-enable_ft_lcdfilter.patch
 # NEEDS REBASE
 Patch50: qt5-poll.patch
 
-# Qt5 application crashes when connecting/disconnecting displays
-# https://bugzilla.redhat.com/show_bug.cgi?id=1083664
-Patch51: qtbase-opensource-src-5.5-disconnect_displays.patch
-
 # Workaround moc/multilib issues
 # https://bugzilla.redhat.com/show_bug.cgi?id=1290020
 # https://bugreports.qt.io/browse/QTBUG-49972
@@ -327,7 +323,6 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 %patch4 -p1 -b .QTBUG-35459
 %patch12 -p1 -b .enable_ft_lcdfilter
 
-#patch51 -p1 -b .disconnect_displays
 %patch52 -p1 -b .moc_WORDSIZE
 
 %if 0%{?rhel} == 6
