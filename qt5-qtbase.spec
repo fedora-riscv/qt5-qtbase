@@ -39,7 +39,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 0.19.%{prerelease}%{?dist}
+Release: 0.20.%{prerelease}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -154,6 +154,9 @@ BuildRequires: pkgconfig(xkbcommon) >= 0.4.1
 BuildRequires: pkgconfig(xkbcommon-x11) >= 0.4.1
 %else
 # not Fedora
+%if 0%{?rhel} == 6
+%global xcb -qt-xcb
+%endif
 %global xkbcommon -qt-xkbcommon
 Provides: bundled(libxkbcommon) = 0.4.1
 %endif
@@ -353,7 +356,10 @@ bin/syncqt.pl -version %{version}
 # move some bundled libs to ensure they're not accidentally used
 pushd src/3rdparty
 mkdir UNUSED
-mv freetype libjpeg libpng zlib xcb sqlite UNUSED/
+mv freetype libjpeg libpng zlib sqlite UNUSED/
+%if "%{?xcb}" != "-qt-xcb"
+mv xcb UNUSED/
+%endif
 popd
 
 # builds failing mysteriously on f20
@@ -407,6 +413,7 @@ test -x configure || chmod +x configure
   -system-sqlite \
   %{?pcre} \
   %{?tds} \
+  %{?xcb} \
   %{?xkbcommon} \
   -system-zlib \
   -no-directfb
@@ -863,6 +870,9 @@ fi
 
 
 %changelog
+* Fri Jan 15 2016 Than Ngo <than@redhat.com> - 5.6.0-0.20.beta
+- enable -qt-xcb to fix non-US keys under VNC (#1295713
+
 * Mon Jan 04 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.19.beta
 - Crash in QXcbWindow::setParent() due to NULL xcbScreen (QTBUG-50081, #1291003)
 
