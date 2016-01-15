@@ -164,7 +164,9 @@ BuildRequires: pkgconfig(atspi-2)
 BuildRequires: pkgconfig(egl)
 BuildRequires: pkgconfig(gbm)
 BuildRequires: pkgconfig(glesv2)
+%global sqlite -system-sqlite
 BuildRequires: pkgconfig(sqlite3) >= 3.7
+%global harfbuzz -system-harfbuzz
 BuildRequires: pkgconfig(harfbuzz) >= 1.0.6
 BuildRequires: pkgconfig(icu-i18n)
 BuildRequires: pkgconfig(libpcre) >= 8.30
@@ -349,7 +351,10 @@ bin/syncqt.pl -version %{version}
 # move some bundled libs to ensure they're not accidentally used
 pushd src/3rdparty
 mkdir UNUSED
-mv freetype libjpeg libpng zlib sqlite UNUSED/
+mv freetype libjpeg libpng zlib UNUSED/
+%if "%{?sqlite}" == "-system-sqlite"
+mv sqlite UNUSED/
+%endif
 %if "%{?xcb}" != "-qt-xcb"
 mv xcb UNUSED/
 %endif
@@ -400,11 +405,11 @@ test -x configure || chmod +x configure
   -no-sse2 \
 %endif
   -no-strip \
-  -system-harfbuzz \
   -system-libjpeg \
   -system-libpng \
-  -system-sqlite \
+  %{?harfbuzz} \
   %{?pcre} \
+  %{?sqlite} \
   %{?tds} \
   %{?xcb} \
   %{?xkbcommon} \
