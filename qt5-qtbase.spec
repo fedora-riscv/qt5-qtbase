@@ -79,9 +79,6 @@ Patch50: qt5-poll.patch
 Patch52: qtbase-opensource-src-5.6.0-moc_WORDSIZE.patch
 
 ## upstream patches
-# workaround https://bugreports.qt-project.org/browse/QTBUG-43057
-# 'make docs' crash on el6, use qSort instead of std::sort
-Patch100: qtbase-opensource-src-5.4.0-QTBUG-43057.patch
 
 # recently passed code review, not integrated yet
 # https://codereview.qt-project.org/126102/
@@ -327,10 +324,6 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 %patch12 -p1 -b .enable_ft_lcdfilter
 
 %patch52 -p1 -b .moc_WORDSIZE
-
-%if 0%{?rhel} == 6
-%patch100 -p1 -b .QTBUG-43057
-%endif
 
 %patch150 -p1 -b .moc_system_defines
 %patch184 -p1 -b .0084
