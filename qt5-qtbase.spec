@@ -871,7 +871,7 @@ fi
 
 %changelog
 * Fri Jan 15 2016 Than Ngo <than@redhat.com> - 5.6.0-0.20.beta
-- enable -qt-xcb to fix non-US keys under VNC (#1295713
+- enable -qt-xcb to fix non-US keys under VNC (#1295713)
 
 * Mon Jan 04 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.19.beta
 - Crash in QXcbWindow::setParent() due to NULL xcbScreen (QTBUG-50081, #1291003)
