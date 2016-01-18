@@ -578,7 +578,8 @@ fi
 %endif
 
 %files
-%doc LICENSE.LGPL* LGPL_EXCEPTION.txt LICENSE.FDL
+%{!?_licensedir:%global license %%doc}
+%license LICENSE.LGPL* LGPL_EXCEPTION.txt LICENSE.FDL
 %if 0%{?qtchooser}
 %dir %{_sysconfdir}/xdg/qtchooser
 # not editable config files, so not using %%config here
