@@ -23,6 +23,11 @@
 %global qt_settings 1
 %endif
 
+# See http://bugzilla.redhat.com/1279265
+%if 0%{?fedora} < 24
+%global inject_optflags 1
+%endif
+
 # define to build docs, need to undef this for bootstrapping
 # where qt5-qttools builds are not yet available
 # only primary archs (for now), allow secondary to bootstrap
@@ -39,7 +44,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 0.21.%{prerelease}%{?dist}
+Release: 0.22.%{prerelease}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -223,11 +228,10 @@ Requires: %{name}-gui%{?_isa}
 Requires: pkgconfig(egl)
 %endif
 Requires: pkgconfig(gl)
-%if 0%{?fedora} > 22
+%if 0%{?fedora} > 22 && 0%{?inject_optflags}
 # https://bugzilla.redhat.com/show_bug.cgi?id=1248174
 Requires: redhat-rpm-config
 %endif
-
 %description devel
 %{summary}.
 
@@ -318,10 +322,6 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %prep
 %setup -q -n %{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}
 
-%patch2 -p1 -b .multilib_optflags
-# drop backup file(s), else they get installed too, http://bugzilla.redhat.com/639463
-rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
-
 %patch4 -p1 -b .QTBUG-35459
 %patch12 -p1 -b .enable_ft_lcdfilter
 
@@ -341,6 +341,11 @@ RPM_OPT_FLAGS="$RPM_OPT_FLAGS $QT5_RPM_OPT_FLAGS"
 
 %define platform linux-g++
 
+%if 0%{?inject_optflags}
+%patch2 -p1 -b .multilib_optflags
+# drop backup file(s), else they get installed too, http://bugzilla.redhat.com/639463
+rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
+
 sed -i -e "s|-O2|$RPM_OPT_FLAGS|g" \
   mkspecs/%{platform}/qmake.conf
 
@@ -349,6 +354,7 @@ sed -i -e "s|^\(QMAKE_LFLAGS_RELEASE.*\)|\1 $RPM_LD_FLAGS|" \
 
 # undefine QMAKE_STRIP (and friends), so we get useful -debuginfo pkgs (#1065636)
 sed -i -e 's|^\(QMAKE_STRIP.*=\).*$|\1|g' mkspecs/common/linux.conf
+%endif
 
 %if %{prerelease}
 bin/syncqt.pl -version %{version}
@@ -373,6 +379,20 @@ test -x configure || chmod +x configure
 
 
 %build
+## adjust $RPM_OPT_FLAGS
+# remove -fexceptions
+RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
+# add -fno-delete-null-pointer-checks for f24/gcc6
+%if 0%{?fedora} > 23
+QT5_RPM_OPT_FLAGS="-fno-delete-null-pointer-checks"
+RPM_OPT_FLAGS="$RPM_OPT_FLAGS $QT5_RPM_OPT_FLAGS"
+%endif
+
+export CFLAGS="$CFLAGS $RPM_OPT_FLAGS"
+export CXXFLAGS="$CXXFLAGS $RPM_OPT_FLAGS"
+export LDFLAGS="$LDFLAGS $RPM_LD_FLAGS"
+export MAKEFLAGS="%{?_smp_mflags}"
+
 ./configure -v \
   -confirm-license \
   -opensource \
@@ -421,6 +441,16 @@ test -x configure || chmod +x configure
   %{?xkbcommon} \
   -system-zlib \
   -no-directfb
+
+%if ! 0%{?inject_optflags}
+# ensure qmake build using optflags (which can happen if not munging qmake.conf defaults)
+make clean -C qmake
+make %{?_smp_mflags} -C qmake \
+  QMAKE_CFLAGS_RELEASE="${CFLAGS:-$RPM_OPT_FLAGS}" \
+  QMAKE_CXXFLAGS_RELEASE="${CXXFLAGS:-$RPM_OPT_FLAGS}" \
+  QMAKE_LFLAGS_RELEASE="${LDFLAGS:-$RPM_LD_FLAGS}" \
+  QMAKE_STRIP=
+%endif
 
 make %{?_smp_mflags}
 
@@ -877,6 +907,9 @@ fi
 
 
 %changelog
+* Tue Feb 02 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.22.beta
+- - don't inject $RPM_OPT_FLAGS/$RPM_LD_FLAGS into qmake defaults f24+ (#1279265)
+
 * Tue Feb 02 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.21.beta
 - build with and add to macros.qt5 flags: -fno-delete-null-pointer-checks
 
