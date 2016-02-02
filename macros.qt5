@@ -18,13 +18,16 @@
 %_qt5_sysconfdir %{_qt5_settingsdir}
 %_qt5_translationdir %{_datadir}/qt5/translations
 
-%qmake_qt5 \
-  %{_qt5_qmake} \\\
-  QMAKE_CFLAGS_DEBUG="${CFLAGS:-%optflags}" \\\
-  QMAKE_CFLAGS_RELEASE="${CFLAGS:-%optflags}" \\\
-  QMAKE_CXXFLAGS_DEBUG="${CXXFLAGS:-%optflags}" \\\
-  QMAKE_CXXFLAGS_RELEASE="${CXXFLAGS:-%optflags}" \\\
-  QMAKE_LFLAGS_DEBUG="${LDFLAGS:-%{?__global_ldflags}}" \\\
-  QMAKE_LFLAGS_RELEASE="${LDFLAGS:-%{?__global_ldflags}}" \\\
+%_qt5_ldflags %{?__global_ldflags} @@QT5_RPM_LD_FLAGS@
+%_qt5_optflags %{optflags} @@QT5_RPM_OPT_FLAGS@@
+
+%_qt5_qmake_flags \\\
+  QMAKE_CFLAGS_DEBUG="${CFLAGS:-%{_qt5_optflags}}" \\\
+  QMAKE_CFLAGS_RELEASE="${CFLAGS:-%{_qt5_optflags}}" \\\
+  QMAKE_CXXFLAGS_DEBUG="${CXXFLAGS:-%{_qt5_optflags}}" \\\
+  QMAKE_CXXFLAGS_RELEASE="${CXXFLAGS:-%{_qt5_optflags}}" \\\
+  QMAKE_LFLAGS_DEBUG="${LDFLAGS:-%{_qt5_ldflags}}" \\\
+  QMAKE_LFLAGS_RELEASE="${LDFLAGS:-%{_qt5_ldflags}}" \\\
   QMAKE_STRIP=
 
+%qmake_qt5 %{_qt5_qmake} %{?_qt5_qmake_flags}

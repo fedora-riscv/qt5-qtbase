@@ -39,7 +39,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 0.20.%{prerelease}%{?dist}
+Release: 0.21.%{prerelease}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -330,8 +330,14 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 %patch150 -p1 -b .moc_system_defines
 %patch184 -p1 -b .0084
 
-# drop -fexceptions from $RPM_OPT_FLAGS
+## adjust $RPM_OPT_FLAGS
+# remove -fexceptions
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
+# add -fno-delete-null-pointer-checks for f24/gcc6
+%if 0%{?fedora} > 23
+QT5_RPM_OPT_FLAGS="-fno-delete-null-pointer-checks"
+RPM_OPT_FLAGS="$RPM_OPT_FLAGS $QT5_RPM_OPT_FLAGS"
+%endif
 
 %define platform linux-g++
 
@@ -468,6 +474,8 @@ sed -i \
   -e "s|@@EPOCH@@|%{?epoch}%{!?epoch:0}|g" \
   -e "s|@@VERSION@@|%{version}|g" \
   -e "s|@@EVR@@|%{?epoch:%{epoch:}}%{version}-%{release}|g" \
+  -e "s|@@QT5_RPM_LD_FLAGS@@|$QT5_RPM_LD_FLAGS|g" \
+  -e "s|@@QT5_RPM_OPT_FLAGS@@|$QT5_RPM_OPT_FLAGS|g" \
   %{buildroot}%{rpm_macros_dir}/macros.qt5
 
 # create/own dirs
@@ -869,6 +877,9 @@ fi
 
 
 %changelog
+* Tue Feb 02 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.21.beta
+- build with and add to macros.qt5 flags: -fno-delete-null-pointer-checks
+
 * Fri Jan 15 2016 Than Ngo <than@redhat.com> - 5.6.0-0.20.beta
 - enable -qt-xcb to fix non-US keys under VNC (#1295713)
 
