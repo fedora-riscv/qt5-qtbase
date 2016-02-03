@@ -44,7 +44,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 0.22.%{prerelease}%{?dist}
+Release: 0.23.%{prerelease}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -228,10 +228,7 @@ Requires: %{name}-gui%{?_isa}
 Requires: pkgconfig(egl)
 %endif
 Requires: pkgconfig(gl)
-%if 0%{?fedora} > 22 && 0%{?inject_optflags}
-# https://bugzilla.redhat.com/show_bug.cgi?id=1248174
-Requires: redhat-rpm-config
-%endif
+Requires: qt5-rpm-macros
 %description devel
 %{summary}.
 
@@ -310,13 +307,23 @@ Recommends: mesa-dri-drivers
 %endif
 Obsoletes: qt5-qtbase-x11 < 5.2.0
 Provides:  qt5-qtbase-x11 = %{version}-%{release}
-
 # for Source6: 10-qt5-check-opengl2.sh:
 # glxinfo
 Requires: glx-utils
-
 %description gui
 Qt5 libraries used for drawing widgets and OpenGL items.
+
+%package -n qt5-rpm-macros
+Summary: RPM macros for Qt5
+%if 0%{?fedora} > 22 && 0%{?inject_optflags}
+# https://bugzilla.redhat.com/show_bug.cgi?id=1248174
+Requires: redhat-rpm-config
+%endif
+# when qt5-rpm-macros was split out
+Conflicts: qt5-qtbase-devel < 5.6.0-0.23
+BuildArch: noarch
+%description -n qt5-rpm-macros
+RPM macros for building Qt5 packages.
 
 
 %prep
@@ -703,7 +710,6 @@ fi
 %endif
 
 %files devel
-%{rpm_macros_dir}/macros.qt5
 %if "%{_qt5_bindir}" != "%{_bindir}"
 %dir %{_qt5_bindir}
 %endif
@@ -905,10 +911,16 @@ fi
 %{_qt5_plugindir}/printsupport/libcupsprintersupport.so
 %{_qt5_libdir}/cmake/Qt5PrintSupport/Qt5PrintSupport_QCupsPrinterSupportPlugin.cmake
 
+%files -n qt5-rpm-macros
+%{rpm_macros_dir}/macros.qt5
+
 
 %changelog
+* Wed Feb 03 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.23.beta
+- qt5-rpm-macros pkg
+
 * Tue Feb 02 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.22.beta
-- - don't inject $RPM_OPT_FLAGS/$RPM_LD_FLAGS into qmake defaults f24+ (#1279265)
+- don't inject $RPM_OPT_FLAGS/$RPM_LD_FLAGS into qmake defaults f24+ (#1279265)
 
 * Tue Feb 02 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.21.beta
 - build with and add to macros.qt5 flags: -fno-delete-null-pointer-checks
