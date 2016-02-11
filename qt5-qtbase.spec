@@ -44,7 +44,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 0.23.%{prerelease}%{?dist}
+Release: 0.24.%{prerelease}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -82,6 +82,9 @@ Patch50: qt5-poll.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1290020
 # https://bugreports.qt.io/browse/QTBUG-49972
 Patch52: qtbase-opensource-src-5.6.0-moc_WORDSIZE.patch
+
+# correct check for alsa-1.1
+Patch53: qtbase-opensource-src-5.6.0-alsa-1.1.patch
 
 ## upstream patches
 
@@ -333,6 +336,7 @@ RPM macros for building Qt5 packages.
 %patch12 -p1 -b .enable_ft_lcdfilter
 
 %patch52 -p1 -b .moc_WORDSIZE
+%patch53 -p1 -b .alsa1.1
 
 %patch150 -p1 -b .moc_system_defines
 %patch184 -p1 -b .0084
@@ -342,7 +346,7 @@ RPM macros for building Qt5 packages.
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
 # add -fno-delete-null-pointer-checks for f24/gcc6
 %if 0%{?fedora} > 23
-QT5_RPM_OPT_FLAGS="-fno-delete-null-pointer-checks"
+QT5_RPM_OPT_FLAGS="-fno-delete-null-pointer-checks -std=gnu++11"
 RPM_OPT_FLAGS="$RPM_OPT_FLAGS $QT5_RPM_OPT_FLAGS"
 %endif
 
@@ -391,7 +395,7 @@ test -x configure || chmod +x configure
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
 # add -fno-delete-null-pointer-checks for f24/gcc6
 %if 0%{?fedora} > 23
-QT5_RPM_OPT_FLAGS="-fno-delete-null-pointer-checks"
+QT5_RPM_OPT_FLAGS="-fno-delete-null-pointer-checks -std=gnu++11"
 RPM_OPT_FLAGS="$RPM_OPT_FLAGS $QT5_RPM_OPT_FLAGS"
 %endif
 
@@ -916,6 +920,10 @@ fi
 
 
 %changelog
+* Thu Feb 11 2016 Than Ngo <than@redhat.com> - 5.6.0-0.24.beta
+- fix build issue with gcc6
+- fix check for alsa 1.1.x
+
 * Wed Feb 03 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.23.beta
 - qt5-rpm-macros pkg
 
