@@ -86,6 +86,9 @@ Patch52: qtbase-opensource-src-5.6.0-moc_WORDSIZE.patch
 # correct check for alsa-1.1
 Patch53: qtbase-opensource-src-5.6.0-alsa-1.1.patch
 
+# arm patch
+Patch54: qtbase-opensource-src-5.6.0-arm.patch
+
 ## upstream patches
 
 # recently passed code review, not integrated yet
@@ -337,6 +340,7 @@ RPM macros for building Qt5 packages.
 
 %patch52 -p1 -b .moc_WORDSIZE
 %patch53 -p1 -b .alsa1.1
+%patch54 -p1 -b .arm
 
 %patch150 -p1 -b .moc_system_defines
 %patch184 -p1 -b .0084
@@ -346,8 +350,11 @@ RPM macros for building Qt5 packages.
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
 # add -fno-delete-null-pointer-checks for f24/gcc6
 %if 0%{?fedora} > 23
-QT5_RPM_OPT_FLAGS="-fno-delete-null-pointer-checks -std=gnu++11"
+QT5_RPM_OPT_FLAGS="-fno-delete-null-pointer-checks"
 RPM_OPT_FLAGS="$RPM_OPT_FLAGS $QT5_RPM_OPT_FLAGS"
+%ifarch armv7hl
+RPM_OPT_FLAGS="$RPM_OPT_FLAGS -mfpu=neon"
+%endif
 %endif
 
 %define platform linux-g++
@@ -395,8 +402,11 @@ test -x configure || chmod +x configure
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
 # add -fno-delete-null-pointer-checks for f24/gcc6
 %if 0%{?fedora} > 23
-QT5_RPM_OPT_FLAGS="-fno-delete-null-pointer-checks -std=gnu++11"
+QT5_RPM_OPT_FLAGS="-fno-delete-null-pointer-checks"
 RPM_OPT_FLAGS="$RPM_OPT_FLAGS $QT5_RPM_OPT_FLAGS"
+%ifarch armv7hl
+RPM_OPT_FLAGS="$RPM_OPT_FLAGS -mfpu=neon"
+%endif
 %endif
 
 export CFLAGS="$CFLAGS $RPM_OPT_FLAGS"
