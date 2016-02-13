@@ -44,7 +44,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 0.24.%{prerelease}%{?dist}
+Release: 0.25.%{prerelease}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -930,6 +930,9 @@ fi
 
 
 %changelog
+* Sat Feb 13 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.25.beta
+- macros.qt5: fix %%qt5_ldflags macro
+
 * Thu Feb 11 2016 Than Ngo <than@redhat.com> - 5.6.0-0.24.beta
 - fix build issue with gcc6
 - fix check for alsa 1.1.x

@@ -18,7 +18,7 @@
 %_qt5_sysconfdir %{_qt5_settingsdir}
 %_qt5_translationdir %{_datadir}/qt5/translations
 
-%_qt5_ldflags %{?__global_ldflags} @@QT5_RPM_LD_FLAGS@
+%_qt5_ldflags %{?__global_ldflags} @@QT5_RPM_LD_FLAGS@@
 %_qt5_optflags %{optflags} @@QT5_RPM_OPT_FLAGS@@
 
 %_qt5_qmake_flags \\\
