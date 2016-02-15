@@ -89,6 +89,9 @@ Patch53: qtbase-opensource-src-5.6.0-alsa-1.1.patch
 # arm patch
 Patch54: qtbase-opensource-src-5.6.0-arm.patch
 
+# Epel patches
+Patch100: qt5-qtbase-5.6.0-el6-sqrt.patch
+
 ## upstream patches
 
 # recently passed code review, not integrated yet
@@ -337,6 +340,10 @@ RPM macros for building Qt5 packages.
 %patch52 -p1 -b .moc_WORDSIZE
 %patch53 -p1 -b .alsa1.1
 %patch54 -p1 -b .arm
+
+%if 0%{?rhel} == 6
+%patch100 -p1 -b .sqrt
+%endif
 
 %patch150 -p1 -b .moc_system_defines
 
