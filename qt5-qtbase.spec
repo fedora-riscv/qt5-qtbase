@@ -39,20 +39,20 @@
 
 %define examples 1
 
-%define prerelease beta
+%define prerelease rc
 
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 0.25.%{prerelease}%{?dist}
+Release: 0.26.%{prerelease}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
 Url: http://qt-project.org/
 %if 0%{?prerelease:1}
-Source0: http://download.qt.io/development_releases/qt/5.6/%{version}-%{prerelease}/submodules/%{qt_module}-opensource-src-%{version}-%{prerelease}.tar.gz
+Source0: http://download.qt.io/development_releases/qt/5.6/%{version}-%{prerelease}/submodules/%{qt_module}-opensource-src-%{version}-%{prerelease}.tar.xz
 %else
-Source0: http://download.qt.io/official_releases/qt/5.6/%{version}%{?prerelease:-%{prerelease}}/submodules/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}.tar.gz
+Source0: http://download.qt.io/official_releases/qt/5.6/%{version}%{?prerelease:-%{prerelease}}/submodules/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}.tar.xz
 %endif
 
 # header file to workaround multilib issue
@@ -94,10 +94,6 @@ Patch54: qtbase-opensource-src-5.6.0-arm.patch
 # recently passed code review, not integrated yet
 # https://codereview.qt-project.org/126102/
 Patch150: moc-get-the-system-defines-from-the-compiler-itself.patch
-
-# https://bugreports.qt.io/browse/QTBUG-50081
-# https://codereview.qt-project.org/#/c/144896/
-Patch184: 0084-Fix-crash-because-of-NULL-screen-in-QXcbWindow.patch
 
 # macros, be mindful to keep sync'd with macros.qt5
 Source10: macros.qt5
@@ -343,7 +339,6 @@ RPM macros for building Qt5 packages.
 %patch54 -p1 -b .arm
 
 %patch150 -p1 -b .moc_system_defines
-%patch184 -p1 -b .0084
 
 ## adjust $RPM_OPT_FLAGS
 # remove -fexceptions
@@ -930,6 +925,9 @@ fi
 
 
 %changelog
+* Mon Feb 15 2016 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.26.rc
+- Integrate rc releases now.
+
 * Sat Feb 13 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.25.beta
 - macros.qt5: fix %%qt5_ldflags macro
 
