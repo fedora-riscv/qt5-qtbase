@@ -44,7 +44,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 0.27.%{prerelease}%{?dist}
+Release: 0.28.%{prerelease}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -352,7 +352,7 @@ RPM macros for building Qt5 packages.
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
 # add -fno-delete-null-pointer-checks for f24/gcc6
 %if 0%{?fedora} > 23
-QT5_RPM_OPT_FLAGS="-fno-delete-null-pointer-checks"
+QT5_RPM_OPT_FLAGS="-fno-delete-null-pointer-checks -Wno-deprecated-declaration"
 RPM_OPT_FLAGS="$RPM_OPT_FLAGS $QT5_RPM_OPT_FLAGS"
 %ifarch armv7hl
 RPM_OPT_FLAGS="$RPM_OPT_FLAGS -mfpu=neon"
@@ -932,6 +932,9 @@ fi
 
 
 %changelog
+* Wed Feb 17 2016 Than Ngo <than@redhat.com> - 5.6.0-0.28.rc
+- fix build issue with gcc6
+
 * Mon Feb 15 2016 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.27.rc
 - Update proper tarball. Need avoid the fix branch
 
