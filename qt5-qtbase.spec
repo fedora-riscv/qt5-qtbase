@@ -341,9 +341,7 @@ RPM macros for building Qt5 packages.
 %patch53 -p1 -b .alsa1.1
 %patch54 -p1 -b .arm
 
-%if 0%{?rhel} == 6
 %patch100 -p1 -b .sqrt
-%endif
 
 %patch150 -p1 -b .moc_system_defines
 
@@ -404,7 +402,7 @@ test -x configure || chmod +x configure
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
 # add -fno-delete-null-pointer-checks for f24/gcc6
 %if 0%{?fedora} > 23
-QT5_RPM_OPT_FLAGS="-fno-delete-null-pointer-checks"
+QT5_RPM_OPT_FLAGS="-fno-delete-null-pointer-checks -Wno-deprecated-declaration"
 RPM_OPT_FLAGS="$RPM_OPT_FLAGS $QT5_RPM_OPT_FLAGS"
 %ifarch armv7hl
 RPM_OPT_FLAGS="$RPM_OPT_FLAGS -mfpu=neon"
