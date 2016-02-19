@@ -44,7 +44,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 0.27.%{prerelease}%{?dist}
+Release: 0.28.%{prerelease}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -932,6 +932,9 @@ fi
 
 
 %changelog
+* Fri Feb 19 2016 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.28.rc
+- Update tarball with https://bugreports.qt.io/browse/QTBUG-50703 fix
+
 * Mon Feb 15 2016 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.27.rc
 - Update proper tarball. Need avoid the fix branch
 
