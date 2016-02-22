@@ -44,7 +44,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 0.28.%{prerelease}%{?dist}
+Release: 0.29.%{prerelease}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -341,9 +341,7 @@ RPM macros for building Qt5 packages.
 %patch53 -p1 -b .alsa1.1
 %patch54 -p1 -b .arm
 
-%if 0%{?rhel} == 6
 %patch100 -p1 -b .sqrt
-%endif
 
 %patch150 -p1 -b .moc_system_defines
 
@@ -352,7 +350,7 @@ RPM macros for building Qt5 packages.
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
 # add -fno-delete-null-pointer-checks for f24/gcc6
 %if 0%{?fedora} > 23
-QT5_RPM_OPT_FLAGS="-fno-delete-null-pointer-checks"
+QT5_RPM_OPT_FLAGS="-fno-delete-null-pointer-checks -Wno-deprecated-declaration"
 RPM_OPT_FLAGS="$RPM_OPT_FLAGS $QT5_RPM_OPT_FLAGS"
 %ifarch armv7hl
 RPM_OPT_FLAGS="$RPM_OPT_FLAGS -mfpu=neon"
@@ -404,7 +402,7 @@ test -x configure || chmod +x configure
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
 # add -fno-delete-null-pointer-checks for f24/gcc6
 %if 0%{?fedora} > 23
-QT5_RPM_OPT_FLAGS="-fno-delete-null-pointer-checks"
+QT5_RPM_OPT_FLAGS="-fno-delete-null-pointer-checks -Wno-deprecated-declaration"
 RPM_OPT_FLAGS="$RPM_OPT_FLAGS $QT5_RPM_OPT_FLAGS"
 %ifarch armv7hl
 RPM_OPT_FLAGS="$RPM_OPT_FLAGS -mfpu=neon"
@@ -932,8 +930,11 @@ fi
 
 
 %changelog
-* Fri Feb 19 2016 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.28.rc
+* Mon Feb 22 2016 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.29.rc
 - Update tarball with https://bugreports.qt.io/browse/QTBUG-50703 fix
+
+* Wed Feb 17 2016 Than Ngo <than@redhat.com> - 5.6.0-0.28.rc
+- fix build issue with gcc6
 
 * Mon Feb 15 2016 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.27.rc
 - Update proper tarball. Need avoid the fix branch
