@@ -44,7 +44,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 0.30.%{prerelease}%{?dist}
+Release: 0.31.%{prerelease}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -97,6 +97,9 @@ Patch100: qt5-qtbase-5.6.0-el6-sqrt.patch
 # recently passed code review, not integrated yet
 # https://codereview.qt-project.org/126102/
 Patch150: moc-get-the-system-defines-from-the-compiler-itself.patch
+
+# Item views, https://bugreports.qt.io/browse/QTBUG-48870
+Patch176: 0076-QListView-fix-skipping-indexes-in-selectedIndexes.patch
 
 # macros, be mindful to keep sync'd with macros.qt5
 Source10: macros.qt5
@@ -344,6 +347,7 @@ RPM macros for building Qt5 packages.
 %patch100 -p1 -b .sqrt
 
 %patch150 -p1 -b .moc_system_defines
+%patch176 -p1 -b .0076
 
 ## adjust $RPM_OPT_FLAGS
 # remove -fexceptions
@@ -930,6 +934,9 @@ fi
 
 
 %changelog
+* Wed Feb 24 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.31.rc
+- Item views don't handle insert/remove of rows robustly (QTBUG-48870)
+
 * Tue Feb 23 2016 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.30.rc
 - Update to final RC
 
