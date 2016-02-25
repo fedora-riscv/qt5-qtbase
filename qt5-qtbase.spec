@@ -44,7 +44,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 0.32.%{prerelease}%{?dist}
+Release: 0.33.%{prerelease}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -54,6 +54,9 @@ Source0: http://download.qt.io/development_releases/qt/5.6/%{version}-%{prerelea
 %else
 Source0: http://download.qt.io/official_releases/qt/5.6/%{version}%{?prerelease:-%{prerelease}}/submodules/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}.tar.xz
 %endif
+
+# https://bugzilla.redhat.com/show_bug.cgi?id=1227295
+Source1: qtlogging.ini
 
 # header file to workaround multilib issue
 # https://bugzilla.redhat.com/show_bug.cgi?id=1036956
@@ -500,6 +503,8 @@ make install INSTALL_ROOT=%{buildroot}
 make install_docs INSTALL_ROOT=%{buildroot}
 %endif
 
+install -m644 -p -D %{SOURCE1} %{buildroot}%{_qt5_datadir}/qtlogging.ini
+
 # Qt5.pc
 cat >%{buildroot}%{_libdir}/pkgconfig/Qt5.pc<<EOF
 prefix=%{_qt5_prefix}
@@ -681,6 +686,7 @@ fi
 %{_qt5_translationdir}/
 %dir %{_qt5_prefix}/
 %dir %{_qt5_datadir}/
+%{_qt5_datadir}/qtlogging.ini
 %dir %{_qt5_libexecdir}/
 %dir %{_qt5_plugindir}/
 %dir %{_qt5_plugindir}/bearer/
@@ -938,6 +944,9 @@ fi
 
 
 %changelog
+* Thu Feb 25 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.33.rc
+- ship $$[QT_INSTALL_DATA]/qtlogging.ini for packaged logging defaults (#1227295)
+
 * Thu Feb 25 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.32.rc
 - qt5-qtbase-static missing dependencies (#1311311)
 
