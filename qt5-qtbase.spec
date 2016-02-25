@@ -44,7 +44,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 0.31.%{prerelease}%{?dist}
+Release: 0.32.%{prerelease}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -263,6 +263,10 @@ Summary: Static library files for %{name}
 Requires: %{name}-devel%{?_isa} = %{version}-%{release}
 Requires: pkgconfig(fontconfig)
 Requires: pkgconfig(glib-2.0)
+%if 0%{?fedora}
+Requires: pkgconfig(libinput)
+Requires: pkgconfig(xkbcommon)
+%endif
 Requires: pkgconfig(zlib)
 %description static
 %{summary}.
@@ -934,6 +938,9 @@ fi
 
 
 %changelog
+* Thu Feb 25 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.32.rc
+- qt5-qtbase-static missing dependencies (#1311311)
+
 * Wed Feb 24 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.31.rc
 - Item views don't handle insert/remove of rows robustly (QTBUG-48870)
 
