@@ -44,7 +44,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 0.33.%{prerelease}%{?dist}
+Release: 0.34.%{prerelease}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -944,6 +944,9 @@ fi
 
 
 %changelog
+* Fri Feb 26 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.34.rc
+- qtlogging.ini: remove comments
+
 * Thu Feb 25 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.33.rc
 - ship $$[QT_INSTALL_DATA]/qtlogging.ini for packaged logging defaults (#1227295)
 
