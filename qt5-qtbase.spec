@@ -16,7 +16,7 @@
 %global rpm_macros_dir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
 ## set to 1 to enable bootstrap
-#global bootstrap 1
+%global bootstrap 1
 
 %if 0%{?fedora} > 21
 # use external qt_settings pkg
