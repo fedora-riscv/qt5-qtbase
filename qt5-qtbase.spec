@@ -16,7 +16,7 @@
 %global rpm_macros_dir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
 ## set to 1 to enable bootstrap
-%global bootstrap 1
+%global bootstrap 0
 
 %if 0%{?fedora} > 21
 # use external qt_settings pkg
@@ -44,7 +44,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 0.35.%{prerelease}%{?dist}
+Release: 0.36.%{prerelease}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -948,6 +948,9 @@ fi
 
 
 %changelog
+* Wed Mar 02 2016 Daniel Vrátil <dvratil@fedoraproject.org> 5.6.0-0.36.rc
+- Non-bootstrapped build
+
 * Tue Mar 01 2016 Daniel Vrátil <dvratil@fedoraproject.org> 5.6.0-0.35.rc
 - Rebuild against new openssl
 
