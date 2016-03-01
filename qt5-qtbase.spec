@@ -719,8 +719,10 @@ fi
 %doc dist/README dist/changes-5.*
 %{_qt5_docdir}/*.qch
 %if 0%{?examples}
+%if 0%{!?bootstrap}
 # included in -examples instead, see bug #1212750
 %exclude %{_qt5_docdir}/*/examples-manifest.xml
+%endif
 %endif
 %{_qt5_docdir}/qmake/
 %{_qt5_docdir}/qtconcurrent/
@@ -847,7 +849,9 @@ fi
 
 %if 0%{?examples}
 %files examples
+%if 0%{!?bootstrap}
 %{_qt5_docdir}/*/examples-manifest.xml
+%endif
 %{_qt5_examplesdir}/
 %endif
 
