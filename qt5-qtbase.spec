@@ -28,6 +28,10 @@
 %global inject_optflags 1
 %endif
 
+%if 0%{?fedora} > 23
+%global journald -journald
+%endif
+
 # define to build docs, need to undef this for bootstrapping
 # where qt5-qttools builds are not yet available
 # only primary archs (for now), allow secondary to bootstrap
@@ -44,7 +48,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 0.36.%{prerelease}%{?dist}
+Release: 0.37.%{prerelease}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -452,6 +456,7 @@ export MAKEFLAGS="%{?_smp_mflags}"
   %{?ibase} \
   -iconv \
   -icu \
+  %{?journald} \
   -openssl-linked \
   -optimized-qmake \
   %{!?examples:-nomake examples} \
@@ -948,6 +953,9 @@ fi
 
 
 %changelog
+* Sat Mar 05 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.37.rc
+- %build: ./configure -journal (f24+)
+
 * Wed Mar 02 2016 Daniel Vrátil <dvratil@fedoraproject.org> 5.6.0-0.36.rc
 - Non-bootstrapped build
 
