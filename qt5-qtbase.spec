@@ -48,7 +48,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 0.37.%{prerelease}%{?dist}
+Release: 0.38.%{prerelease}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -100,6 +100,9 @@ Patch54: qtbase-opensource-src-5.6.0-arm.patch
 Patch100: qt5-qtbase-5.6.0-el6-sqrt.patch
 
 ## upstream patches
+
+Patch102: 0002-Fix-crash-when-a-standard-bus-isn-t-available.patch
+
 
 # recently passed code review, not integrated yet
 # https://codereview.qt-project.org/126102/
@@ -356,6 +359,8 @@ RPM macros for building Qt5 packages.
 %patch54 -p1 -b .arm
 
 %patch100 -p1 -b .sqrt
+
+%patch102 -p1 -b .QTBUG-51299
 
 %patch150 -p1 -b .moc_system_defines
 %patch176 -p1 -b .0076
@@ -953,6 +958,9 @@ fi
 
 
 %changelog
+* Mon Mar 07 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.38.rc
+- backport "crash on start if system bus is not available" (QTBUG-51299)
+
 * Sat Mar 05 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.37.rc
 - %build: ./configure -journal (f24+)
 

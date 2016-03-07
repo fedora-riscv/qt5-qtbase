@@ -1,0 +1,43 @@
+From 469e293286f7b9ea093fdac41938e00082c70bcd Mon Sep 17 00:00:00 2001
+From: Thiago Macieira <thiago.macieira@intel.com>
+Date: Mon, 22 Feb 2016 14:44:30 -0800
+Subject: [PATCH 2/6] Fix crash when a standard bus isn't available
+
+Commit 1f6fa1f37a14742ddf53c753ce52d9dc048cd1dc added a way of
+suspending delivery of messages to standard buses when they connect and
+resuming delivery when the main loop starts. As a side-effect, we caused
+an attempt to do dispatching even after the connection failed. The D-Bus
+library doesn't like that.
+
+Task-number: QTBUG-51299
+Change-Id: I0c94a5c2846b48c8aea7ffff143564f7fcede890
+Reviewed-by: David Faure <david.faure@kdab.com>
+---
+ src/dbus/qdbusconnection.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/dbus/qdbusconnection.cpp b/src/dbus/qdbusconnection.cpp
+index 7f44272..34b3da7 100644
+--- a/src/dbus/qdbusconnection.cpp
++++ b/src/dbus/qdbusconnection.cpp
+@@ -208,7 +208,7 @@ QDBusConnectionPrivate *QDBusConnectionManager::connectToBus(QDBusConnection::Bu
+     data.suspendedDelivery = suspendedDelivery;
+ 
+     emit connectionRequested(&data);
+-    if (suspendedDelivery) {
++    if (suspendedDelivery && data.result->connection) {
+         data.result->ref.ref();
+         QDBusConnectionDispatchEnabler *o = new QDBusConnectionDispatchEnabler(data.result);
+         QTimer::singleShot(0, o, SLOT(execute()));
+@@ -291,7 +291,7 @@ void QDBusConnectionManager::executeConnectionRequest(QDBusConnectionManager::Co
+         // will lock in QDBusConnectionPrivate::connectRelay()
+         d->setConnection(c, error);
+         d->createBusService();
+-        if (data->suspendedDelivery)
++        if (c && data->suspendedDelivery)
+             d->setDispatchEnabled(false);
+     }
+ }
+-- 
+2.5.0
+
