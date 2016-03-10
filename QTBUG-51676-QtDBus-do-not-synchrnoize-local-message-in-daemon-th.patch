@@ -1,0 +1,37 @@
+From d011c92b47f95554fe639ad9c0542768d802666b Mon Sep 17 00:00:00 2001
+From: Weng Xuetian <wengxt@gmail.com>
+Date: Fri, 4 Mar 2016 10:53:46 -0800
+Subject: [PATCH] QtDBus: do not synchrnoize local message in daemon thread
+
+When qDBusAddSpyHook is used and there is a local message, the
+handleObjectCall on this message will be deferred to daemon thread. It
+would cause dead lock if dbus daemon thread wait for this message and
+there is no point to wait for the reply since daemon thread is not same
+as the message sender thread.
+
+Task-number: QTBUG-51676
+Change-Id: I1dc112894cde7121e8ce302ae51b438ade1ff612
+---
+ src/dbus/qdbusintegrator.cpp | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/src/dbus/qdbusintegrator.cpp b/src/dbus/qdbusintegrator.cpp
+index cd44861..caf2e92 100644
+--- a/src/dbus/qdbusintegrator.cpp
++++ b/src/dbus/qdbusintegrator.cpp
+@@ -1484,8 +1484,10 @@ void QDBusConnectionPrivate::handleObjectCall(const QDBusMessage &msg)
+             return;
+         }
+ 
+-        if (!QDBusMessagePrivate::isLocal(msg)) {
+-            // external incoming message
++        if (!QDBusMessagePrivate::isLocal(msg) || QThread::currentThread() == QDBusConnectionManager::instance()) {
++            // two cases:
++            // 1. external incoming message
++            // 2. local message deferred by spy hook
+             // post it and forget
+             postEventToThread(HandleObjectCallPostEventAction, result.obj,
+                               new QDBusActivateObjectEvent(QDBusConnection(this), this, result,
+-- 
+2.5.0
+

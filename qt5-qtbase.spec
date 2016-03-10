@@ -48,7 +48,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 0.38.%{prerelease}%{?dist}
+Release: 0.39.%{prerelease}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -95,6 +95,16 @@ Patch53: qtbase-opensource-src-5.6.0-alsa-1.1.patch
 
 # arm patch
 Patch54: qtbase-opensource-src-5.6.0-arm.patch
+
+# https://codereview.qt-project.org/#/c/151496/
+Patch55: QTBUG-51648-QtDBus-clean-up-signal-hooks-and-object-tree-in-clos.patch
+
+# https://codereview.qt-project.org/#/c/151340/
+Patch56: QTBUG-51649-QtDBus-finish-all-pending-call-with-error-if-disconn.patch
+
+# https://codereview.qt-project.org/#/c/151459/
+Patch57: QTBUG-51676-QtDBus-do-not-synchrnoize-local-message-in-daemon-th.patch
+
 
 # Epel patches
 Patch100: qt5-qtbase-5.6.0-el6-sqrt.patch
@@ -357,6 +367,9 @@ RPM macros for building Qt5 packages.
 %patch52 -p1 -b .moc_WORDSIZE
 %patch53 -p1 -b .alsa1.1
 %patch54 -p1 -b .arm
+%patch55 -p1 -b .QTBUG-51648
+%patch56 -p1 -b .QTBUG-51649
+%patch57 -p1 -b .QTBUG-51676
 
 %patch100 -p1 -b .sqrt
 
@@ -958,6 +971,9 @@ fi
 
 
 %changelog
+* Thu Mar 10 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.39.rc
+- candidate fixes for various QtDBus deadlocks (QTBUG-51648,QTBUG-51649,QTBUG-51676)
+
 * Mon Mar 07 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.38.rc
 - backport "crash on start if system bus is not available" (QTBUG-51299)
 
