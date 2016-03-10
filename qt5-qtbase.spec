@@ -368,7 +368,8 @@ RPM macros for building Qt5 packages.
 %patch53 -p1 -b .alsa1.1
 %patch54 -p1 -b .arm
 %patch55 -p1 -b .QTBUG-51648
-%patch56 -p1 -b .QTBUG-51649
+## FTBFS, omit for now
+#patch56 -p1 -b .QTBUG-51649
 %patch57 -p1 -b .QTBUG-51676
 
 %patch100 -p1 -b .sqrt
@@ -972,7 +973,7 @@ fi
 
 %changelog
 * Thu Mar 10 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.39.rc
-- candidate fixes for various QtDBus deadlocks (QTBUG-51648,QTBUG-51649,QTBUG-51676)
+- candidate fixes for various QtDBus deadlocks (QTBUG-51648,QTBUG-51676)
 
 * Mon Mar 07 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.38.rc
 - backport "crash on start if system bus is not available" (QTBUG-51299)
