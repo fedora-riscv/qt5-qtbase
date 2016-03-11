@@ -48,7 +48,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 0.39.%{prerelease}%{?dist}
+Release: 0.40.%{prerelease}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -158,11 +158,6 @@ BuildRequires: libjpeg-devel
 BuildRequires: libmng-devel
 BuildRequires: libtiff-devel
 BuildRequires: pkgconfig(alsa)
-# http://bugzilla.redhat.com/1196359
-%if 0%{?fedora} || 0%{?rhel} > 6
-%global dbus -dbus-linked
-BuildRequires: pkgconfig(dbus-1)
-%endif
 BuildRequires: pkgconfig(libdrm)
 BuildRequires: pkgconfig(fontconfig)
 BuildRequires: pkgconfig(gl)
@@ -173,7 +168,6 @@ BuildRequires: pkgconfig(libproxy-1.0)
 BuildRequires: pkgconfig(ice) pkgconfig(sm)
 BuildRequires: pkgconfig(libpng)
 BuildRequires: pkgconfig(libudev)
-BuildRequires: pkgconfig(NetworkManager)
 BuildRequires: pkgconfig(openssl)
 BuildRequires: pkgconfig(libpulse) pkgconfig(libpulse-mainloop-glib)
 %if 0%{?fedora}
@@ -193,7 +187,6 @@ Provides: bundled(libxkbcommon) = 0.4.1
 BuildRequires: pkgconfig(xkeyboard-config)
 %if 0%{?fedora} || 0%{?rhel} > 6
 %define egl 1
-BuildRequires: pkgconfig(atspi-2)
 BuildRequires: pkgconfig(egl)
 BuildRequires: pkgconfig(gbm)
 BuildRequires: pkgconfig(glesv2)
@@ -369,7 +362,7 @@ RPM macros for building Qt5 packages.
 %patch54 -p1 -b .arm
 %patch55 -p1 -b .QTBUG-51648
 ## FTBFS, omit for now
-#patch56 -p1 -b .QTBUG-51649
+%patch56 -p1 -b .QTBUG-51649
 %patch57 -p1 -b .QTBUG-51676
 
 %patch100 -p1 -b .sqrt
@@ -468,7 +461,7 @@ export MAKEFLAGS="%{?_smp_mflags}"
   -release \
   -shared \
   -accessibility \
-  %{?dbus}%{!?dbus:-dbus} \
+  -dbus-runtime \
   -fontconfig \
   -glib \
   -gtkstyle \
@@ -972,6 +965,11 @@ fi
 
 
 %changelog
+* Fri Mar 11 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.40.rc
+- respin QTBUG-51649 patch
+- %%build: use -dbus-runtime unconditionally
+- drop (unused) build deps: atspi, dbus, networkmanager
+
 * Thu Mar 10 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.39.rc
 - candidate fixes for various QtDBus deadlocks (QTBUG-51648,QTBUG-51676)
 

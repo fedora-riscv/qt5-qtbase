@@ -140,3 +140,17 @@ index a53ba32..720e484 100644
 -- 
 2.5.0
 
+diff -up qtbase-opensource-src-5.6.0-rc/src/dbus/dbus_minimal_p.h.QTBUG-51649 qtbase-opensource-src-5.6.0-rc/src/dbus/dbus_minimal_p.h
+--- qtbase-opensource-src-5.6.0-rc/src/dbus/dbus_minimal_p.h.QTBUG-51649	2016-02-18 01:24:38.000000000 -0600
++++ qtbase-opensource-src-5.6.0-rc/src/dbus/dbus_minimal_p.h	2016-03-11 11:40:11.176244645 -0600
+@@ -99,8 +99,10 @@ typedef dbus_uint32_t  dbus_bool_t;
+ /* dbus-shared.h */
+ #define DBUS_SERVICE_DBUS      "org.freedesktop.DBus"
+ #define DBUS_PATH_DBUS  "/org/freedesktop/DBus"
++#define DBUS_PATH_LOCAL "/org/freedesktop/DBus/Local"
+ #define DBUS_INTERFACE_DBUS           "org.freedesktop.DBus"
+ #define DBUS_INTERFACE_INTROSPECTABLE "org.freedesktop.DBus.Introspectable"
++#define DBUS_INTERFACE_LOCAL          "org.freedesktop.DBus.Local"
+ #define DBUS_INTERFACE_PROPERTIES     "org.freedesktop.DBus.Properties"
+ 
+ #define DBUS_NAME_FLAG_ALLOW_REPLACEMENT 0x1 /**< Allow another service to become the primary owner if requested */
