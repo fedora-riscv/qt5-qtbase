@@ -48,7 +48,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 0.40.%{prerelease}%{?dist}
+Release: 0.41.%{prerelease}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -158,6 +158,11 @@ BuildRequires: libjpeg-devel
 BuildRequires: libmng-devel
 BuildRequires: libtiff-devel
 BuildRequires: pkgconfig(alsa)
+# http://bugzilla.redhat.com/1196359
+%if 0%{?fedora} || 0%{?rhel} > 6
+%global dbus -dbus-linked
+BuildRequires: pkgconfig(dbus-1)
+%endif
 BuildRequires: pkgconfig(libdrm)
 BuildRequires: pkgconfig(fontconfig)
 BuildRequires: pkgconfig(gl)
@@ -461,7 +466,7 @@ export MAKEFLAGS="%{?_smp_mflags}"
   -release \
   -shared \
   -accessibility \
-  -dbus-runtime \
+  %{?dbus}%{!?dbus:-dbus-runtime} \
   -fontconfig \
   -glib \
   -gtkstyle \
@@ -965,6 +970,9 @@ fi
 
 
 %changelog
+* Sat Mar 12 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.41.rc
+- %%build: restore -dbus-linked
+
 * Fri Mar 11 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.40.rc
 - respin QTBUG-51649 patch
 - %%build: use -dbus-runtime unconditionally
