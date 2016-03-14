@@ -43,21 +43,17 @@
 
 %define examples 1
 
-%define prerelease rc
+#define prerelease rc
 
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 0.41.%{prerelease}%{?dist}
+Release: 1%{?prerelease:.${prerelease}}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
 Url: http://qt-project.org/
-%if 0%{?prerelease:1}
-Source0: http://download.qt.io/development_releases/qt/5.6/%{version}-%{prerelease}/submodules/%{qt_module}-opensource-src-%{version}-%{prerelease}.tar.xz
-%else
 Source0: http://download.qt.io/official_releases/qt/5.6/%{version}%{?prerelease:-%{prerelease}}/submodules/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}.tar.xz
-%endif
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1227295
 Source1: qtlogging.ini
@@ -108,10 +104,6 @@ Patch57: QTBUG-51676-QtDBus-do-not-synchrnoize-local-message-in-daemon-th.patch
 
 # Epel patches
 Patch100: qt5-qtbase-5.6.0-el6-sqrt.patch
-
-## upstream patches
-
-Patch102: 0002-Fix-crash-when-a-standard-bus-isn-t-available.patch
 
 
 # recently passed code review, not integrated yet
@@ -372,8 +364,6 @@ RPM macros for building Qt5 packages.
 
 %patch100 -p1 -b .sqrt
 
-%patch102 -p1 -b .QTBUG-51299
-
 %patch150 -p1 -b .moc_system_defines
 %patch176 -p1 -b .0076
 
@@ -406,7 +396,7 @@ sed -i -e "s|^\(QMAKE_LFLAGS_RELEASE.*\)|\1 $RPM_LD_FLAGS|" \
 sed -i -e 's|^\(QMAKE_STRIP.*=\).*$|\1|g' mkspecs/common/linux.conf
 %endif
 
-%if %{prerelease}
+%if 0%{?prerelease}
 bin/syncqt.pl -version %{version}
 %endif
 
@@ -970,6 +960,9 @@ fi
 
 
 %changelog
+* Mon Mar 14 2016 Helio Chissini de Castro <helio@kde.org> - 5.6.0-1
+- 5.6.0 release
+
 * Sat Mar 12 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.41.rc
 - %%build: restore -dbus-linked
 
