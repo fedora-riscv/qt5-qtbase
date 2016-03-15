@@ -48,7 +48,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 1%{?prerelease:.${prerelease}}%{?dist}
+Release: 2%{?prerelease:.%{prerelease}}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -99,8 +99,7 @@ Patch55: QTBUG-51648-QtDBus-clean-up-signal-hooks-and-object-tree-in-clos.patch
 Patch56: QTBUG-51649-QtDBus-finish-all-pending-call-with-error-if-disconn.patch
 
 # https://codereview.qt-project.org/#/c/151459/
-Patch57: QTBUG-51676-QtDBus-do-not-synchrnoize-local-message-in-daemon-th.patch
-
+Patch57: QTBUG-51676-Fix-QtDBus-deadlock-inside-kded-kiod.patch
 
 # Epel patches
 Patch100: qt5-qtbase-5.6.0-el6-sqrt.patch
@@ -960,6 +959,9 @@ fi
 
 
 %changelog
+* Tue Mar 15 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-2
+- respin QTBUG-51767 patch
+
 * Mon Mar 14 2016 Helio Chissini de Castro <helio@kde.org> - 5.6.0-1
 - 5.6.0 release
 
