@@ -188,8 +188,10 @@ BuildRequires: pkgconfig(gbm)
 BuildRequires: pkgconfig(glesv2)
 %global sqlite -system-sqlite
 BuildRequires: pkgconfig(sqlite3) >= 3.7
+%if 0%{?fedora} > 22
 %global harfbuzz -system-harfbuzz
-BuildRequires: pkgconfig(harfbuzz) >= 1.0.6
+BuildRequires: pkgconfig(harfbuzz) >= 0.9.42
+%endif
 BuildRequires: pkgconfig(icu-i18n)
 BuildRequires: pkgconfig(libpcre) >= 8.30
 %define pcre -system-pcre
