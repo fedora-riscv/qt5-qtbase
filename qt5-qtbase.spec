@@ -185,9 +185,6 @@ BuildRequires: pkgconfig(xkbcommon)
 %endif
 %else
 # not Fedora
-%if 0%{?rhel} == 6
-%global xcb -qt-xcb
-%endif
 %global xkbcommon -qt-xkbcommon
 Provides: bundled(libxkbcommon) = 0.4.1
 %endif
@@ -398,12 +395,9 @@ sed -i -e 's|^\(QMAKE_STRIP.*=\).*$|\1|g' mkspecs/common/linux.conf
 # move some bundled libs to ensure they're not accidentally used
 pushd src/3rdparty
 mkdir UNUSED
-mv freetype libjpeg libpng zlib UNUSED/
+mv freetype libjpeg libpng zlib xcb UNUSED/
 %if "%{?sqlite}" == "-system-sqlite"
 mv sqlite UNUSED/
-%endif
-%if "%{?xcb}" != "-qt-xcb"
-mv xcb UNUSED/
 %endif
 popd
 
@@ -462,7 +456,6 @@ test -x configure || chmod +x configure
   %{?pcre} \
   %{?sqlite} \
   %{?tds} \
-  %{?xcb} \
   %{?xkbcommon} \
   -system-zlib \
   %{?use_gold_linker} \
@@ -946,9 +939,8 @@ fi
 
 
 %changelog
-* Fri Jan 15 2016 Than Ngo <than@redhat.com> - 5.5.1-11
+* Tue Jan 05 2016 Rex Dieter <rdieter@fedoraproject.org> 5.5.1-11
 - Crash in QXcbWindow::setParent() due to NULL xcbScreen (QTBUG-50081, #1291003)
-- enable -qt-xcb to fix non-US keys under VNC (#1295713)
 
 * Tue Jan 05 2016 Jan Grulich <jgrulich@redhat.com> - 5.5.1-10
 - QLineEdit - fix visibility handling of side widgets
