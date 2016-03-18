@@ -48,7 +48,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 2%{?prerelease:.%{prerelease}}%{?dist}
+Release: 3%{?prerelease:.%{prerelease}}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -188,8 +188,10 @@ BuildRequires: pkgconfig(gbm)
 BuildRequires: pkgconfig(glesv2)
 %global sqlite -system-sqlite
 BuildRequires: pkgconfig(sqlite3) >= 3.7
+%if 0%{?fedora} > 22
 %global harfbuzz -system-harfbuzz
-BuildRequires: pkgconfig(harfbuzz) >= 1.0.6
+BuildRequires: pkgconfig(harfbuzz) >= 0.9.42
+%endif
 BuildRequires: pkgconfig(icu-i18n)
 BuildRequires: pkgconfig(libpcre) >= 8.30
 %define pcre -system-pcre
@@ -959,6 +961,9 @@ fi
 
 
 %changelog
+* Fri Mar 18 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-3
+- rebuild
+
 * Tue Mar 15 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-2
 - respin QTBUG-51767 patch
 
