@@ -1,11 +1,6 @@
 # See http://bugzilla.redhat.com/223663
-%define multilib_archs x86_64 %{ix86} ppc64 ppc s390x s390 sparc64 sparcv9 ppc64le
-%define multilib_basearchs x86_64 ppc64 s390x sparc64 ppc64le
-
-# use valgrind to debug qdoc HTML generation
-%ifarch %{ix86} x86_64 ppc ppc64 ppc64le s390x armv7hl aarch64
-%global valgrind 1
-%endif
+%define multilib_archs x86_64 %{ix86} ppc64 ppc s390x s390 sparc64 sparcv9
+%define multilib_basearchs x86_64 ppc64 s390x sparc64
 
 # support qtchooser (adds qtchooser .conf file)
 %define qtchooser 1
@@ -21,37 +16,47 @@
 %global rpm_macros_dir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
 ## set to 1 to enable bootstrap
-#global bootstrap 1
+%global bootstrap 0
 
 %if 0%{?fedora} > 21
 # use external qt_settings pkg
 %global qt_settings 1
 %endif
 
+# See http://bugzilla.redhat.com/1279265
+%if 0%{?fedora} < 24
+%global inject_optflags 1
+%endif
+
+%if 0%{?fedora} > 23
+%global journald -journald
+%endif
+
 # define to build docs, need to undef this for bootstrapping
 # where qt5-qttools builds are not yet available
 # only primary archs (for now), allow secondary to bootstrap
 %if ! 0%{?bootstrap}
-%ifarch %{arm} %{ix86} x86_64
+%ifarch %{arm} %{ix86} x86_64 %{power64} s390 s390x aarch64
 %define docs 1
 %endif
 %endif
 
 %define examples 1
 
-## define prerelease rc1
+#define prerelease rc
 
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
-Version: 5.5.1
-Release: 8%{?dist}
+Version: 5.6.0
+Release: 2%{?prerelease:.%{prerelease}}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
 Url: http://qt-project.org/
-Source0: http://download.qt.io/official_releases/qt/5.5/%{version}%{?prerelease:-%{prerelease}}/submodules/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}.tar.xz
+Source0: http://download.qt.io/official_releases/qt/5.6/%{version}%{?prerelease:-%{prerelease}}/submodules/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}.tar.xz
 
-Source2: qdoc.valgrind
+# https://bugzilla.redhat.com/show_bug.cgi?id=1227295
+Source1: qtlogging.ini
 
 # header file to workaround multilib issue
 # https://bugzilla.redhat.com/show_bug.cgi?id=1036956
@@ -60,12 +65,6 @@ Source5: qconfig-multilib.h
 # xinitrc script to check for OpenGL 1 only drivers and automatically set
 # QT_XCB_FORCE_SOFTWARE_OPENGL for them
 Source6: 10-qt5-check-opengl2.sh
-
-# support the old version of libxcb and the resulting lack of libxkbcommon-x11
-# in F19 and F20
-Patch0: qtbase-opensource-src-5.4.0-rc-old_xcb.patch
-# support the old version of libxkbcommon in F19
-Patch1: qtbase-opensource-src-5.4.0-rc-old_xkbcommon.patch
 
 # support multilib optflags
 Patch2: qtbase-multilib_optflags.patch
@@ -76,29 +75,45 @@ Patch4: qtbase-opensource-src-5.3.2-QTBUG-35459.patch
 # unconditionally enable freetype lcdfilter support
 Patch12: qtbase-opensource-src-5.2.0-enable_ft_lcdfilter.patch
 
-# hack out largely useless (to users) warnings about qdbusconnection
-# (often in kde apps), keep an eye on https://git.reviewboard.kde.org/r/103699/
-Patch25: qtbase-opensource-src-5.5.1-qdbusconnection_no_debug.patch
-
 # upstreamable patches
 # support poll
 # https://bugreports.qt-project.org/browse/QTBUG-27195
 # NEEDS REBASE
 Patch50: qt5-poll.patch
 
-# Qt5 application crashes when connecting/disconnecting displays
-# https://bugzilla.redhat.com/show_bug.cgi?id=1083664
-Patch51: qtbase-opensource-src-5.5-disconnect_displays.patch
-# Followup https://codereview.qt-project.org/#/c/138201/ adapted for 5.5
-Patch52: https://smani.fedorapeople.org/138201.patch
+# Workaround moc/multilib issues
+# https://bugzilla.redhat.com/show_bug.cgi?id=1290020
+# https://bugreports.qt.io/browse/QTBUG-49972
+Patch52: qtbase-opensource-src-5.6.0-moc_WORDSIZE.patch
 
-## upstream patches
-# workaround https://bugreports.qt-project.org/browse/QTBUG-43057
-# 'make docs' crash on el6, use qSort instead of std::sort
-Patch100: qtbase-opensource-src-5.4.0-QTBUG-43057.patch
+# correct check for alsa-1.1
+Patch53: qtbase-opensource-src-5.6.0-alsa-1.1.patch
+
+# arm patch
+Patch54: qtbase-opensource-src-5.6.0-arm.patch
+
+# https://codereview.qt-project.org/#/c/151496/
+Patch55: QTBUG-51648-QtDBus-clean-up-signal-hooks-and-object-tree-in-clos.patch
+
+# https://codereview.qt-project.org/#/c/151340/
+Patch56: QTBUG-51649-QtDBus-finish-all-pending-call-with-error-if-disconn.patch
+
+# https://codereview.qt-project.org/#/c/151459/
+Patch57: QTBUG-51676-Fix-QtDBus-deadlock-inside-kded-kiod.patch
+
+# Epel patches
+Patch100: qt5-qtbase-5.6.0-el6-sqrt.patch
+
+
+# recently passed code review, not integrated yet
+# https://codereview.qt-project.org/126102/
+Patch150: moc-get-the-system-defines-from-the-compiler-itself.patch
+
+# Item views, https://bugreports.qt.io/browse/QTBUG-48870
+Patch176: 0076-QListView-fix-skipping-indexes-in-selectedIndexes.patch
 
 # macros, be mindful to keep sync'd with macros.qt5
-Source1: macros.qt5
+Source10: macros.qt5
 %define _qt5 %{name}
 %define _qt5_prefix %{_libdir}/qt5
 %define _qt5_archdatadir %{_libdir}/qt5
@@ -125,10 +140,6 @@ Source1: macros.qt5
 # RPM drag in gtk2 as a dependency for the GTK+ 2 dialog support.
 %global __requires_exclude_from ^%{_qt5_plugindir}/platformthemes/.*$
 
-# for doc hacks
-%if 0%{?valgrind}
-BuildRequires: valgrind
-%endif
 # for %%check
 BuildRequires: cmake
 BuildRequires: cups-devel
@@ -148,55 +159,37 @@ BuildRequires: pkgconfig(fontconfig)
 BuildRequires: pkgconfig(gl)
 BuildRequires: pkgconfig(glib-2.0)
 BuildRequires: pkgconfig(gtk+-2.0)
+BuildRequires: pkgconfig(libproxy-1.0)
 # xcb-sm
 BuildRequires: pkgconfig(ice) pkgconfig(sm)
 BuildRequires: pkgconfig(libpng)
 BuildRequires: pkgconfig(libudev)
-BuildRequires: pkgconfig(NetworkManager)
 BuildRequires: pkgconfig(openssl)
 BuildRequires: pkgconfig(libpulse) pkgconfig(libpulse-mainloop-glib)
 %if 0%{?fedora}
 %global xkbcommon -system-xkbcommon
-%if 0%{?fedora} > 20
-# libinput is currently f21+ only
-%global libinput 1
 BuildRequires: pkgconfig(libinput)
 BuildRequires: pkgconfig(xcb-xkb) >= 1.10
 BuildRequires: pkgconfig(xkbcommon) >= 0.4.1
 BuildRequires: pkgconfig(xkbcommon-x11) >= 0.4.1
 %else
-# apply patch to support older version of xcb, resulting lack of xkbcommon-x11
-%global old_xcb 1
-%if 0%{?fedora} > 19
-# Fedora 20
-BuildRequires: pkgconfig(xkbcommon) >= 0.4.1
-%global xkbcommon_version %(pkg-config --modversion xkbcommon 2> /dev/null || echo '0.4.1')
-Requires: libxkbcommon%{?_isa} >= %{xkbcommon_version}
-%else
-# Fedora 19 and older
-BuildRequires: pkgconfig(xkbcommon)
-# apply patch to support older version of xkbcommon
-%global old_xkbcommon 1
-%endif
-%endif
-%else
 # not Fedora
+%if 0%{?rhel} == 6
+%global xcb -qt-xcb
+%endif
 %global xkbcommon -qt-xkbcommon
 Provides: bundled(libxkbcommon) = 0.4.1
 %endif
 BuildRequires: pkgconfig(xkeyboard-config)
 %if 0%{?fedora} || 0%{?rhel} > 6
 %define egl 1
-BuildRequires: pkgconfig(atspi-2)
 BuildRequires: pkgconfig(egl)
 BuildRequires: pkgconfig(gbm)
 BuildRequires: pkgconfig(glesv2)
+%global sqlite -system-sqlite
 BuildRequires: pkgconfig(sqlite3) >= 3.7
-%define sqlite -system-sqlite
-%if 0%{?fedora} > 20
-BuildRequires: pkgconfig(harfbuzz) >= 0.9.31
-%define harfbuzz -system-harfbuzz
-%endif
+%global harfbuzz -system-harfbuzz
+BuildRequires: pkgconfig(harfbuzz) >= 1.0.6
 BuildRequires: pkgconfig(icu-i18n)
 BuildRequires: pkgconfig(libpcre) >= 8.30
 %define pcre -system-pcre
@@ -207,7 +200,11 @@ BuildRequires: libicu-devel
 %endif
 BuildRequires: pkgconfig(xcb) pkgconfig(xcb-glx) pkgconfig(xcb-icccm) pkgconfig(xcb-image) pkgconfig(xcb-keysyms) pkgconfig(xcb-renderutil)
 BuildRequires: pkgconfig(zlib)
-BuildRequires: sed
+# For the very first bootstrap of 5.6 we need valgring for now, as qt5-qdoc brand new 
+# splitted package script still using it
+%ifnarch s390
+BuildRequires: valgrind
+%endif
 
 %if 0%{?qtchooser}
 %if 0%{?fedora}
@@ -227,13 +224,6 @@ Requires: %{name}-common = %{version}-%{release}
 %define tds -no-sql-tds
 %endif
 
-# workaround gold linker bug by not using it
-# https://bugzilla.redhat.com/show_bug.cgi?id=1193044
-#https://sourceware.org/bugzilla/show_bug.cgi?id=16992
-%if 0%{?fedora} > 21
-%define use_gold_linker -no-use-gold-linker
-%endif
-
 %description
 Qt is a software toolkit for developing applications.
 
@@ -251,11 +241,11 @@ BuildArch: noarch
 Summary: Development files for %{name}
 Requires: %{name}%{?_isa} = %{version}-%{release}
 Requires: %{name}-gui%{?_isa}
-Requires: qt5-qdoc
 %if 0%{?egl}
 Requires: pkgconfig(egl)
 %endif
 Requires: pkgconfig(gl)
+Requires: qt5-rpm-macros
 %description devel
 %{summary}.
 
@@ -265,6 +255,7 @@ Summary: API documentation for %{name}
 License: GFDL
 Requires: %{name} = %{version}-%{release}
 BuildRequires: qt5-qhelpgenerator
+BuildRequires: qt5-qdoc
 BuildArch: noarch
 %description doc
 %{summary}.
@@ -281,6 +272,10 @@ Summary: Static library files for %{name}
 Requires: %{name}-devel%{?_isa} = %{version}-%{release}
 Requires: pkgconfig(fontconfig)
 Requires: pkgconfig(glib-2.0)
+%if 0%{?fedora}
+Requires: pkgconfig(libinput)
+Requires: pkgconfig(xkbcommon)
+%endif
 Requires: pkgconfig(zlib)
 %description static
 %{summary}.
@@ -339,42 +334,56 @@ Requires: glx-utils
 %description gui
 Qt5 libraries used for drawing widgets and OpenGL items.
 
-%package -n qt5-qdoc
-Summary: Qt5 documentation generator 
-Requires: %{name}%{?_isa} >= %{version}-%{release}
-%description -n qt5-qdoc
-%{summary}.
+%package -n qt5-rpm-macros
+Summary: RPM macros for Qt5
+%if 0%{?fedora} > 22 && 0%{?inject_optflags}
+# https://bugzilla.redhat.com/show_bug.cgi?id=1248174
+Requires: redhat-rpm-config
+%endif
+# when qt5-rpm-macros was split out
+Conflicts: qt5-qtbase-devel < 5.6.0-0.23
+BuildArch: noarch
+%description -n qt5-rpm-macros
+RPM macros for building Qt5 packages.
 
 
 %prep
 %setup -q -n %{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}
 
-%if 0%{?old_xcb}
-%patch0 -p1 -b .old_xcb
-%if 0%{?old_xkbcommon}
-%patch1 -p1 -b .old_xkbcommon
+%patch4 -p1 -b .QTBUG-35459
+%patch12 -p1 -b .enable_ft_lcdfilter
+
+%patch52 -p1 -b .moc_WORDSIZE
+%patch53 -p1 -b .alsa1.1
+%patch54 -p1 -b .arm
+%patch55 -p1 -b .QTBUG-51648
+## FTBFS, omit for now
+%patch56 -p1 -b .QTBUG-51649
+%patch57 -p1 -b .QTBUG-51676
+
+%patch100 -p1 -b .sqrt
+
+%patch150 -p1 -b .moc_system_defines
+%patch176 -p1 -b .0076
+
+## adjust $RPM_OPT_FLAGS
+# remove -fexceptions
+RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
+# add -fno-delete-null-pointer-checks for f24/gcc6
+%if 0%{?fedora} > 23
+QT5_RPM_OPT_FLAGS="-fno-delete-null-pointer-checks -Wno-deprecated-declaration"
+RPM_OPT_FLAGS="$RPM_OPT_FLAGS $QT5_RPM_OPT_FLAGS"
+%ifarch armv7hl
+RPM_OPT_FLAGS="$RPM_OPT_FLAGS -mfpu=neon"
 %endif
 %endif
+
+%define platform linux-g++
+
+%if 0%{?inject_optflags}
 %patch2 -p1 -b .multilib_optflags
 # drop backup file(s), else they get installed too, http://bugzilla.redhat.com/639463
 rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
-
-%patch4 -p1 -b .QTBUG-35459
-%patch12 -p1 -b .enable_ft_lcdfilter
-%patch25 -p1 -b .qdbusconnection_no_debug
-
-#patch50 -p1 -b .poll
-%patch51 -p1 -b .disconnect_displays
-%patch52 -p1 -b .138201
-
-%if 0%{?rhel} == 6
-%patch100 -p1 -b .QTBUG-43057
-%endif
-
-# drop -fexceptions from $RPM_OPT_FLAGS
-RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
-
-%define platform linux-g++
 
 sed -i -e "s|-O2|$RPM_OPT_FLAGS|g" \
   mkspecs/%{platform}/qmake.conf
@@ -384,13 +393,21 @@ sed -i -e "s|^\(QMAKE_LFLAGS_RELEASE.*\)|\1 $RPM_LD_FLAGS|" \
 
 # undefine QMAKE_STRIP (and friends), so we get useful -debuginfo pkgs (#1065636)
 sed -i -e 's|^\(QMAKE_STRIP.*=\).*$|\1|g' mkspecs/common/linux.conf
+%endif
+
+%if 0%{?prerelease}
+bin/syncqt.pl -version %{version}
+%endif
 
 # move some bundled libs to ensure they're not accidentally used
 pushd src/3rdparty
 mkdir UNUSED
-mv freetype libjpeg libpng zlib xcb UNUSED/
+mv freetype libjpeg libpng zlib UNUSED/
 %if "%{?sqlite}" == "-system-sqlite"
 mv sqlite UNUSED/
+%endif
+%if "%{?xcb}" != "-qt-xcb"
+mv xcb UNUSED/
 %endif
 popd
 
@@ -401,7 +418,23 @@ test -x configure || chmod +x configure
 
 
 %build
-# limit -reduce-relocations to %%ix86 x86_64 archs, https://bugreports.qt-project.org/browse/QTBUG-36129
+## adjust $RPM_OPT_FLAGS
+# remove -fexceptions
+RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
+# add -fno-delete-null-pointer-checks for f24/gcc6
+%if 0%{?fedora} > 23
+QT5_RPM_OPT_FLAGS="-fno-delete-null-pointer-checks -Wno-deprecated-declaration"
+RPM_OPT_FLAGS="$RPM_OPT_FLAGS $QT5_RPM_OPT_FLAGS"
+%ifarch armv7hl
+RPM_OPT_FLAGS="$RPM_OPT_FLAGS -mfpu=neon"
+%endif
+%endif
+
+export CFLAGS="$CFLAGS $RPM_OPT_FLAGS"
+export CXXFLAGS="$CXXFLAGS $RPM_OPT_FLAGS"
+export LDFLAGS="$LDFLAGS $RPM_LD_FLAGS"
+export MAKEFLAGS="%{?_smp_mflags}"
+
 ./configure -v \
   -confirm-license \
   -opensource \
@@ -422,13 +455,14 @@ test -x configure || chmod +x configure
   -release \
   -shared \
   -accessibility \
-  %{?dbus}%{!?dbus:-dbus} \
+  %{?dbus}%{!?dbus:-dbus-runtime} \
   -fontconfig \
   -glib \
   -gtkstyle \
   %{?ibase} \
   -iconv \
   -icu \
+  %{?journald} \
   -openssl-linked \
   -optimized-qmake \
   %{!?examples:-nomake examples} \
@@ -440,40 +474,35 @@ test -x configure || chmod +x configure
   -no-sse2 \
 %endif
   -no-strip \
-%ifarch %{ix86} x86_64
-  -reduce-relocations \
-%endif
-  %{?harfbuzz} \
   -system-libjpeg \
   -system-libpng \
+  %{?harfbuzz} \
   %{?pcre} \
   %{?sqlite} \
   %{?tds} \
+  %{?xcb} \
   %{?xkbcommon} \
   -system-zlib \
-  %{?use_gold_linker} \
   -no-directfb
+
+%if ! 0%{?inject_optflags}
+# ensure qmake build using optflags (which can happen if not munging qmake.conf defaults)
+make clean -C qmake
+make %{?_smp_mflags} -C qmake \
+  QMAKE_CFLAGS_RELEASE="${CFLAGS:-$RPM_OPT_FLAGS}" \
+  QMAKE_CXXFLAGS_RELEASE="${CXXFLAGS:-$RPM_OPT_FLAGS}" \
+  QMAKE_LFLAGS_RELEASE="${LDFLAGS:-$RPM_LD_FLAGS}" \
+  QMAKE_STRIP=
+%endif
 
 make %{?_smp_mflags}
 
 %if 0%{?docs}
-# qdoc
-# wierd but necessary, to force use of just-built qdoc
-rm -fv qmake/Makefile.qmake-docs src/corelib/Makefile
-pushd src; ../bin/qmake; make sub-qdoc; popd
-pushd src/corelib; ../../bin/qmake; popd
-pushd src/xml; ../../bin/qmake; popd
 # HACK to avoid multilib conflicts in noarch content
 # see also https://bugreports.qt-project.org/browse/QTBUG-42071
 QT_HASH_SEED=0; export QT_HASH_SEED
-%if 0%{?valgrind}
-make html_docs || (\
-  mv bin/qdoc bin/qdoc.orig && install %{SOURCE2} bin/qdoc && \
-  make html_docs)
-  [ -e bin/qdoc/orig ] && mv bin/qdoc.orig bin/qdoc -f
-%else
+
 make html_docs
-%endif
 make qch_docs
 %endif
 
@@ -484,6 +513,8 @@ make install INSTALL_ROOT=%{buildroot}
 %if 0%{?docs}
 make install_docs INSTALL_ROOT=%{buildroot}
 %endif
+
+install -m644 -p -D %{SOURCE1} %{buildroot}%{_qt5_datadir}/qtlogging.ini
 
 # Qt5.pc
 cat >%{buildroot}%{_libdir}/pkgconfig/Qt5.pc<<EOF
@@ -507,17 +538,19 @@ translationdir=%{_qt5_translationdir}
 
 Name: Qt5
 Description: Qt5 Configuration
-Version: 5.5.1
+Version: 5.6.0
 EOF
 
 # rpm macros
-install -p -m644 -D %{SOURCE1} \
+install -p -m644 -D %{SOURCE10} \
   %{buildroot}%{rpm_macros_dir}/macros.qt5
 sed -i \
   -e "s|@@NAME@@|%{name}|g" \
   -e "s|@@EPOCH@@|%{?epoch}%{!?epoch:0}|g" \
   -e "s|@@VERSION@@|%{version}|g" \
   -e "s|@@EVR@@|%{?epoch:%{epoch:}}%{version}-%{release}|g" \
+  -e "s|@@QT5_RPM_LD_FLAGS@@|$QT5_RPM_LD_FLAGS|g" \
+  -e "s|@@QT5_RPM_OPT_FLAGS@@|$QT5_RPM_OPT_FLAGS|g" \
   %{buildroot}%{rpm_macros_dir}/macros.qt5
 
 # create/own dirs
@@ -538,10 +571,6 @@ for i in * ; do
       ;;
   esac
 done
-# purge use of /usr/bin/env
-sed -i \
-  -e "s|^#!/usr/bin/env perl|#!/usr/bin/perl|g" \
-  *.pl ||:
 popd
 
 %ifarch %{multilib_archs}
@@ -632,7 +661,8 @@ fi
 %endif
 
 %files
-%doc LICENSE.LGPL* LGPL_EXCEPTION.txt LICENSE.FDL
+%{!?_licensedir:%global license %%doc}
+%license LICENSE.LGPL* LGPL_EXCEPTION.txt LICENSE.FDL
 %if 0%{?qtchooser}
 %dir %{_sysconfdir}/xdg/qtchooser
 # not editable config files, so not using %%config here
@@ -667,6 +697,7 @@ fi
 %{_qt5_translationdir}/
 %dir %{_qt5_prefix}/
 %dir %{_qt5_datadir}/
+%{_qt5_datadir}/qtlogging.ini
 %dir %{_qt5_libexecdir}/
 %dir %{_qt5_plugindir}/
 %dir %{_qt5_plugindir}/bearer/
@@ -695,13 +726,14 @@ fi
 
 %if 0%{?docs}
 %files doc
-%doc LICENSE.FDL
+%license LICENSE.FDL
 %doc dist/README dist/changes-5.*
 %{_qt5_docdir}/*.qch
-%{_qt5_docdir}/qdoc/
 %if 0%{?examples}
+%if 0%{!?bootstrap}
 # included in -examples instead, see bug #1212750
-%exclude %{_qt5_docdir}/qdoc/examples-manifest.xml
+%exclude %{_qt5_docdir}/*/examples-manifest.xml
+%endif
 %endif
 %{_qt5_docdir}/qmake/
 %{_qt5_docdir}/qtconcurrent/
@@ -719,7 +751,6 @@ fi
 %endif
 
 %files devel
-%{rpm_macros_dir}/macros.qt5
 %if "%{_qt5_bindir}" != "%{_bindir}"
 %dir %{_qt5_bindir}
 %endif
@@ -731,6 +762,7 @@ fi
 %{_bindir}/syncqt*
 %{_bindir}/uic*
 %{_bindir}/qlalr
+%{_bindir}/fixqt4headers.pl
 %{_qt5_bindir}/moc*
 %{_qt5_bindir}/qdbuscpp2xml*
 %{_qt5_bindir}/qdbusxml2cpp*
@@ -739,6 +771,7 @@ fi
 %{_qt5_bindir}/syncqt*
 %{_qt5_bindir}/uic*
 %{_qt5_bindir}/qlalr
+%{_qt5_bindir}/fixqt4headers.pl
 %if "%{_qt5_headerdir}" != "%{_includedir}"
 %dir %{_qt5_headerdir}
 %endif
@@ -806,19 +839,16 @@ fi
 %{_qt5_libdir}/pkgconfig/Qt5Sql.pc
 %{_qt5_libdir}/pkgconfig/Qt5Test.pc
 %{_qt5_libdir}/pkgconfig/Qt5Widgets.pc
-%{_qt5_libdir}/pkgconfig/Qt5XcbQpa.pc
 %{_qt5_libdir}/pkgconfig/Qt5Xml.pc
 %if 0%{?egl}
 %{_qt5_libdir}/libQt5EglDeviceIntegration.prl
 %{_qt5_libdir}/libQt5EglDeviceIntegration.so
-%{_qt5_libdir}/pkgconfig/Qt5EglDeviceIntegration.pc
 %endif
 
 
 %files static
 %{_qt5_libdir}/libQt5Bootstrap.*a
 %{_qt5_libdir}/libQt5Bootstrap.prl
-%{_qt5_libdir}/pkgconfig/Qt5Bootstrap.pc
 %{_qt5_headerdir}/QtOpenGLExtensions/
 %{_qt5_libdir}/libQt5OpenGLExtensions.*a
 %{_qt5_libdir}/libQt5OpenGLExtensions.prl
@@ -827,13 +857,11 @@ fi
 %{_qt5_headerdir}/QtPlatformSupport/
 %{_qt5_libdir}/libQt5PlatformSupport.*a
 %{_qt5_libdir}/libQt5PlatformSupport.prl
-%{_qt5_libdir}/pkgconfig/Qt5PlatformSupport.pc
 
 %if 0%{?examples}
 %files examples
-%if 0%{?docs}
-%dir %{_qt5_docdir}/qdoc/
-%{_qt5_docdir}/qdoc/examples-manifest.xml
+%if 0%{!?bootstrap}
+%{_qt5_docdir}/*/examples-manifest.xml
 %endif
 %{_qt5_examplesdir}/
 %endif
@@ -878,7 +906,7 @@ fi
 %{_qt5_plugindir}/generic/libqevdevmouseplugin.so
 %{_qt5_plugindir}/generic/libqevdevtabletplugin.so
 %{_qt5_plugindir}/generic/libqevdevtouchplugin.so
-%if 0%{?libinput}
+%if 0%{?fedora}
 %{_qt5_plugindir}/generic/libqlibinputplugin.so
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QLibInputPlugin.cmake
 %endif
@@ -926,29 +954,168 @@ fi
 %{_qt5_plugindir}/printsupport/libcupsprintersupport.so
 %{_qt5_libdir}/cmake/Qt5PrintSupport/Qt5PrintSupport_QCupsPrinterSupportPlugin.cmake
 
-%files -n qt5-qdoc
-%{_bindir}/qdoc*
-%{_qt5_bindir}/qdoc*
+%files -n qt5-rpm-macros
+%{rpm_macros_dir}/macros.qt5
 
 
 %changelog
+* Tue Mar 15 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-2
+- respin QTBUG-51767 patch
+
+* Mon Mar 14 2016 Helio Chissini de Castro <helio@kde.org> - 5.6.0-1
+- 5.6.0 release
+
+* Sat Mar 12 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.41.rc
+- %%build: restore -dbus-linked
+
+* Fri Mar 11 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.40.rc
+- respin QTBUG-51649 patch
+- %%build: use -dbus-runtime unconditionally
+- drop (unused) build deps: atspi, dbus, networkmanager
+
+* Thu Mar 10 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.39.rc
+- candidate fixes for various QtDBus deadlocks (QTBUG-51648,QTBUG-51676)
+
+* Mon Mar 07 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.38.rc
+- backport "crash on start if system bus is not available" (QTBUG-51299)
+
+* Sat Mar 05 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.37.rc
+- %build: ./configure -journal (f24+)
+
+* Wed Mar 02 2016 Daniel Vrátil <dvratil@fedoraproject.org> 5.6.0-0.36.rc
+- Non-bootstrapped build
+
+* Tue Mar 01 2016 Daniel Vrátil <dvratil@fedoraproject.org> 5.6.0-0.35.rc
+- Rebuild against new openssl
+
+* Fri Feb 26 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.34.rc
+- qtlogging.ini: remove comments
+
+* Thu Feb 25 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.33.rc
+- ship $$[QT_INSTALL_DATA]/qtlogging.ini for packaged logging defaults (#1227295)
+
+* Thu Feb 25 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.32.rc
+- qt5-qtbase-static missing dependencies (#1311311)
+
+* Wed Feb 24 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.31.rc
+- Item views don't handle insert/remove of rows robustly (QTBUG-48870)
+
+* Tue Feb 23 2016 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.30.rc
+- Update to final RC
+
+* Mon Feb 22 2016 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.29.rc
+- Update tarball with https://bugreports.qt.io/browse/QTBUG-50703 fix
+
+* Wed Feb 17 2016 Than Ngo <than@redhat.com> - 5.6.0-0.28.rc
+- fix build issue with gcc6
+
+* Mon Feb 15 2016 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.27.rc
+- Update proper tarball. Need avoid the fix branch
+
+* Mon Feb 15 2016 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.26.rc
+- Integrate rc releases now.
+
+* Sat Feb 13 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.25.beta
+- macros.qt5: fix %%qt5_ldflags macro
+
+* Thu Feb 11 2016 Than Ngo <than@redhat.com> - 5.6.0-0.24.beta
+- fix build issue with gcc6
+- fix check for alsa 1.1.x
+
+* Wed Feb 03 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.23.beta
+- qt5-rpm-macros pkg
+
+* Tue Feb 02 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.22.beta
+- don't inject $RPM_OPT_FLAGS/$RPM_LD_FLAGS into qmake defaults f24+ (#1279265)
+
+* Tue Feb 02 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.21.beta
+- build with and add to macros.qt5 flags: -fno-delete-null-pointer-checks
+
+* Fri Jan 15 2016 Than Ngo <than@redhat.com> - 5.6.0-0.20.beta
+- enable -qt-xcb to fix non-US keys under VNC (#1295713)
+
+* Mon Jan 04 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.19.beta
+- Crash in QXcbWindow::setParent() due to NULL xcbScreen (QTBUG-50081, #1291003)
+
+* Mon Dec 21 2015 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.17.beta
+- fix/update Release: tag
+
+* Fri Dec 18 2015 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.16
+- 5.6.0-beta (final)
+
+* Wed Dec 16 2015 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-0.15
+- pull in another upstream moc fix/improvement (#1290020,QTBUG-49972)
+- fix bootstrap/docs
+
+* Wed Dec 16 2015 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.13
+- workaround moc/qconfig-multilib issues (#1290020,QTBUG-49972)
+
+* Wed Dec 16 2015 Peter Robinson <pbrobinson@fedoraproject.org> 5.6.0-0.12
+- aarch64 is secondary arch too
+- ppc64le is NOT multilib
+- Fix Power 64 macro use
+
+* Mon Dec 14 2015 Than Ngo <than@redhat.com> - 5.6.0-0.11
+- fix build failure on secondary arch
+
+* Sun Dec 13 2015 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.10
+- We're back to gold linker
+- Remove reduce relocations
+
+* Sat Dec 12 2015 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.9
+- drop disconnect_displays.patch so we can better test latest xcb/display work
+
+* Fri Dec 11 2015 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.8
+- sync latest xcb/screen/display related upstream commits
+
+* Thu Dec 10 2015 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.7
+- Official beta release
+
+* Thu Dec 10 2015 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.6
+- Official beta release
+
+* Wed Dec 09 2015 Daniel Vratil <dvratil@fedoraproject.org> - 5.6.0-0.5
+- try reverting from -optimized-tools to -optimized-qmake
+
+* Sun Dec 06 2015 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-0.4
+- re-introduce bootstrap/examples macros
+- put examples-manifest.xml in -examples
+- restore -doc multilib hack (to be on the safe side, can't hurt)
+- %%build: s/-optimized-qmake/-optimized-tools/
+
+* Sat Dec 05 2015 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.3
+- Beta 3
+- Reintroduce xcb patch from https://codereview.qt-project.org/#/c/138201/
+
+* Fri Nov 27 2015 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.2
+- Valgrind still needed as buildreq due recent split qdoc package, but we can get rid of
+  specific arch set.
+- Added missing libproxy buildreq
+- Epel and RHEL doesn't have libinput, so a plugin need to be excluded for this distros
+
+* Wed Nov 25 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.1-10
+- -devel: Requires: redhat-rpm-config (#1248174)
+
+* Wed Nov 18 2015 Helio Chissini de Castro <helio@kde.org> - 5.5.1-9
+- Get rid of valgrind hack. It sort out that we don't need it anymore (#1211203)
+
 * Mon Nov 09 2015 Helio Chissini de Castro <helio@kde.org> - 5.5.1-8
 - qt5-qdoc need requires >= current version, otherwise will prevent the usage further when moved to qttools
 
 * Mon Nov 09 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.1-7
 - qt5-qdoc subpkg
 
+* Tue Nov 03 2015 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.1
+- Start to implement 5.6.0 beta
+
+* Tue Nov 03 2015 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.1
+- Start to implement 5.6.0 beta
+
 * Wed Oct 28 2015 David Tardon <dtardon@redhat.com> - 5.5.1-6
 - full build
 
 * Wed Oct 28 2015 David Tardon <dtardon@redhat.com> - 5.5.1-5
 - rebuild for ICU 56.1
-
-* Wed Oct 28 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.1-4
-- purge use of /usr/bin/env
-
-* Sat Oct 24 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.1-3
-- pull in more screen connect/disconnect fixes (code review 138201)
 
 * Thu Oct 15 2015 Helio Chissini de Castro <helio@kde.org> - 5.5.1-2
 - Update to final release 5.5.1

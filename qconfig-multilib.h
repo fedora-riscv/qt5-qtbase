@@ -6,7 +6,10 @@
 
 #ifndef QCONFIG_MULTILIB_H
 #define QCONFIG_MULTILIB_H
+
+#ifndef __WORDSIZE
 #include <bits/wordsize.h>
+#endif
 
 #if __WORDSIZE == 32
 #include "QtCore/qconfig-32.h"
