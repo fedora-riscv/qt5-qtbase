@@ -44,7 +44,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.5.1
-Release: 11%{?dist}
+Release: 10%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -939,7 +939,7 @@ fi
 
 
 %changelog
-* Tue Jan 05 2016 Rex Dieter <rdieter@fedoraproject.org> 5.5.1-11
+* Tue Jan 05 2016 Rex Dieter <rdieter@fedoraproject.org> 5.5.1-10
 - Crash in QXcbWindow::setParent() due to NULL xcbScreen (QTBUG-50081, #1291003)
 
 * Tue Jan 05 2016 Jan Grulich <jgrulich@redhat.com> - 5.5.1-10
