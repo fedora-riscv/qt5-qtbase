@@ -48,7 +48,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 3%{?prerelease:.%{prerelease}}%{?dist}
+Release: 4%{?prerelease:.%{prerelease}}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -373,8 +373,8 @@ RPM macros for building Qt5 packages.
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
 # add -fno-delete-null-pointer-checks for f24/gcc6
 %if 0%{?fedora} > 23
-QT5_RPM_OPT_FLAGS="-fno-delete-null-pointer-checks -Wno-deprecated-declaration"
-RPM_OPT_FLAGS="$RPM_OPT_FLAGS $QT5_RPM_OPT_FLAGS"
+%global qt5_rpm_opt_flags -fno-delete-null-pointer-checks -Wno-deprecated-declaration
+RPM_OPT_FLAGS="$RPM_OPT_FLAGS %{?qt5_rpm_opt_flags}"
 %ifarch armv7hl
 RPM_OPT_FLAGS="$RPM_OPT_FLAGS -mfpu=neon"
 %endif
@@ -425,8 +425,7 @@ test -x configure || chmod +x configure
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
 # add -fno-delete-null-pointer-checks for f24/gcc6
 %if 0%{?fedora} > 23
-QT5_RPM_OPT_FLAGS="-fno-delete-null-pointer-checks -Wno-deprecated-declaration"
-RPM_OPT_FLAGS="$RPM_OPT_FLAGS $QT5_RPM_OPT_FLAGS"
+RPM_OPT_FLAGS="$RPM_OPT_FLAGS %{?qt5_rpm_opt_flags}"
 %ifarch armv7hl
 RPM_OPT_FLAGS="$RPM_OPT_FLAGS -mfpu=neon"
 %endif
@@ -551,8 +550,8 @@ sed -i \
   -e "s|@@EPOCH@@|%{?epoch}%{!?epoch:0}|g" \
   -e "s|@@VERSION@@|%{version}|g" \
   -e "s|@@EVR@@|%{?epoch:%{epoch:}}%{version}-%{release}|g" \
-  -e "s|@@QT5_RPM_LD_FLAGS@@|$QT5_RPM_LD_FLAGS|g" \
-  -e "s|@@QT5_RPM_OPT_FLAGS@@|$QT5_RPM_OPT_FLAGS|g" \
+  -e "s|@@QT5_RPM_LD_FLAGS@@|%{?qt5_rpm_ld_flags}|g" \
+  -e "s|@@QT5_RPM_OPT_FLAGS@@|%{?qt5_rpm_opt_flags}|g" \
   %{buildroot}%{rpm_macros_dir}/macros.qt5
 
 # create/own dirs
@@ -961,6 +960,9 @@ fi
 
 
 %changelog
+* Fri Mar 18 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-4
+- macros.qt5: fix %%{_qt5_optflags} (for f24+)
+
 * Fri Mar 18 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-3
 - rebuild
 
