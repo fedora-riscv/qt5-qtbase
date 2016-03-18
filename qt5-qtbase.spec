@@ -44,7 +44,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.5.1
-Release: 12%{?dist}
+Release: 11%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -100,9 +100,6 @@ Patch100: qtbase-opensource-src-5.4.0-QTBUG-43057.patch
 
 # Fix for https://bugreports.qt.io/browse/QTBUG-4246
 Patch101: qt5-qtbase-qlineedit-fix-visibility-of-side-widgets.patch
-
-Patch102: 0002-QListView-Use-correct-available-size-when-calculatin.patch
-Patch103: 0003-QListView-fix-skipping-indexes-in-selectedIndexes.patch
 
 # macros, be mindful to keep sync'd with macros.qt5
 Source1: macros.qt5
@@ -383,8 +380,6 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 %endif
 
 %patch101 -p1 -b .qlineedit-fix-visibility-of-side-widgets
-%patch102 -p1 -b .0002
-%patch103 -p1 -b .0003
 
 # drop -fexceptions from $RPM_OPT_FLAGS
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
@@ -951,9 +946,6 @@ fi
 
 
 %changelog
-* Wed Feb 24 2016 Rex Dieter <rdieter@fedoraproject.org> 5.5.1-12
-- Item views don't handle insert/remove of rows robustly (QTBUG-48870)
-
 * Fri Jan 15 2016 Than Ngo <than@redhat.com> - 5.5.1-11
 - Crash in QXcbWindow::setParent() due to NULL xcbScreen (QTBUG-50081, #1291003)
 - enable -qt-xcb to fix non-US keys under VNC (#1295713)
