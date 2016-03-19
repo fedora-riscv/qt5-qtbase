@@ -56,7 +56,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 4%{?prerelease:.%{prerelease}}%{?dist}
+Release: 5%{?prerelease:.%{prerelease}}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -957,7 +957,7 @@ fi
 
 
 %changelog
-* Fri Mar 18 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-4
+* Fri Mar 18 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-5
 - macros.qt5: cleanup, %%_qt5_cflags, %%_qt5_cxxflags (for f24+)
 
 * Fri Mar 18 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-3
