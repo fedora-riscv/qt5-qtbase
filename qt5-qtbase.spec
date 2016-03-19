@@ -382,7 +382,8 @@ RPM macros for building Qt5 packages.
 ## adjust $RPM_OPT_FLAGS
 # remove -fexceptions
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
-RPM_OPT_FLAGS="$RPM_OPT_FLAGS %{?qt5_deprecated_flag} %{?qt5_arm_flag}"
+# these flags are for qtbase build only, no need to propogate elsewhere
+#RPM_OPT_FLAGS="$RPM_OPT_FLAGS %{?qt5_deprecated_flag} %{?qt5_arm_flag}"
 
 %patch2 -p1 -b .multilib_optflags
 # drop backup file(s), else they get installed too, http://bugzilla.redhat.com/639463
