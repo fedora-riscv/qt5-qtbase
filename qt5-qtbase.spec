@@ -56,7 +56,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 6%{?prerelease:.%{prerelease}}%{?dist}
+Release: 7%{?prerelease:.%{prerelease}}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -425,10 +425,10 @@ test -x configure || chmod +x configure
 ## adjust $RPM_OPT_FLAGS
 # remove -fexceptions
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
-RPM_OPT_FLAGS="$RPM_OPT_FLAGS %{?qt5_deprecated_flag} %{?qt5_arm_flag}"
+RPM_OPT_FLAGS="$RPM_OPT_FLAGS %{?qt5_arm_flag} %{?qt5_deprecated_flag} %{?qt5_null_flag}"
 
 export CFLAGS="$CFLAGS $RPM_OPT_FLAGS"
-export CXXFLAGS="$CXXFLAGS $RPM_OPT_FLAGS %{?qt5_null_flag}"
+export CXXFLAGS="$CXXFLAGS $RPM_OPT_FLAGS"
 export LDFLAGS="$LDFLAGS $RPM_LD_FLAGS"
 export MAKEFLAGS="%{?_smp_mflags}"
 
@@ -547,9 +547,9 @@ sed -i \
   -e "s|@@VERSION@@|%{version}|g" \
   -e "s|@@EVR@@|%{?epoch:%{epoch:}}%{version}-%{release}|g" \
   -e "s|@@QT5_CFLAGS@@|%{?qt5_cflags}|g" \
-  -e "s|@@QT5_CXXFLAGS@@|%{?qt5_null_flag}|g" \
+  -e "s|@@QT5_CXXFLAGS@@|%{?qt5_cxxflags}|g" \
   -e "s|@@QT5_RPM_LD_FLAGS@@|%{?qt5_rpm_ld_flags}|g" \
-  -e "s|@@QT5_RPM_OPT_FLAGS@@|%{?qt5_rpm_opt_flags}|g" \
+  -e "s|@@QT5_RPM_OPT_FLAGS@@|%{?qt5_rpm_opt_flags} %{?qt5_null_flag}|g" \
   %{buildroot}%{rpm_macros_dir}/macros.qt5
 
 # create/own dirs
@@ -958,6 +958,9 @@ fi
 
 
 %changelog
+* Sat Mar 19 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-7
+- macros.qt5: null-pointer-checks flag isn't c++-specific
+
 * Sat Mar 19 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-6
 - macros.qt5: we really only want the null-pointer-checks flag here
   and definitely no arch-specific ones
