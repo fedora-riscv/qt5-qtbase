@@ -30,6 +30,14 @@
 
 %if 0%{?fedora} > 23
 %global journald -journald
+# gcc6: FTBFS
+%global qt5_deprecated_flag -Wno-deprecated-declaration
+# gcc6: Qt assumes this in places
+%global qt5_null_flag -fno-delete-null-pointer-checks
+%ifarch armv7hl
+# gcc6: arm FTBFS
+%global qt5_arm_flag -mfpu=neon
+%endif
 %endif
 
 # define to build docs, need to undef this for bootstrapping
@@ -48,7 +56,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 2%{?prerelease:.%{prerelease}}%{?dist}
+Release: 7%{?prerelease:.%{prerelease}}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -188,8 +196,10 @@ BuildRequires: pkgconfig(gbm)
 BuildRequires: pkgconfig(glesv2)
 %global sqlite -system-sqlite
 BuildRequires: pkgconfig(sqlite3) >= 3.7
+%if 0%{?fedora} > 22
 %global harfbuzz -system-harfbuzz
-BuildRequires: pkgconfig(harfbuzz) >= 1.0.6
+BuildRequires: pkgconfig(harfbuzz) >= 0.9.42
+%endif
 BuildRequires: pkgconfig(icu-i18n)
 BuildRequires: pkgconfig(libpcre) >= 8.30
 %define pcre -system-pcre
@@ -366,21 +376,15 @@ RPM macros for building Qt5 packages.
 %patch150 -p1 -b .moc_system_defines
 %patch176 -p1 -b .0076
 
-## adjust $RPM_OPT_FLAGS
-# remove -fexceptions
-RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
-# add -fno-delete-null-pointer-checks for f24/gcc6
-%if 0%{?fedora} > 23
-QT5_RPM_OPT_FLAGS="-fno-delete-null-pointer-checks -Wno-deprecated-declaration"
-RPM_OPT_FLAGS="$RPM_OPT_FLAGS $QT5_RPM_OPT_FLAGS"
-%ifarch armv7hl
-RPM_OPT_FLAGS="$RPM_OPT_FLAGS -mfpu=neon"
-%endif
-%endif
-
 %define platform linux-g++
 
 %if 0%{?inject_optflags}
+## adjust $RPM_OPT_FLAGS
+# remove -fexceptions
+RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
+# these flags are for qtbase build only, no need to propogate elsewhere
+#RPM_OPT_FLAGS="$RPM_OPT_FLAGS %{?qt5_deprecated_flag} %{?qt5_arm_flag}"
+
 %patch2 -p1 -b .multilib_optflags
 # drop backup file(s), else they get installed too, http://bugzilla.redhat.com/639463
 rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
@@ -421,14 +425,7 @@ test -x configure || chmod +x configure
 ## adjust $RPM_OPT_FLAGS
 # remove -fexceptions
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
-# add -fno-delete-null-pointer-checks for f24/gcc6
-%if 0%{?fedora} > 23
-QT5_RPM_OPT_FLAGS="-fno-delete-null-pointer-checks -Wno-deprecated-declaration"
-RPM_OPT_FLAGS="$RPM_OPT_FLAGS $QT5_RPM_OPT_FLAGS"
-%ifarch armv7hl
-RPM_OPT_FLAGS="$RPM_OPT_FLAGS -mfpu=neon"
-%endif
-%endif
+RPM_OPT_FLAGS="$RPM_OPT_FLAGS %{?qt5_arm_flag} %{?qt5_deprecated_flag} %{?qt5_null_flag}"
 
 export CFLAGS="$CFLAGS $RPM_OPT_FLAGS"
 export CXXFLAGS="$CXXFLAGS $RPM_OPT_FLAGS"
@@ -549,8 +546,10 @@ sed -i \
   -e "s|@@EPOCH@@|%{?epoch}%{!?epoch:0}|g" \
   -e "s|@@VERSION@@|%{version}|g" \
   -e "s|@@EVR@@|%{?epoch:%{epoch:}}%{version}-%{release}|g" \
-  -e "s|@@QT5_RPM_LD_FLAGS@@|$QT5_RPM_LD_FLAGS|g" \
-  -e "s|@@QT5_RPM_OPT_FLAGS@@|$QT5_RPM_OPT_FLAGS|g" \
+  -e "s|@@QT5_CFLAGS@@|%{?qt5_cflags}|g" \
+  -e "s|@@QT5_CXXFLAGS@@|%{?qt5_cxxflags}|g" \
+  -e "s|@@QT5_RPM_LD_FLAGS@@|%{?qt5_rpm_ld_flags}|g" \
+  -e "s|@@QT5_RPM_OPT_FLAGS@@|%{?qt5_rpm_opt_flags} %{?qt5_null_flag}|g" \
   %{buildroot}%{rpm_macros_dir}/macros.qt5
 
 # create/own dirs
@@ -959,6 +958,19 @@ fi
 
 
 %changelog
+* Sat Mar 19 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-7
+- macros.qt5: null-pointer-checks flag isn't c++-specific
+
+* Sat Mar 19 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-6
+- macros.qt5: we really only want the null-pointer-checks flag here
+  and definitely no arch-specific ones
+
+* Fri Mar 18 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-5
+- macros.qt5: cleanup, %%_qt5_cflags, %%_qt5_cxxflags (for f24+)
+
+* Fri Mar 18 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-3
+- rebuild
+
 * Tue Mar 15 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-2
 - respin QTBUG-51767 patch
 
