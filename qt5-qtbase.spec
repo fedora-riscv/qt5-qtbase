@@ -28,8 +28,10 @@
 %global inject_optflags 1
 %endif
 
-%if 0%{?fedora} > 23
+%if 0%{?fedora} > 23 || 0%{?rhel} > 6
 %global journald -journald
+
+%if 0%{?fedora} > 23
 # gcc6: FTBFS
 %global qt5_deprecated_flag -Wno-deprecated-declaration
 # gcc6: Qt assumes this in places
@@ -56,7 +58,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 7%{?prerelease:.%{prerelease}}%{?dist}
+Release: 8%{?prerelease:.%{prerelease}}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -958,6 +960,10 @@ fi
 
 
 %changelog
+* Thu Mar 24 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-8
+- make 10-qt5-check-opengl2.sh xinit script more robust
+- enable journald support for el7+ (#1315239)
+
 * Sat Mar 19 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-7
 - macros.qt5: null-pointer-checks flag isn't c++-specific
 
