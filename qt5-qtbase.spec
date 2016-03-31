@@ -1,6 +1,6 @@
 # See http://bugzilla.redhat.com/223663
-%define multilib_archs x86_64 %{ix86} ppc64 ppc s390x s390 sparc64 sparcv9
-%define multilib_basearchs x86_64 ppc64 s390x sparc64
+%define multilib_archs x86_64 %{ix86} %{?mips} ppc64 ppc s390x s390 sparc64 sparcv9
+%define multilib_basearchs x86_64 %{?mips64} ppc64 s390x sparc64
 
 # support qtchooser (adds qtchooser .conf file)
 %define qtchooser 1
@@ -59,7 +59,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 9%{?prerelease:.%{prerelease}}%{?dist}
+Release: 10%{?prerelease:.%{prerelease}}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -212,11 +212,6 @@ BuildRequires: libicu-devel
 %endif
 BuildRequires: pkgconfig(xcb) pkgconfig(xcb-glx) pkgconfig(xcb-icccm) pkgconfig(xcb-image) pkgconfig(xcb-keysyms) pkgconfig(xcb-renderutil)
 BuildRequires: pkgconfig(zlib)
-# For the very first bootstrap of 5.6 we need valgring for now, as qt5-qdoc brand new 
-# splitted package script still using it
-%ifnarch s390
-BuildRequires: valgrind
-%endif
 
 %if 0%{?qtchooser}
 %if 0%{?fedora}
@@ -963,6 +958,10 @@ fi
 
 
 %changelog
+* Thu Mar 31 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-10
+- Fix build on MIPS (#1322537)
+- drop BR: valgrind (not used, for awhile)
+
 * Fri Mar 25 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-9
 - pull upstream patches (upstreamed versions, gcc6-related bits mostly)
 
