@@ -59,7 +59,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 10%{?prerelease:.%{prerelease}}%{?dist}
+Release: 11%{?prerelease:.%{prerelease}}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -958,6 +958,9 @@ fi
 
 
 %changelog
+* Fri Apr 15 2016 David Tardon <dtardon@redhat.com> - 5.6.0-11
+- rebuild for ICU 57.1
+
 * Thu Mar 31 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-10
 - Fix build on MIPS (#1322537)
 - drop BR: valgrind (not used, for awhile)
