@@ -59,7 +59,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 12%{?prerelease:.%{prerelease}}%{?dist}
+Release: 13%{?prerelease:.%{prerelease}}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -246,6 +246,7 @@ BuildArch: noarch
 
 %package devel
 Summary: Development files for %{name}
+Provides: %{name}-private-devel = %{version}-%{release}
 Requires: %{name}%{?_isa} = %{version}-%{release}
 Requires: %{name}-gui%{?_isa}
 %if 0%{?egl}
@@ -958,6 +959,9 @@ fi
 
 
 %changelog
+* Sat Apr 16 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-13
+- -devel: Provides: qt5-qtbase-private-devel (#1233829)
+
 * Sat Apr 16 2016 David Tardon <dtardon@redhat.com> - 5.6.0-12
 - full build
 
