@@ -16,7 +16,7 @@
 %global rpm_macros_dir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
 ## set to 1 to enable bootstrap
-%global bootstrap 0
+%global bootstrap 1
 
 %if 0%{?fedora} > 21
 # use external qt_settings pkg
@@ -59,7 +59,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 13%{?prerelease:.%{prerelease}}%{?dist}
+Release: 14%{?prerelease:.%{prerelease}}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -959,6 +959,9 @@ fi
 
 
 %changelog
+* Mon Apr 18 2016 Caolán McNamara <caolanm@redhat.com> - 5.6.0-14
+- bootstrap rebuild for hunspell 1.4.0
+
 * Sat Apr 16 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-13
 - -devel: Provides: qt5-qtbase-private-devel (#1233829)
 
