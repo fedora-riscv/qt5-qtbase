@@ -87,10 +87,6 @@ Patch4: qtbase-opensource-src-5.3.2-QTBUG-35459.patch
 Patch12: qtbase-opensource-src-5.2.0-enable_ft_lcdfilter.patch
 
 # upstreamable patches
-# support poll
-# https://bugreports.qt-project.org/browse/QTBUG-27195
-# NEEDS REBASE
-Patch50: qt5-poll.patch
 
 # Workaround moc/multilib issues
 # https://bugzilla.redhat.com/show_bug.cgi?id=1290020
