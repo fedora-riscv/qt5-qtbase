@@ -1,6 +1,6 @@
 # See http://bugzilla.redhat.com/223663
-%define multilib_archs x86_64 %{ix86} ppc64 ppc s390x s390 sparc64 sparcv9
-%define multilib_basearchs x86_64 ppc64 s390x sparc64
+%define multilib_archs x86_64 %{ix86} %{?mips} ppc64 ppc s390x s390 sparc64 sparcv9
+%define multilib_basearchs x86_64 %{?mips64} ppc64 s390x sparc64
 
 # support qtchooser (adds qtchooser .conf file)
 %define qtchooser 1
@@ -28,8 +28,11 @@
 %global inject_optflags 1
 %endif
 
-%if 0%{?fedora} > 23
+%if 0%{?fedora} > 23 || 0%{?rhel} > 6
 %global journald -journald
+%endif
+
+%if 0%{?fedora} > 23
 # gcc6: FTBFS
 %global qt5_deprecated_flag -Wno-deprecated-declaration
 # gcc6: Qt assumes this in places
@@ -56,7 +59,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 7%{?prerelease:.%{prerelease}}%{?dist}
+Release: 13%{?prerelease:.%{prerelease}}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -94,9 +97,6 @@ Patch50: qt5-poll.patch
 # https://bugreports.qt.io/browse/QTBUG-49972
 Patch52: qtbase-opensource-src-5.6.0-moc_WORDSIZE.patch
 
-# correct check for alsa-1.1
-Patch53: qtbase-opensource-src-5.6.0-alsa-1.1.patch
-
 # arm patch
 Patch54: qtbase-opensource-src-5.6.0-arm.patch
 
@@ -106,19 +106,21 @@ Patch55: QTBUG-51648-QtDBus-clean-up-signal-hooks-and-object-tree-in-clos.patch
 # https://codereview.qt-project.org/#/c/151340/
 Patch56: QTBUG-51649-QtDBus-finish-all-pending-call-with-error-if-disconn.patch
 
-# https://codereview.qt-project.org/#/c/151459/
-Patch57: QTBUG-51676-Fix-QtDBus-deadlock-inside-kded-kiod.patch
-
-# Epel patches
-Patch100: qt5-qtbase-5.6.0-el6-sqrt.patch
-
-
 # recently passed code review, not integrated yet
 # https://codereview.qt-project.org/126102/
-Patch150: moc-get-the-system-defines-from-the-compiler-itself.patch
+Patch60: moc-get-the-system-defines-from-the-compiler-itself.patch
+
+## upstream patches
 
 # Item views, https://bugreports.qt.io/browse/QTBUG-48870
+Patch158: 0058-QtGui-Avoid-rgba64-rgba32-conversion-on-every-pixel-.patch
 Patch176: 0076-QListView-fix-skipping-indexes-in-selectedIndexes.patch
+Patch201: 0101-xcb-include-cmath.patch
+Patch277: 0177-Fix-GCC-6-Wunused-functions-warnings.patch
+Patch278: 0178-qt_common.prf-when-looking-for-GCC-4.6-match-GCC-6-t.patch
+Patch301: 0201-alsatest-Fix-the-check-to-treat-alsalib-1.1.x-as-cor.patch
+Patch321: 0221-QObject-fix-GCC-6-warning-about-qt_static_metacall-s.patch
+Patch393: 0293-Fix-QtDBus-deadlock-inside-kded-kiod.patch
 
 # macros, be mindful to keep sync'd with macros.qt5
 Source10: macros.qt5
@@ -210,11 +212,6 @@ BuildRequires: libicu-devel
 %endif
 BuildRequires: pkgconfig(xcb) pkgconfig(xcb-glx) pkgconfig(xcb-icccm) pkgconfig(xcb-image) pkgconfig(xcb-keysyms) pkgconfig(xcb-renderutil)
 BuildRequires: pkgconfig(zlib)
-# For the very first bootstrap of 5.6 we need valgring for now, as qt5-qdoc brand new 
-# splitted package script still using it
-%ifnarch s390
-BuildRequires: valgrind
-%endif
 
 %if 0%{?qtchooser}
 %if 0%{?fedora}
@@ -249,6 +246,7 @@ BuildArch: noarch
 
 %package devel
 Summary: Development files for %{name}
+Provides: %{name}-private-devel = %{version}-%{release}
 Requires: %{name}%{?_isa} = %{version}-%{release}
 Requires: %{name}-gui%{?_isa}
 %if 0%{?egl}
@@ -364,17 +362,20 @@ RPM macros for building Qt5 packages.
 %patch12 -p1 -b .enable_ft_lcdfilter
 
 %patch52 -p1 -b .moc_WORDSIZE
-%patch53 -p1 -b .alsa1.1
 %patch54 -p1 -b .arm
 %patch55 -p1 -b .QTBUG-51648
 ## FTBFS, omit for now
 %patch56 -p1 -b .QTBUG-51649
-%patch57 -p1 -b .QTBUG-51676
+%patch60 -p1 -b .moc_system_defines
 
-%patch100 -p1 -b .sqrt
-
-%patch150 -p1 -b .moc_system_defines
+%patch158 -p1 -b .0058
 %patch176 -p1 -b .0076
+%patch201 -p1 -b .0101
+%patch277 -p1 -b .0177
+%patch278 -p1 -b .0178
+%patch301 -p1 -b .0201
+%patch321 -p1 -b .0221
+%patch393 -p1 -b .0293
 
 %define platform linux-g++
 
@@ -958,6 +959,26 @@ fi
 
 
 %changelog
+* Sat Apr 16 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-13
+- -devel: Provides: qt5-qtbase-private-devel (#1233829)
+
+* Sat Apr 16 2016 David Tardon <dtardon@redhat.com> - 5.6.0-12
+- full build
+
+* Fri Apr 15 2016 David Tardon <dtardon@redhat.com> - 5.6.0-11
+- rebuild for ICU 57.1
+
+* Thu Mar 31 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-10
+- Fix build on MIPS (#1322537)
+- drop BR: valgrind (not used, for awhile)
+
+* Fri Mar 25 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-9
+- pull upstream patches (upstreamed versions, gcc6-related bits mostly)
+
+* Thu Mar 24 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-8
+- make 10-qt5-check-opengl2.sh xinit script more robust
+- enable journald support for el7+ (#1315239)
+
 * Sat Mar 19 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-7
 - macros.qt5: null-pointer-checks flag isn't c++-specific
 
