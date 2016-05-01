@@ -59,7 +59,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 15%{?prerelease:.%{prerelease}}%{?dist}
+Release: 16%{?prerelease:.%{prerelease}}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -926,6 +926,7 @@ fi
 %{_qt5_libdir}/libQt5EglDeviceIntegration.so.5*
 %{_qt5_plugindir}/platforms/libqeglfs.so
 %{_qt5_plugindir}/platforms/libqminimalegl.so
+%dir %{_qt5_plugindir}/egldeviceintegrations/
 %{_qt5_plugindir}/egldeviceintegrations/libqeglfs-kms-integration.so
 %{_qt5_plugindir}/egldeviceintegrations/libqeglfs-x11-integration.so
 %{_qt5_plugindir}/xcbglintegrations/libqxcb-egl-integration.so
@@ -955,6 +956,9 @@ fi
 
 
 %changelog
+* Sat Apr 30 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-16
+- own %%{_qt5_plugindir}/egldeviceintegrations
+
 * Mon Apr 18 2016 Caolán McNamara <caolanm@redhat.com> - 5.6.0-15
 - full rebuild for hunspell 1.4.0
 
