@@ -618,7 +618,7 @@ install -p -m755 -D %{SOURCE6} %{buildroot}%{_sysconfdir}/X11/xinit/xinitrc.d/10
 export CTEST_OUTPUT_ON_FAILURE=1
 export PATH=%{buildroot}%{_qt5_bindir}:$PATH
 export LD_LIBRARY_PATH=%{buildroot}%{_qt5_libdir}
-make sub-tests-all %{?_smp_mflags} -C %{_target_platform}
+make sub-tests %{?_smp_mflags} -C %{_target_platform}
 xvfb-run -a \
 dbus-launch --exit-with-session \
 time \
