@@ -501,7 +501,7 @@ make %{?_smp_mflags} -C %{_target_platform}/qmake \
   QMAKE_STRIP=
 %endif
 
-make %{?_smp_mflags}
+make %{?_smp_mflags} -C %{_target_platform}
 
 %if 0%{?docs}
 # HACK to avoid multilib conflicts in noarch content
