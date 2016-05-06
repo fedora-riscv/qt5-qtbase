@@ -48,18 +48,19 @@
 # only primary archs (for now), allow secondary to bootstrap
 %if ! 0%{?bootstrap}
 %ifarch %{arm} %{ix86} x86_64 %{power64} s390 s390x aarch64
-%define docs 1
+%global docs 1
+%global tests 1
 %endif
 %endif
 
-%define examples 1
+%global examples 1
 
 #define prerelease rc
 
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 16%{?prerelease:.%{prerelease}}%{?dist}
+Release: 17%{?prerelease:.%{prerelease}}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -208,6 +209,13 @@ BuildRequires: libicu-devel
 %endif
 BuildRequires: pkgconfig(xcb) pkgconfig(xcb-glx) pkgconfig(xcb-icccm) pkgconfig(xcb-image) pkgconfig(xcb-keysyms) pkgconfig(xcb-renderutil)
 BuildRequires: pkgconfig(zlib)
+
+%if 0%{?tests}
+BuildRequires: dbus-x11
+BuildRequires: mesa-dri-drivers
+BuildRequires: time
+BuildRequires: xorg-x11-server-Xvfb
+%endif
 
 %if 0%{?qtchooser}
 %if 0%{?fedora}
@@ -429,7 +437,9 @@ export CXXFLAGS="$CXXFLAGS $RPM_OPT_FLAGS"
 export LDFLAGS="$LDFLAGS $RPM_LD_FLAGS"
 export MAKEFLAGS="%{?_smp_mflags}"
 
-./configure -v \
+mkdir %{_target_platform}
+pushd %{_target_platform}
+../configure -v \
   -confirm-license \
   -opensource \
   -prefix %{_qt5_prefix} \
@@ -479,10 +489,12 @@ export MAKEFLAGS="%{?_smp_mflags}"
   -system-zlib \
   -no-directfb
 
+popd
+
 %if ! 0%{?inject_optflags}
 # ensure qmake build using optflags (which can happen if not munging qmake.conf defaults)
-make clean -C qmake
-make %{?_smp_mflags} -C qmake \
+make clean -C %{_target_platform}/qmake
+make %{?_smp_mflags} -C %{_target_platform}/qmake \
   QMAKE_CFLAGS_RELEASE="${CFLAGS:-$RPM_OPT_FLAGS}" \
   QMAKE_CXXFLAGS_RELEASE="${CXXFLAGS:-$RPM_OPT_FLAGS}" \
   QMAKE_LFLAGS_RELEASE="${LDFLAGS:-$RPM_LD_FLAGS}" \
@@ -496,16 +508,16 @@ make %{?_smp_mflags}
 # see also https://bugreports.qt-project.org/browse/QTBUG-42071
 QT_HASH_SEED=0; export QT_HASH_SEED
 
-make html_docs
-make qch_docs
+make html_docs -C %{_target_platform}
+make qch_docs  -C %{_target_platform}
 %endif
 
 
 %install
-make install INSTALL_ROOT=%{buildroot}
+make install INSTALL_ROOT=%{buildroot} -C %{_target_platform}
 
 %if 0%{?docs}
-make install_docs INSTALL_ROOT=%{buildroot}
+make install_docs INSTALL_ROOT=%{buildroot} -C %{_target_platform}
 %endif
 
 install -m644 -p -D %{SOURCE1} %{buildroot}%{_qt5_datadir}/qtlogging.ini
@@ -600,17 +612,19 @@ popd
 
 install -p -m755 -D %{SOURCE6} %{buildroot}%{_sysconfdir}/X11/xinit/xinitrc.d/10-qt5-check-opengl2.sh
 
-## work-in-progress, doesn't work yet -- rex
+
 %check
-export CMAKE_PREFIX_PATH=%{buildroot}%{_prefix}
+%if 0%{?tests}
 export CTEST_OUTPUT_ON_FAILURE=1
-export PATH=%{buildroot}%{_bindir}:$PATH
-export LD_LIBRARY_PATH=%{buildroot}%{_libdir}
-mkdir -p tests/auto/cmake/%{_target_platform}
-pushd tests/auto/cmake/%{_target_platform}
-cmake .. ||:
-ctest --output-on-failure ||:
-popd
+export PATH=%{buildroot}%{_qt5_bindir}:$PATH
+export LD_LIBRARY_PATH=%{buildroot}%{_qt5_libdir}
+make sub-tests-all %{?_smp_mflags} -C %{_target_platform}
+xvfb-run -a \
+dbus-launch --exit-with-session \
+time \
+make check -k -C %{_target_platform}/tests ||:
+%endif
+
 
 %if 0%{?qtchooser}
 %pre
@@ -956,6 +970,10 @@ fi
 
 
 %changelog
+* Thu May 05 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-17
+- support out-of-tree build
+- better %%check
+
 * Sat Apr 30 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-16
 - own %%{_qt5_plugindir}/egldeviceintegrations
 
