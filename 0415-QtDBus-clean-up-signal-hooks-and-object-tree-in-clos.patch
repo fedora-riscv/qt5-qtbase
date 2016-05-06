@@ -1,7 +1,7 @@
-From b024fbe83863fc57364a52c717d5b43d654bdb5d Mon Sep 17 00:00:00 2001
+From b77ef8a7e6e4104067d52824e29eadc8c66f5929 Mon Sep 17 00:00:00 2001
 From: Weng Xuetian <wengxt@gmail.com>
 Date: Sat, 5 Mar 2016 12:23:21 -0800
-Subject: [PATCH] QtDBus: clean up signal hooks and object tree in
+Subject: [PATCH 415/595] QtDBus: clean up signal hooks and object tree in
  closeConnection
 
 If a QObject is added or passed as receiver to QDBusConnection::connect()
@@ -13,10 +13,11 @@ lock since the thread is no longer processing events.
 
 Task-number: QTBUG-51648
 Change-Id: I1a1810a6d6d0234af0269d5f3fc1f54101bf1547
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
 ---
  src/dbus/qdbusconnection_p.h |  1 +
- src/dbus/qdbusintegrator.cpp | 28 +++++++++++++++++++++++++++-
- 2 files changed, 28 insertions(+), 1 deletion(-)
+ src/dbus/qdbusintegrator.cpp | 26 +++++++++++++++++++++++++-
+ 2 files changed, 26 insertions(+), 1 deletion(-)
 
 diff --git a/src/dbus/qdbusconnection_p.h b/src/dbus/qdbusconnection_p.h
 index c77daf7..565eb83 100644
@@ -31,10 +32,10 @@ index c77daf7..565eb83 100644
      bool isServiceRegisteredByThread(const QString &serviceName);
  
 diff --git a/src/dbus/qdbusintegrator.cpp b/src/dbus/qdbusintegrator.cpp
-index cd44861..a3cd47b 100644
+index 478a2c4..3be775d 100644
 --- a/src/dbus/qdbusintegrator.cpp
 +++ b/src/dbus/qdbusintegrator.cpp
-@@ -1030,7 +1030,6 @@ QDBusConnectionPrivate::~QDBusConnectionPrivate()
+@@ -1050,7 +1050,6 @@ QDBusConnectionPrivate::~QDBusConnectionPrivate()
                   qPrintable(name));
  
      closeConnection();
@@ -42,7 +43,7 @@ index cd44861..a3cd47b 100644
      qDeleteAll(cachedMetaObjects);
  
      if (mode == ClientMode || mode == PeerMode) {
-@@ -1052,6 +1051,20 @@ QDBusConnectionPrivate::~QDBusConnectionPrivate()
+@@ -1072,6 +1071,19 @@ QDBusConnectionPrivate::~QDBusConnectionPrivate()
      }
  }
  
@@ -55,23 +56,21 @@ index cd44861..a3cd47b 100644
 +        it++;
 +    }
 +
-+    if (haystack.obj) {
++    if (haystack.obj)
 +        haystack.obj->disconnect(this);
-+    }
 +}
 +
  void QDBusConnectionPrivate::closeConnection()
  {
      QDBusWriteLocker locker(CloseConnectionAction, this);
-@@ -1075,6 +1088,19 @@ void QDBusConnectionPrivate::closeConnection()
+@@ -1095,6 +1107,18 @@ void QDBusConnectionPrivate::closeConnection()
      }
  
      qDeleteAll(pendingCalls);
 +
-+    // clean up all signal hook and object tree, to avoid QObject::destroyed
-+    // being activated to dbus daemon thread which already quits.
-+    // dbus connection is already closed, so there is nothing we could do be clean
-+    // up everything here.
++    // Disconnect all signals from signal hooks and from the object tree to
++    // avoid QObject::destroyed being sent to dbus daemon thread which has
++    // already quit.
 +    SignalHookHash::iterator sit = signalHooks.begin();
 +    while (sit != signalHooks.end()) {
 +        sit.value().obj->disconnect(this);
@@ -84,5 +83,5 @@ index cd44861..a3cd47b 100644
  
  void QDBusConnectionPrivate::checkThread()
 -- 
-2.5.0
+2.7.4
 

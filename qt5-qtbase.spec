@@ -49,11 +49,10 @@
 %if ! 0%{?bootstrap}
 %ifarch %{arm} %{ix86} x86_64 %{power64} s390 s390x aarch64
 %global docs 1
+%endif
+%global examples 1
 %global tests 1
 %endif
-%endif
-
-%global examples 1
 
 #define prerelease rc
 
@@ -97,12 +96,6 @@ Patch52: qtbase-opensource-src-5.6.0-moc_WORDSIZE.patch
 # arm patch
 Patch54: qtbase-opensource-src-5.6.0-arm.patch
 
-# https://codereview.qt-project.org/#/c/151496/
-Patch55: QTBUG-51648-QtDBus-clean-up-signal-hooks-and-object-tree-in-clos.patch
-
-# https://codereview.qt-project.org/#/c/151340/
-Patch56: QTBUG-51649-QtDBus-finish-all-pending-call-with-error-if-disconn.patch
-
 # recently passed code review, not integrated yet
 # https://codereview.qt-project.org/126102/
 Patch60: moc-get-the-system-defines-from-the-compiler-itself.patch
@@ -118,6 +111,8 @@ Patch278: 0178-qt_common.prf-when-looking-for-GCC-4.6-match-GCC-6-t.patch
 Patch301: 0201-alsatest-Fix-the-check-to-treat-alsalib-1.1.x-as-cor.patch
 Patch321: 0221-QObject-fix-GCC-6-warning-about-qt_static_metacall-s.patch
 Patch393: 0293-Fix-QtDBus-deadlock-inside-kded-kiod.patch
+Patch515: 0415-QtDBus-clean-up-signal-hooks-and-object-tree-in-clos.patch
+Patch637: 0537-QtDBus-finish-all-pending-call-with-error-if-disconn.patch
 
 # macros, be mindful to keep sync'd with macros.qt5
 Source10: macros.qt5
@@ -171,6 +166,7 @@ BuildRequires: pkgconfig(libproxy-1.0)
 BuildRequires: pkgconfig(ice) pkgconfig(sm)
 BuildRequires: pkgconfig(libpng)
 BuildRequires: pkgconfig(libudev)
+%global openssl -openssl-linked
 BuildRequires: pkgconfig(openssl)
 BuildRequires: pkgconfig(libpulse) pkgconfig(libpulse-mainloop-glib)
 %if 0%{?fedora}
@@ -367,9 +363,6 @@ RPM macros for building Qt5 packages.
 
 %patch52 -p1 -b .moc_WORDSIZE
 %patch54 -p1 -b .arm
-%patch55 -p1 -b .QTBUG-51648
-## FTBFS, omit for now
-%patch56 -p1 -b .QTBUG-51649
 %patch60 -p1 -b .moc_system_defines
 
 %patch158 -p1 -b .0058
@@ -380,6 +373,8 @@ RPM macros for building Qt5 packages.
 %patch301 -p1 -b .0201
 %patch321 -p1 -b .0221
 %patch393 -p1 -b .0293
+%patch515 -p1 -b .0415
+%patch637 -p1 -b .0637
 
 %define platform linux-g++
 
@@ -467,10 +462,10 @@ pushd %{_target_platform}
   -iconv \
   -icu \
   %{?journald} \
-  -openssl-linked \
+  %{?openssl} \
   -optimized-qmake \
   %{!?examples:-nomake examples} \
-  -nomake tests \
+  %{!?tests:-nomake tests} \
   -no-pch \
   -no-rpath \
   -no-separate-debug-info \
@@ -615,11 +610,15 @@ install -p -m755 -D %{SOURCE6} %{buildroot}%{_sysconfdir}/X11/xinit/xinitrc.d/10
 
 %check
 %if 0%{?tests}
+## see tests/README for expected environment (running a plasma session essentially)
+## we are not quite there yet
 export CTEST_OUTPUT_ON_FAILURE=1
 export PATH=%{buildroot}%{_qt5_bindir}:$PATH
 export LD_LIBRARY_PATH=%{buildroot}%{_qt5_libdir}
-make sub-tests %{?_smp_mflags} -C %{_target_platform}
-xvfb-run -a \
+# dbus tests error out when building if session bus is not available
+dbus-launch --exit-with-session \
+make sub-tests %{?_smp_mflags} -k -C %{_target_platform} ||:
+xvfb-run -a --server-args="-screen 0 1280x1024x32" \
 dbus-launch --exit-with-session \
 time \
 make check -k -C %{_target_platform}/tests ||:
@@ -973,6 +972,8 @@ fi
 * Thu May 05 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-17
 - support out-of-tree build
 - better %%check
+- pull in final/upstream fixes for QTBUG-51648,QTBUG-51649
+- disable examples/tests in bootstrap mode
 
 * Sat Apr 30 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-16
 - own %%{_qt5_plugindir}/egldeviceintegrations
