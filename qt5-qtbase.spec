@@ -59,7 +59,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 17%{?prerelease:.%{prerelease}}%{?dist}
+Release: 18%{?prerelease:.%{prerelease}}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -432,9 +432,7 @@ export CXXFLAGS="$CXXFLAGS $RPM_OPT_FLAGS"
 export LDFLAGS="$LDFLAGS $RPM_LD_FLAGS"
 export MAKEFLAGS="%{?_smp_mflags}"
 
-mkdir %{_target_platform}
-pushd %{_target_platform}
-../configure -v \
+./configure -v \
   -confirm-license \
   -opensource \
   -prefix %{_qt5_prefix} \
@@ -484,35 +482,35 @@ pushd %{_target_platform}
   -system-zlib \
   -no-directfb
 
-popd
-
 %if ! 0%{?inject_optflags}
 # ensure qmake build using optflags (which can happen if not munging qmake.conf defaults)
-make clean -C %{_target_platform}/qmake
-make %{?_smp_mflags} -C %{_target_platform}/qmake \
+make clean
+make %{?_smp_mflags} \
   QMAKE_CFLAGS_RELEASE="${CFLAGS:-$RPM_OPT_FLAGS}" \
   QMAKE_CXXFLAGS_RELEASE="${CXXFLAGS:-$RPM_OPT_FLAGS}" \
   QMAKE_LFLAGS_RELEASE="${LDFLAGS:-$RPM_LD_FLAGS}" \
   QMAKE_STRIP=
 %endif
 
-make %{?_smp_mflags} -C %{_target_platform}
+make %{?_smp_mflags}
 
 %if 0%{?docs}
 # HACK to avoid multilib conflicts in noarch content
 # see also https://bugreports.qt-project.org/browse/QTBUG-42071
 QT_HASH_SEED=0; export QT_HASH_SEED
 
-make html_docs -C %{_target_platform}
-make qch_docs  -C %{_target_platform}
+make html_docs
+make qch_docs
 %endif
+
+popd
 
 
 %install
-make install INSTALL_ROOT=%{buildroot} -C %{_target_platform}
+make install INSTALL_ROOT=%{buildroot}
 
 %if 0%{?docs}
-make install_docs INSTALL_ROOT=%{buildroot} -C %{_target_platform}
+make install_docs INSTALL_ROOT=%{buildroot}
 %endif
 
 install -m644 -p -D %{SOURCE1} %{buildroot}%{_qt5_datadir}/qtlogging.ini
@@ -617,11 +615,11 @@ export PATH=%{buildroot}%{_qt5_bindir}:$PATH
 export LD_LIBRARY_PATH=%{buildroot}%{_qt5_libdir}
 # dbus tests error out when building if session bus is not available
 dbus-launch --exit-with-session \
-make sub-tests %{?_smp_mflags} -k -C %{_target_platform} ||:
+make sub-tests %{?_smp_mflags} -k ||:
 xvfb-run -a --server-args="-screen 0 1280x1024x32" \
 dbus-launch --exit-with-session \
 time \
-make check -k -C %{_target_platform}/tests ||:
+make check -k ||:
 %endif
 
 
@@ -969,6 +967,9 @@ fi
 
 
 %changelog
+* Sat May 07 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-18
+- revert out-of-tree build, breaks Qt5*Config.cmake *_PRIVATE_INCLUDE_DIRS entries (all blank)
+
 * Thu May 05 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-17
 - support out-of-tree build
 - better %%check
