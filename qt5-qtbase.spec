@@ -503,8 +503,6 @@ make html_docs
 make qch_docs
 %endif
 
-popd
-
 
 %install
 make install INSTALL_ROOT=%{buildroot}
