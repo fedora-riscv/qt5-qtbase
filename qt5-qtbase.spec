@@ -484,7 +484,7 @@ export MAKEFLAGS="%{?_smp_mflags}"
 
 %if ! 0%{?inject_optflags}
 # ensure qmake build using optflags (which can happen if not munging qmake.conf defaults)
-make clean
+make clean -C qmake
 make %{?_smp_mflags} -C qmake \
   QMAKE_CFLAGS_RELEASE="${CFLAGS:-$RPM_OPT_FLAGS}" \
   QMAKE_CXXFLAGS_RELEASE="${CXXFLAGS:-$RPM_OPT_FLAGS}" \
