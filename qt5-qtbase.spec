@@ -34,7 +34,7 @@
 
 %if 0%{?fedora} > 23
 # gcc6: FTBFS
-%global qt5_deprecated_flag -Wno-deprecated-declaration
+%global qt5_deprecated_flag -Wno-deprecated-declarations
 # gcc6: Qt assumes this in places
 %global qt5_null_flag -fno-delete-null-pointer-checks
 %ifarch armv7hl
@@ -59,7 +59,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 19%{?prerelease:.%{prerelease}}%{?dist}
+Release: 20%{?prerelease:.%{prerelease}}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -971,6 +971,9 @@ fi
 
 
 %changelog
+* Fri May 20 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-20
+- -Wno-deprecated-declarations (typo missed trailing 's')
+
 * Fri May 13 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-19
 - pull in upstream drag-n-drop related fixes (QTBUG-45812, QTBUG-51215)
 
