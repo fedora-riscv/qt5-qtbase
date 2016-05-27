@@ -638,8 +638,8 @@ if [ $1 -gt 1 ] ; then
 %{_sbindir}/update-alternatives  \
   --remove qtchooser-default \
   %{_sysconfdir}/xdg/qtchooser/qt5.conf >& /dev/null ||:
-%endif
 fi
+%endif
 
 %post
 /sbin/ldconfig
