@@ -37,10 +37,6 @@
 %global qt5_deprecated_flag -Wno-deprecated-declarations
 # gcc6: Qt assumes this in places
 %global qt5_null_flag -fno-delete-null-pointer-checks
-%ifarch armv7hl
-# gcc6: arm FTBFS
-%global qt5_arm_flag -mfpu=neon
-%endif
 %endif
 
 # define to build docs, need to undef this for bootstrapping
@@ -99,6 +95,9 @@ Patch54: qtbase-opensource-src-5.6.0-arm.patch
 # recently passed code review, not integrated yet
 # https://codereview.qt-project.org/126102/
 Patch60: moc-get-the-system-defines-from-the-compiler-itself.patch
+
+# drop -O3 and make -O2 by default
+Patch61: qt5-qtbase-cxxflag.patch
 
 ## upstream patches
 
@@ -367,6 +366,7 @@ RPM macros for building Qt5 packages.
 %patch52 -p1 -b .moc_WORDSIZE
 %patch54 -p1 -b .arm
 %patch60 -p1 -b .moc_system_defines
+%patch61 -p1 -b .qt5-qtbase-cxxflag
 
 %patch158 -p1 -b .0058
 %patch176 -p1 -b .0076
@@ -971,6 +971,9 @@ fi
 
 
 %changelog
+* Thu Jun 02 2016 Than Ngo <than@redhat.com> - 5.6.0-21
+- drop gcc6 workaround on arm
+
 * Fri May 20 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-20
 - -Wno-deprecated-declarations (typo missed trailing 's')
 
