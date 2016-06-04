@@ -30,6 +30,7 @@
 
 %if 0%{?fedora} > 23 || 0%{?rhel} > 6
 %global journald -journald
+BuildRequires: pkgconfig(libsystemd-journal)
 %endif
 
 %if 0%{?fedora} > 23
