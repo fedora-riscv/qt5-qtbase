@@ -84,8 +84,6 @@ Patch4: qtbase-opensource-src-5.3.2-QTBUG-35459.patch
 Patch12: qtbase-opensource-src-5.2.0-enable_ft_lcdfilter.patch
 
 # upstreamable patches
-# libsystemd-journal => libsystemd api change
-Patch20: qtbase-opensource-src-5.6.0-libsystemd.patch
 
 # Workaround moc/multilib issues
 # https://bugzilla.redhat.com/show_bug.cgi?id=1290020
@@ -106,6 +104,7 @@ Patch61: qt5-qtbase-cxxflag.patch
 
 # Item views, https://bugreports.qt.io/browse/QTBUG-48870
 Patch158: 0058-QtGui-Avoid-rgba64-rgba32-conversion-on-every-pixel-.patch
+Patch167: 0067-Search-for-libsystemd-first-fall-back-to-libsystemd-.patch
 Patch176: 0076-QListView-fix-skipping-indexes-in-selectedIndexes.patch
 Patch187: 0087-xcb-Fix-drag-and-drop-between-xcb-screens.patch
 Patch201: 0101-xcb-include-cmath.patch
@@ -366,14 +365,13 @@ RPM macros for building Qt5 packages.
 %patch4 -p1 -b .QTBUG-35459
 %patch12 -p1 -b .enable_ft_lcdfilter
 
-%patch20 -p1 -b .libsystemd
-
 %patch52 -p1 -b .moc_WORDSIZE
 %patch54 -p1 -b .arm
 %patch60 -p1 -b .moc_system_defines
 %patch61 -p1 -b .qt5-qtbase-cxxflag
 
 %patch158 -p1 -b .0058
+%patch167 -p1 -b .0067
 %patch176 -p1 -b .0076
 %patch187 -p1 -b .0087
 %patch201 -p1 -b .0101
