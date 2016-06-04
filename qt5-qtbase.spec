@@ -30,7 +30,7 @@
 
 %if 0%{?fedora} > 23 || 0%{?rhel} > 6
 %global journald -journald
-BuildRequires: pkgconfig(libsystemd-journal)
+BuildRequires: pkgconfig(libsystemd)
 %endif
 
 %if 0%{?fedora} > 23
@@ -84,6 +84,8 @@ Patch4: qtbase-opensource-src-5.3.2-QTBUG-35459.patch
 Patch12: qtbase-opensource-src-5.2.0-enable_ft_lcdfilter.patch
 
 # upstreamable patches
+# libsystemd-journal => libsystemd api change
+Patch20: qtbase-opensource-src-5.6.0-libsystemd.patch
 
 # Workaround moc/multilib issues
 # https://bugzilla.redhat.com/show_bug.cgi?id=1290020
@@ -363,6 +365,8 @@ RPM macros for building Qt5 packages.
 
 %patch4 -p1 -b .QTBUG-35459
 %patch12 -p1 -b .enable_ft_lcdfilter
+
+%patch20 -p1 -b .libsystemd
 
 %patch52 -p1 -b .moc_WORDSIZE
 %patch54 -p1 -b .arm

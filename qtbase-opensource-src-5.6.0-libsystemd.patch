@@ -1,0 +1,11 @@
+diff -up qtbase-opensource-src-5.6.0/config.tests/unix/journald/journald.pro.systemd qtbase-opensource-src-5.6.0/config.tests/unix/journald/journald.pro
+--- qtbase-opensource-src-5.6.0/config.tests/unix/journald/journald.pro.systemd	2016-02-25 10:25:37.000000000 -0600
++++ qtbase-opensource-src-5.6.0/config.tests/unix/journald/journald.pro	2016-06-03 21:41:09.119559127 -0500
+@@ -1,6 +1,6 @@
+ SOURCES = journald.c
+ 
+ CONFIG += link_pkgconfig
+-PKGCONFIG_PRIVATE += libsystemd-journal
++PKGCONFIG_PRIVATE += libsystemd
+ 
+ CONFIG -= qt
