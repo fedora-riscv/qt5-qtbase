@@ -48,18 +48,18 @@
 # only primary archs (for now), allow secondary to bootstrap
 %if ! 0%{?bootstrap}
 %ifarch %{arm} %{ix86} x86_64 %{power64} s390 s390x aarch64
-%define docs 1
+%global docs 1
 %endif
+%global examples 1
+%global tests 1
 %endif
-
-%define examples 1
 
 #define prerelease rc
 
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.0
-Release: 13%{?prerelease:.%{prerelease}}%{?dist}
+Release: 19%{?prerelease:.%{prerelease}}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -87,10 +87,6 @@ Patch4: qtbase-opensource-src-5.3.2-QTBUG-35459.patch
 Patch12: qtbase-opensource-src-5.2.0-enable_ft_lcdfilter.patch
 
 # upstreamable patches
-# support poll
-# https://bugreports.qt-project.org/browse/QTBUG-27195
-# NEEDS REBASE
-Patch50: qt5-poll.patch
 
 # Workaround moc/multilib issues
 # https://bugzilla.redhat.com/show_bug.cgi?id=1290020
@@ -99,12 +95,6 @@ Patch52: qtbase-opensource-src-5.6.0-moc_WORDSIZE.patch
 
 # arm patch
 Patch54: qtbase-opensource-src-5.6.0-arm.patch
-
-# https://codereview.qt-project.org/#/c/151496/
-Patch55: QTBUG-51648-QtDBus-clean-up-signal-hooks-and-object-tree-in-clos.patch
-
-# https://codereview.qt-project.org/#/c/151340/
-Patch56: QTBUG-51649-QtDBus-finish-all-pending-call-with-error-if-disconn.patch
 
 # recently passed code review, not integrated yet
 # https://codereview.qt-project.org/126102/
@@ -115,12 +105,17 @@ Patch60: moc-get-the-system-defines-from-the-compiler-itself.patch
 # Item views, https://bugreports.qt.io/browse/QTBUG-48870
 Patch158: 0058-QtGui-Avoid-rgba64-rgba32-conversion-on-every-pixel-.patch
 Patch176: 0076-QListView-fix-skipping-indexes-in-selectedIndexes.patch
+Patch187: 0087-xcb-Fix-drag-and-drop-between-xcb-screens.patch
 Patch201: 0101-xcb-include-cmath.patch
 Patch277: 0177-Fix-GCC-6-Wunused-functions-warnings.patch
 Patch278: 0178-qt_common.prf-when-looking-for-GCC-4.6-match-GCC-6-t.patch
 Patch301: 0201-alsatest-Fix-the-check-to-treat-alsalib-1.1.x-as-cor.patch
 Patch321: 0221-QObject-fix-GCC-6-warning-about-qt_static_metacall-s.patch
 Patch393: 0293-Fix-QtDBus-deadlock-inside-kded-kiod.patch
+Patch515: 0415-QtDBus-clean-up-signal-hooks-and-object-tree-in-clos.patch
+Patch608: 0508-xcb-Fix-drag-and-drop-to-applications-like-Emacs-and.patch
+Patch637: 0537-QtDBus-finish-all-pending-call-with-error-if-disconn.patch
+Patch654: 0554-xcb-Fix-drag-and-drop-to-Emacs.patch
 
 # macros, be mindful to keep sync'd with macros.qt5
 Source10: macros.qt5
@@ -174,6 +169,7 @@ BuildRequires: pkgconfig(libproxy-1.0)
 BuildRequires: pkgconfig(ice) pkgconfig(sm)
 BuildRequires: pkgconfig(libpng)
 BuildRequires: pkgconfig(libudev)
+%global openssl -openssl-linked
 BuildRequires: pkgconfig(openssl)
 BuildRequires: pkgconfig(libpulse) pkgconfig(libpulse-mainloop-glib)
 %if 0%{?fedora}
@@ -212,6 +208,13 @@ BuildRequires: libicu-devel
 %endif
 BuildRequires: pkgconfig(xcb) pkgconfig(xcb-glx) pkgconfig(xcb-icccm) pkgconfig(xcb-image) pkgconfig(xcb-keysyms) pkgconfig(xcb-renderutil)
 BuildRequires: pkgconfig(zlib)
+
+%if 0%{?tests}
+BuildRequires: dbus-x11
+BuildRequires: mesa-dri-drivers
+BuildRequires: time
+BuildRequires: xorg-x11-server-Xvfb
+%endif
 
 %if 0%{?qtchooser}
 %if 0%{?fedora}
@@ -363,19 +366,21 @@ RPM macros for building Qt5 packages.
 
 %patch52 -p1 -b .moc_WORDSIZE
 %patch54 -p1 -b .arm
-%patch55 -p1 -b .QTBUG-51648
-## FTBFS, omit for now
-%patch56 -p1 -b .QTBUG-51649
 %patch60 -p1 -b .moc_system_defines
 
 %patch158 -p1 -b .0058
 %patch176 -p1 -b .0076
+%patch187 -p1 -b .0087
 %patch201 -p1 -b .0101
 %patch277 -p1 -b .0177
 %patch278 -p1 -b .0178
 %patch301 -p1 -b .0201
 %patch321 -p1 -b .0221
 %patch393 -p1 -b .0293
+%patch515 -p1 -b .0415
+%patch608 -p1 -b .0508
+%patch637 -p1 -b .0537
+%patch654 -p1 -b .0554
 
 %define platform linux-g++
 
@@ -461,10 +466,10 @@ export MAKEFLAGS="%{?_smp_mflags}"
   -iconv \
   -icu \
   %{?journald} \
-  -openssl-linked \
+  %{?openssl} \
   -optimized-qmake \
   %{!?examples:-nomake examples} \
-  -nomake tests \
+  %{!?tests:-nomake tests} \
   -no-pch \
   -no-rpath \
   -no-separate-debug-info \
@@ -604,17 +609,23 @@ popd
 
 install -p -m755 -D %{SOURCE6} %{buildroot}%{_sysconfdir}/X11/xinit/xinitrc.d/10-qt5-check-opengl2.sh
 
-## work-in-progress, doesn't work yet -- rex
+
 %check
-export CMAKE_PREFIX_PATH=%{buildroot}%{_prefix}
+%if 0%{?tests}
+## see tests/README for expected environment (running a plasma session essentially)
+## we are not quite there yet
 export CTEST_OUTPUT_ON_FAILURE=1
-export PATH=%{buildroot}%{_bindir}:$PATH
-export LD_LIBRARY_PATH=%{buildroot}%{_libdir}
-mkdir -p tests/auto/cmake/%{_target_platform}
-pushd tests/auto/cmake/%{_target_platform}
-cmake .. ||:
-ctest --output-on-failure ||:
-popd
+export PATH=%{buildroot}%{_qt5_bindir}:$PATH
+export LD_LIBRARY_PATH=%{buildroot}%{_qt5_libdir}
+# dbus tests error out when building if session bus is not available
+dbus-launch --exit-with-session \
+make sub-tests %{?_smp_mflags} -k ||:
+xvfb-run -a --server-args="-screen 0 1280x1024x32" \
+dbus-launch --exit-with-session \
+time \
+make check -k ||:
+%endif
+
 
 %if 0%{?qtchooser}
 %pre
@@ -930,6 +941,7 @@ fi
 %{_qt5_libdir}/libQt5EglDeviceIntegration.so.5*
 %{_qt5_plugindir}/platforms/libqeglfs.so
 %{_qt5_plugindir}/platforms/libqminimalegl.so
+%dir %{_qt5_plugindir}/egldeviceintegrations/
 %{_qt5_plugindir}/egldeviceintegrations/libqeglfs-kms-integration.so
 %{_qt5_plugindir}/egldeviceintegrations/libqeglfs-x11-integration.so
 %{_qt5_plugindir}/xcbglintegrations/libqxcb-egl-integration.so
@@ -959,6 +971,27 @@ fi
 
 
 %changelog
+* Fri May 13 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-19
+- pull in upstream drag-n-drop related fixes (QTBUG-45812, QTBUG-51215)
+
+* Sat May 07 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-18
+- revert out-of-tree build, breaks Qt5*Config.cmake *_PRIVATE_INCLUDE_DIRS entries (all blank)
+
+* Thu May 05 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-17
+- support out-of-tree build
+- better %%check
+- pull in final/upstream fixes for QTBUG-51648,QTBUG-51649
+- disable examples/tests in bootstrap mode
+
+* Sat Apr 30 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-16
+- own %%{_qt5_plugindir}/egldeviceintegrations
+
+* Mon Apr 18 2016 Caolán McNamara <caolanm@redhat.com> - 5.6.0-15
+- full rebuild for hunspell 1.4.0
+
+* Mon Apr 18 2016 Caolán McNamara <caolanm@redhat.com> - 5.6.0-14
+- bootstrap rebuild for hunspell 1.4.0
+
 * Sat Apr 16 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-13
 - -devel: Provides: qt5-qtbase-private-devel (#1233829)
 
