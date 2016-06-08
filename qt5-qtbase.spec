@@ -431,6 +431,10 @@ test -x configure || chmod +x configure
 
 
 %build
+## FIXME/TODO:
+# * for %%ix86, add sse2 enabled builds for Qt5Gui, Qt5Core, QtNetwork, see also:
+#   http://anonscm.debian.org/cgit/pkg-kde/qt/qtbase.git/tree/debian/rules (234-249)
+
 ## adjust $RPM_OPT_FLAGS
 # remove -fexceptions
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
