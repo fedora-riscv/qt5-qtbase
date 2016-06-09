@@ -56,7 +56,7 @@ BuildRequires: pkgconfig(libsystemd)
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.1
-Release: 1%{?prerelease:.%{prerelease}}%{?dist}
+Release: 2%{?prerelease:.%{prerelease}}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -517,7 +517,7 @@ translationdir=%{_qt5_translationdir}
 
 Name: Qt5
 Description: Qt5 Configuration
-Version: 5.6.0
+Version: %{version}
 EOF
 
 # rpm macros
@@ -947,6 +947,9 @@ fi
 
 
 %changelog
+* Thu Jun 09 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.1-2
+- fix Qt5.pc version
+
 * Thu Jun 09 2016 Jan Grulich <jgrulich@redhat.com> - 5.6.1-1
 - Update to 5.6.1
 
