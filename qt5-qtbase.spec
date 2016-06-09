@@ -55,8 +55,8 @@ BuildRequires: pkgconfig(libsystemd)
 
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
-Version: 5.6.0
-Release: 21%{?prerelease:.%{prerelease}}%{?dist}
+Version: 5.6.1
+Release: 1%{?prerelease:.%{prerelease}}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -101,22 +101,6 @@ Patch60: moc-get-the-system-defines-from-the-compiler-itself.patch
 Patch61: qt5-qtbase-cxxflag.patch
 
 ## upstream patches
-
-# Item views, https://bugreports.qt.io/browse/QTBUG-48870
-Patch158: 0058-QtGui-Avoid-rgba64-rgba32-conversion-on-every-pixel-.patch
-Patch167: 0067-Search-for-libsystemd-first-fall-back-to-libsystemd-.patch
-Patch176: 0076-QListView-fix-skipping-indexes-in-selectedIndexes.patch
-Patch187: 0087-xcb-Fix-drag-and-drop-between-xcb-screens.patch
-Patch201: 0101-xcb-include-cmath.patch
-Patch277: 0177-Fix-GCC-6-Wunused-functions-warnings.patch
-Patch278: 0178-qt_common.prf-when-looking-for-GCC-4.6-match-GCC-6-t.patch
-Patch301: 0201-alsatest-Fix-the-check-to-treat-alsalib-1.1.x-as-cor.patch
-Patch321: 0221-QObject-fix-GCC-6-warning-about-qt_static_metacall-s.patch
-Patch393: 0293-Fix-QtDBus-deadlock-inside-kded-kiod.patch
-Patch515: 0415-QtDBus-clean-up-signal-hooks-and-object-tree-in-clos.patch
-Patch608: 0508-xcb-Fix-drag-and-drop-to-applications-like-Emacs-and.patch
-Patch637: 0537-QtDBus-finish-all-pending-call-with-error-if-disconn.patch
-Patch654: 0554-xcb-Fix-drag-and-drop-to-Emacs.patch
 
 # macros, be mindful to keep sync'd with macros.qt5
 Source10: macros.qt5
@@ -369,21 +353,6 @@ RPM macros for building Qt5 packages.
 %patch54 -p1 -b .arm
 %patch60 -p1 -b .moc_system_defines
 %patch61 -p1 -b .qt5-qtbase-cxxflag
-
-%patch158 -p1 -b .0058
-%patch167 -p1 -b .0067
-%patch176 -p1 -b .0076
-%patch187 -p1 -b .0087
-%patch201 -p1 -b .0101
-%patch277 -p1 -b .0177
-%patch278 -p1 -b .0178
-%patch301 -p1 -b .0201
-%patch321 -p1 -b .0221
-%patch393 -p1 -b .0293
-%patch515 -p1 -b .0415
-%patch608 -p1 -b .0508
-%patch637 -p1 -b .0537
-%patch654 -p1 -b .0554
 
 %define platform linux-g++
 
@@ -978,6 +947,9 @@ fi
 
 
 %changelog
+* Thu Jun 09 2016 Jan Grulich <jgrulich@redhat.com> - 5.6.1-1
+- Update to 5.6.1
+
 * Thu Jun 02 2016 Than Ngo <than@redhat.com> - 5.6.0-21
 - drop gcc6 workaround on arm
 
