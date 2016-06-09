@@ -30,17 +30,14 @@
 
 %if 0%{?fedora} > 23 || 0%{?rhel} > 6
 %global journald -journald
+BuildRequires: pkgconfig(libsystemd)
 %endif
 
 %if 0%{?fedora} > 23
 # gcc6: FTBFS
-%global qt5_deprecated_flag -Wno-deprecated-declaration
+%global qt5_deprecated_flag -Wno-deprecated-declarations
 # gcc6: Qt assumes this in places
 %global qt5_null_flag -fno-delete-null-pointer-checks
-%ifarch armv7hl
-# gcc6: arm FTBFS
-%global qt5_arm_flag -mfpu=neon
-%endif
 %endif
 
 # define to build docs, need to undef this for bootstrapping
@@ -58,8 +55,8 @@
 
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
-Version: 5.6.0
-Release: 19%{?prerelease:.%{prerelease}}%{?dist}
+Version: 5.6.1
+Release: 1%{?prerelease:.%{prerelease}}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -100,22 +97,10 @@ Patch54: qtbase-opensource-src-5.6.0-arm.patch
 # https://codereview.qt-project.org/126102/
 Patch60: moc-get-the-system-defines-from-the-compiler-itself.patch
 
-## upstream patches
+# drop -O3 and make -O2 by default
+Patch61: qt5-qtbase-cxxflag.patch
 
-# Item views, https://bugreports.qt.io/browse/QTBUG-48870
-Patch158: 0058-QtGui-Avoid-rgba64-rgba32-conversion-on-every-pixel-.patch
-Patch176: 0076-QListView-fix-skipping-indexes-in-selectedIndexes.patch
-Patch187: 0087-xcb-Fix-drag-and-drop-between-xcb-screens.patch
-Patch201: 0101-xcb-include-cmath.patch
-Patch277: 0177-Fix-GCC-6-Wunused-functions-warnings.patch
-Patch278: 0178-qt_common.prf-when-looking-for-GCC-4.6-match-GCC-6-t.patch
-Patch301: 0201-alsatest-Fix-the-check-to-treat-alsalib-1.1.x-as-cor.patch
-Patch321: 0221-QObject-fix-GCC-6-warning-about-qt_static_metacall-s.patch
-Patch393: 0293-Fix-QtDBus-deadlock-inside-kded-kiod.patch
-Patch515: 0415-QtDBus-clean-up-signal-hooks-and-object-tree-in-clos.patch
-Patch608: 0508-xcb-Fix-drag-and-drop-to-applications-like-Emacs-and.patch
-Patch637: 0537-QtDBus-finish-all-pending-call-with-error-if-disconn.patch
-Patch654: 0554-xcb-Fix-drag-and-drop-to-Emacs.patch
+## upstream patches
 
 # macros, be mindful to keep sync'd with macros.qt5
 Source10: macros.qt5
@@ -367,20 +352,7 @@ RPM macros for building Qt5 packages.
 %patch52 -p1 -b .moc_WORDSIZE
 %patch54 -p1 -b .arm
 %patch60 -p1 -b .moc_system_defines
-
-%patch158 -p1 -b .0058
-%patch176 -p1 -b .0076
-%patch187 -p1 -b .0087
-%patch201 -p1 -b .0101
-%patch277 -p1 -b .0177
-%patch278 -p1 -b .0178
-%patch301 -p1 -b .0201
-%patch321 -p1 -b .0221
-%patch393 -p1 -b .0293
-%patch515 -p1 -b .0415
-%patch608 -p1 -b .0508
-%patch637 -p1 -b .0537
-%patch654 -p1 -b .0554
+%patch61 -p1 -b .qt5-qtbase-cxxflag
 
 %define platform linux-g++
 
@@ -428,6 +400,10 @@ test -x configure || chmod +x configure
 
 
 %build
+## FIXME/TODO:
+# * for %%ix86, add sse2 enabled builds for Qt5Gui, Qt5Core, QtNetwork, see also:
+#   http://anonscm.debian.org/cgit/pkg-kde/qt/qtbase.git/tree/debian/rules (234-249)
+
 ## adjust $RPM_OPT_FLAGS
 # remove -fexceptions
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
@@ -638,8 +614,8 @@ if [ $1 -gt 1 ] ; then
 %{_sbindir}/update-alternatives  \
   --remove qtchooser-default \
   %{_sysconfdir}/xdg/qtchooser/qt5.conf >& /dev/null ||:
-%endif
 fi
+%endif
 
 %post
 /sbin/ldconfig
@@ -971,6 +947,15 @@ fi
 
 
 %changelog
+* Thu Jun 09 2016 Jan Grulich <jgrulich@redhat.com> - 5.6.1-1
+- Update to 5.6.1
+
+* Thu Jun 02 2016 Than Ngo <than@redhat.com> - 5.6.0-21
+- drop gcc6 workaround on arm
+
+* Fri May 20 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-20
+- -Wno-deprecated-declarations (typo missed trailing 's')
+
 * Fri May 13 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-19
 - pull in upstream drag-n-drop related fixes (QTBUG-45812, QTBUG-51215)
 
