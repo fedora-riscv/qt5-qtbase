@@ -56,7 +56,7 @@ BuildRequires: pkgconfig(libsystemd)
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.1
-Release: 2%{?prerelease:.%{prerelease}}%{?dist}
+Release: 3%{?prerelease:.%{prerelease}}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -101,6 +101,12 @@ Patch60: moc-get-the-system-defines-from-the-compiler-itself.patch
 Patch61: qt5-qtbase-cxxflag.patch
 
 ## upstream patches
+Patch101: 0001-xcb-Properly-interpret-data.l-0-field-of-XdndStatus-.patch
+Patch111: 0011-XCB-Auto-detect-xcb-glx-also-with-xcb-qt.patch
+Patch132: 0032-xcb-Fix-drop-of-text-uri-list-and-text-html.patch
+Patch133: 0033-xcb-Fix-dropping-URL-on-Firefox-window.patch
+Patch148: 0148-xcb-Disable-GLX-pbuffers-with-Chromium-in-VMs.patch
+Patch155: 0155-xcb-Fix-transient-parent-and-Qt-Window-flag.patch
 
 # macros, be mindful to keep sync'd with macros.qt5
 Source10: macros.qt5
@@ -353,6 +359,13 @@ RPM macros for building Qt5 packages.
 %patch54 -p1 -b .arm
 %patch60 -p1 -b .moc_system_defines
 %patch61 -p1 -b .qt5-qtbase-cxxflag
+
+%patch101 -p1 -b .0001-xcb
+%patch111 -p1 -b .0011
+%patch132 -p1 -b .0032
+%patch133 -p1 -b .0033
+%patch148 -p1 -b .0148
+%patch155 -p1 -b .0155
 
 %define platform linux-g++
 
@@ -947,6 +960,9 @@ fi
 
 
 %changelog
+* Tue Jun 14 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.1-3
+- backport some xcb-plugin-related fixes
+
 * Thu Jun 09 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.1-2
 - fix Qt5.pc version
 
