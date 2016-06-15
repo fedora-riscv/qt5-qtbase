@@ -1,0 +1,12 @@
+diff -up qtbase-opensource-src-5.6.0/mkspecs/common/gcc-base.conf.than qtbase-opensource-src-5.6.0/mkspecs/common/gcc-base.conf
+--- qtbase-opensource-src-5.6.0/mkspecs/common/gcc-base.conf.than	2016-06-02 17:30:07.249027901 +0200
++++ qtbase-opensource-src-5.6.0/mkspecs/common/gcc-base.conf	2016-06-02 17:30:14.681748012 +0200
+@@ -32,7 +32,7 @@
+ #
+ 
+ QMAKE_CFLAGS_OPTIMIZE      = -O2
+-QMAKE_CFLAGS_OPTIMIZE_FULL = -O3
++QMAKE_CFLAGS_OPTIMIZE_FULL = -O2
+ 
+ QMAKE_CFLAGS               += -pipe
+ QMAKE_CFLAGS_DEPS          += -M
