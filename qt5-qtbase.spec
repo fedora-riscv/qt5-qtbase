@@ -30,6 +30,7 @@
 
 %if 0%{?fedora} > 23 || 0%{?rhel} > 6
 %global journald -journald
+BuildRequires: perl-generators
 BuildRequires: pkgconfig(libsystemd)
 %endif
 
