@@ -1,3 +1,5 @@
+#define prerelease rc
+
 # See http://bugzilla.redhat.com/223663
 %define multilib_archs x86_64 %{ix86} %{?mips} ppc64 ppc s390x s390 sparc64 sparcv9
 %define multilib_basearchs x86_64 %{?mips64} ppc64 s390x sparc64
@@ -11,9 +13,13 @@
 %endif
 %endif
 
-%global qt_module qtbase
+%define platform linux-g++
 
-%global rpm_macros_dir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
+%if 0%{?use_clang}
+%define platform linux-clang
+%endif
+
+%global qt_module qtbase
 
 ## set to 1 to enable bootstrap
 %global bootstrap 0
@@ -30,7 +36,6 @@
 
 %if 0%{?fedora} > 23 || 0%{?rhel} > 6
 %global journald -journald
-BuildRequires: perl-generators
 BuildRequires: pkgconfig(libsystemd)
 %endif
 
@@ -52,12 +57,10 @@ BuildRequires: pkgconfig(libsystemd)
 %global tests 1
 %endif
 
-#define prerelease rc
-
-Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
-Version: 5.6.1
-Release: 3%{?prerelease:.%{prerelease}}%{?dist}
+Summary: Qt5 - QtBase components
+Version: 5.7.0
+Release: 2%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -94,47 +97,16 @@ Patch52: qtbase-opensource-src-5.6.0-moc_WORDSIZE.patch
 # arm patch
 Patch54: qtbase-opensource-src-5.6.0-arm.patch
 
-# recently passed code review, not integrated yet
-# https://codereview.qt-project.org/126102/
-Patch60: moc-get-the-system-defines-from-the-compiler-itself.patch
-
 # drop -O3 and make -O2 by default
 Patch61: qt5-qtbase-cxxflag.patch
 
 ## upstream patches
-Patch101: 0001-xcb-Properly-interpret-data.l-0-field-of-XdndStatus-.patch
-Patch111: 0011-XCB-Auto-detect-xcb-glx-also-with-xcb-qt.patch
-Patch132: 0032-xcb-Fix-drop-of-text-uri-list-and-text-html.patch
-Patch133: 0033-xcb-Fix-dropping-URL-on-Firefox-window.patch
-Patch148: 0148-xcb-Disable-GLX-pbuffers-with-Chromium-in-VMs.patch
-Patch155: 0155-xcb-Fix-transient-parent-and-Qt-Window-flag.patch
-
-# macros, be mindful to keep sync'd with macros.qt5
-Source10: macros.qt5
-%define _qt5 %{name}
-%define _qt5_prefix %{_libdir}/qt5
-%define _qt5_archdatadir %{_libdir}/qt5
-# -devel bindir items (still) conflict with qt4
-# at least until this is all implemented,
-# http://lists.qt-project.org/pipermail/development/2012-November/007990.html
-%define _qt5_bindir %{_qt5_prefix}/bin
-%define _qt5_datadir %{_datadir}/qt5
-%define _qt5_docdir %{_docdir}/qt5
-%define _qt5_examplesdir %{_qt5_prefix}/examples
-%define _qt5_headerdir %{_includedir}/qt5
-%define _qt5_importdir %{_qt5_archdatadir}/imports
-%define _qt5_libdir %{_libdir}
-%define _qt5_libexecdir %{_qt5_archdatadir}/libexec
-%define _qt5_plugindir %{_qt5_archdatadir}/plugins
-%define _qt5_settingsdir %{_sysconfdir}/xdg
-%define _qt5_sysconfdir %{_qt5_settingsdir}
-%define _qt5_translationdir %{_datadir}/qt5/translations
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
 # not there, the platform to integrate with isn't either. Then Qt will just
 # silently ignore the plugin that fails to load. Thus, there is no need to let
-# RPM drag in gtk2 as a dependency for the GTK+ 2 dialog support.
+# RPM drag in gtk3 as a dependency for the GTK+3 dialog support.
 %global __requires_exclude_from ^%{_qt5_plugindir}/platformthemes/.*$
 
 # for %%check
@@ -146,6 +118,9 @@ BuildRequires: libjpeg-devel
 BuildRequires: libmng-devel
 BuildRequires: libtiff-devel
 BuildRequires: pkgconfig(alsa)
+%if 0%{?use_clang}
+BuildRequires: clang >= 3.7.0
+%endif
 # http://bugzilla.redhat.com/1196359
 %if 0%{?fedora} || 0%{?rhel} > 6
 %global dbus -dbus-linked
@@ -155,7 +130,7 @@ BuildRequires: pkgconfig(libdrm)
 BuildRequires: pkgconfig(fontconfig)
 BuildRequires: pkgconfig(gl)
 BuildRequires: pkgconfig(glib-2.0)
-BuildRequires: pkgconfig(gtk+-2.0)
+BuildRequires: pkgconfig(gtk+-3.0)
 BuildRequires: pkgconfig(libproxy-1.0)
 # xcb-sm
 BuildRequires: pkgconfig(ice) pkgconfig(sm)
@@ -200,6 +175,7 @@ BuildRequires: libicu-devel
 %endif
 BuildRequires: pkgconfig(xcb) pkgconfig(xcb-glx) pkgconfig(xcb-icccm) pkgconfig(xcb-image) pkgconfig(xcb-keysyms) pkgconfig(xcb-renderutil)
 BuildRequires: pkgconfig(zlib)
+BuildRequires: qt5-rpm-macros >= %{version}
 
 %if 0%{?tests}
 BuildRequires: dbus-x11
@@ -249,6 +225,9 @@ Requires: pkgconfig(egl)
 %endif
 Requires: pkgconfig(gl)
 Requires: qt5-rpm-macros
+%if 0%{?use_clang}
+Requires: clang >= 3.7.0
+%endif
 %description devel
 %{summary}.
 
@@ -260,6 +239,7 @@ Requires: %{name} = %{version}-%{release}
 BuildRequires: qt5-qhelpgenerator
 BuildRequires: qt5-qdoc
 BuildArch: noarch
+
 %description doc
 %{summary}.
 %endif
@@ -267,6 +247,7 @@ BuildArch: noarch
 %package examples
 Summary: Programming examples for %{name}
 Requires: %{name}%{?_isa} = %{version}-%{release}
+
 %description examples
 %{summary}.
 
@@ -280,6 +261,7 @@ Requires: pkgconfig(libinput)
 Requires: pkgconfig(xkbcommon)
 %endif
 Requires: pkgconfig(zlib)
+
 %description static
 %{summary}.
 
@@ -337,18 +319,6 @@ Requires: glx-utils
 %description gui
 Qt5 libraries used for drawing widgets and OpenGL items.
 
-%package -n qt5-rpm-macros
-Summary: RPM macros for Qt5
-%if 0%{?fedora} > 22 && 0%{?inject_optflags}
-# https://bugzilla.redhat.com/show_bug.cgi?id=1248174
-Requires: redhat-rpm-config
-%endif
-# when qt5-rpm-macros was split out
-Conflicts: qt5-qtbase-devel < 5.6.0-0.23
-BuildArch: noarch
-%description -n qt5-rpm-macros
-RPM macros for building Qt5 packages.
-
 
 %prep
 %setup -q -n %{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}
@@ -358,24 +328,10 @@ RPM macros for building Qt5 packages.
 
 %patch52 -p1 -b .moc_WORDSIZE
 %patch54 -p1 -b .arm
-%patch60 -p1 -b .moc_system_defines
 %patch61 -p1 -b .qt5-qtbase-cxxflag
-
-%patch101 -p1 -b .0001-xcb
-%patch111 -p1 -b .0011
-%patch132 -p1 -b .0032
-%patch133 -p1 -b .0033
-%patch148 -p1 -b .0148
-%patch155 -p1 -b .0155
-
-%define platform linux-g++
 
 %if 0%{?inject_optflags}
 ## adjust $RPM_OPT_FLAGS
-# remove -fexceptions
-RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
-# these flags are for qtbase build only, no need to propogate elsewhere
-#RPM_OPT_FLAGS="$RPM_OPT_FLAGS %{?qt5_deprecated_flag} %{?qt5_arm_flag}"
 
 %patch2 -p1 -b .multilib_optflags
 # drop backup file(s), else they get installed too, http://bugzilla.redhat.com/639463
@@ -389,10 +345,6 @@ sed -i -e "s|^\(QMAKE_LFLAGS_RELEASE.*\)|\1 $RPM_LD_FLAGS|" \
 
 # undefine QMAKE_STRIP (and friends), so we get useful -debuginfo pkgs (#1065636)
 sed -i -e 's|^\(QMAKE_STRIP.*=\).*$|\1|g' mkspecs/common/linux.conf
-%endif
-
-%if 0%{?prerelease}
-bin/syncqt.pl -version %{version}
 %endif
 
 # move some bundled libs to ensure they're not accidentally used
@@ -423,6 +375,10 @@ test -x configure || chmod +x configure
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
 RPM_OPT_FLAGS="$RPM_OPT_FLAGS %{?qt5_arm_flag} %{?qt5_deprecated_flag} %{?qt5_null_flag}"
 
+%if 0%{?use_clang}
+RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fno-delete-null-pointer-checks||g'`
+%endif
+
 export CFLAGS="$CFLAGS $RPM_OPT_FLAGS"
 export CXXFLAGS="$CXXFLAGS $RPM_OPT_FLAGS"
 export LDFLAGS="$LDFLAGS $RPM_LD_FLAGS"
@@ -451,7 +407,7 @@ export MAKEFLAGS="%{?_smp_mflags}"
   %{?dbus}%{!?dbus:-dbus-runtime} \
   -fontconfig \
   -glib \
-  -gtkstyle \
+  -gtk \
   %{?ibase} \
   -iconv \
   -icu \
@@ -531,22 +487,8 @@ translationdir=%{_qt5_translationdir}
 
 Name: Qt5
 Description: Qt5 Configuration
-Version: %{version}
+Version: 5.6.0
 EOF
-
-# rpm macros
-install -p -m644 -D %{SOURCE10} \
-  %{buildroot}%{rpm_macros_dir}/macros.qt5
-sed -i \
-  -e "s|@@NAME@@|%{name}|g" \
-  -e "s|@@EPOCH@@|%{?epoch}%{!?epoch:0}|g" \
-  -e "s|@@VERSION@@|%{version}|g" \
-  -e "s|@@EVR@@|%{?epoch:%{epoch:}}%{version}-%{release}|g" \
-  -e "s|@@QT5_CFLAGS@@|%{?qt5_cflags}|g" \
-  -e "s|@@QT5_CXXFLAGS@@|%{?qt5_cxxflags}|g" \
-  -e "s|@@QT5_RPM_LD_FLAGS@@|%{?qt5_rpm_ld_flags}|g" \
-  -e "s|@@QT5_RPM_OPT_FLAGS@@|%{?qt5_rpm_opt_flags} %{?qt5_null_flag}|g" \
-  %{buildroot}%{rpm_macros_dir}/macros.qt5
 
 # create/own dirs
 mkdir -p %{buildroot}{%{_qt5_archdatadir}/mkspecs/modules,%{_qt5_importdir},%{_qt5_libexecdir},%{_qt5_plugindir}/{designer,iconengines,script,styles},%{_qt5_translationdir}}
@@ -844,6 +786,8 @@ fi
 %if 0%{?egl}
 %{_qt5_libdir}/libQt5EglDeviceIntegration.prl
 %{_qt5_libdir}/libQt5EglDeviceIntegration.so
+%{_qt5_libdir}/libQt5EglFsKmsSupport.prl
+%{_qt5_libdir}/libQt5EglFsKmsSupport.so
 %endif
 
 
@@ -929,6 +873,7 @@ fi
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QIbusPlatformInputContextPlugin.cmake
 %if 0%{?egl}
 %{_qt5_libdir}/libQt5EglDeviceIntegration.so.5*
+%{_qt5_libdir}/libQt5EglFsKmsSupport.so.5*
 %{_qt5_plugindir}/platforms/libqeglfs.so
 %{_qt5_plugindir}/platforms/libqminimalegl.so
 %dir %{_qt5_plugindir}/egldeviceintegrations/
@@ -937,9 +882,10 @@ fi
 %{_qt5_plugindir}/xcbglintegrations/libqxcb-egl-integration.so
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QMinimalEglIntegrationPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSIntegrationPlugin.cmake
-%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSKmsIntegrationPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSX11IntegrationPlugin.cmake
+%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSKmsGbmIntegrationPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QXcbEglIntegrationPlugin.cmake
+%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QGtk3ThemePlugin.cmake
 %endif
 %{_qt5_plugindir}/platforms/libqlinuxfb.so
 %{_qt5_plugindir}/platforms/libqminimal.so
@@ -951,24 +897,24 @@ fi
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QXcbIntegrationPlugin.cmake
 %{_qt5_plugindir}/xcbglintegrations/libqxcb-glx-integration.so
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QXcbGlxIntegrationPlugin.cmake
-%{_qt5_plugindir}/platformthemes/libqgtk2.so
-%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QGtk2ThemePlugin.cmake
+%{_qt5_plugindir}/platformthemes/libqgtk3.so
+%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QGtk3ThemePlugin.cmake
 %{_qt5_plugindir}/printsupport/libcupsprintersupport.so
 %{_qt5_libdir}/cmake/Qt5PrintSupport/Qt5PrintSupport_QCupsPrinterSupportPlugin.cmake
 
-%files -n qt5-rpm-macros
-%{rpm_macros_dir}/macros.qt5
+
 
 
 %changelog
-* Tue Jun 14 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.1-3
-- backport some xcb-plugin-related fixes
+* Tue Jun 14 2016 Helio Chissini de Castro <helio@kde.org> - 5.7.0-2
+- Compiled with gcc
 
-* Thu Jun 09 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.1-2
-- fix Qt5.pc version
+* Tue Jun 14 2016 Helio Chissini de Castro <helio@kde.org> - 5.7.0-1
+- Qt 5.7.0 release
 
-* Thu Jun 09 2016 Jan Grulich <jgrulich@redhat.com> - 5.6.1-1
-- Update to 5.6.1
+* Thu Jun 09 2016 Helio Chissini de Castro <helio@kde.org> - 5.7.0-0.1
+- Prepare 5.7
+- Move macros package away from qtbase. Now is called qt5-rpm-macros
 
 * Thu Jun 02 2016 Than Ngo <than@redhat.com> - 5.6.0-21
 - drop gcc6 workaround on arm
