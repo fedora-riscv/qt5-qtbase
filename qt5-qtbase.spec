@@ -21,6 +21,8 @@
 
 %global qt_module qtbase
 
+%global rpm_macros_dir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
+
 ## set to 1 to enable bootstrap
 %global bootstrap 0
 
@@ -60,7 +62,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.7.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -77,6 +79,9 @@ Source5: qconfig-multilib.h
 # xinitrc script to check for OpenGL 1 only drivers and automatically set
 # QT_XCB_FORCE_SOFTWARE_OPENGL for them
 Source6: 10-qt5-check-opengl2.sh
+
+# macros
+Source10: macros.qt5-qtbase
 
 # support multilib optflags
 Patch2: qtbase-multilib_optflags.patch
@@ -487,8 +492,18 @@ translationdir=%{_qt5_translationdir}
 
 Name: Qt5
 Description: Qt5 Configuration
-Version: 5.6.0
+Version: %{version}
 EOF
+
+# rpm macros
+install -p -m644 -D %{SOURCE10} \
+  %{buildroot}%{rpm_macros_dir}/macros.qt5
+sed -i \
+  -e "s|@@NAME@@|%{name}|g" \
+  -e "s|@@EPOCH@@|%{?epoch}%{!?epoch:0}|g" \
+  -e "s|@@VERSION@@|%{version}|g" \
+  -e "s|@@EVR@@|%{?epoch:%{epoch:}}%{version}-%{release}|g" \
+  %{buildroot}%{rpm_macros_dir}/macros.qt5-qtbase
 
 # create/own dirs
 mkdir -p %{buildroot}{%{_qt5_archdatadir}/mkspecs/modules,%{_qt5_importdir},%{_qt5_libexecdir},%{_qt5_plugindir}/{designer,iconengines,script,styles},%{_qt5_translationdir}}
@@ -665,7 +680,8 @@ fi
 %{_qt5_libdir}/cmake/Qt5Sql/Qt5Sql_QSQLiteDriverPlugin.cmake
 
 %files common
-# empty for now, consider: filesystem/dir ownership, licenses
+# mostly empty for now, consider: filesystem/dir ownership, licenses
+%{rpm_macros_dir}/macros.qt5-qtbase
 
 %if 0%{?docs}
 %files doc
@@ -903,9 +919,10 @@ fi
 %{_qt5_libdir}/cmake/Qt5PrintSupport/Qt5PrintSupport_QCupsPrinterSupportPlugin.cmake
 
 
-
-
 %changelog
+* Tue Jul 19 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.7.0-3
+- introduce macros.qt5-qtbase (for %%_qt5, %%_qt5_epoch, %%_qt5_version, %%_qt5_evr)
+
 * Tue Jun 14 2016 Helio Chissini de Castro <helio@kde.org> - 5.7.0-2
 - Compiled with gcc
 
