@@ -497,7 +497,7 @@ EOF
 
 # rpm macros
 install -p -m644 -D %{SOURCE10} \
-  %{buildroot}%{rpm_macros_dir}/macros.qt5
+  %{buildroot}%{rpm_macros_dir}/macros.qt5-qtbase
 sed -i \
   -e "s|@@NAME@@|%{name}|g" \
   -e "s|@@EPOCH@@|%{?epoch}%{!?epoch:0}|g" \
