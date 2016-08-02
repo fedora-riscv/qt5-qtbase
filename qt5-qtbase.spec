@@ -57,7 +57,7 @@ BuildRequires: pkgconfig(libsystemd)
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.1
-Release: 3%{?prerelease:.%{prerelease}}%{?dist}
+Release: 4%{?prerelease:.%{prerelease}}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -137,8 +137,13 @@ Source10: macros.qt5
 # RPM drag in gtk2 as a dependency for the GTK+ 2 dialog support.
 %global __requires_exclude_from ^%{_qt5_plugindir}/platformthemes/.*$
 
-# for %%check
-BuildRequires: cmake
+# for %%check, rpm auto-provides
+%if 0%{?fedora}
+BuildRequires: cmake >= 3
+%endif
+%if 0%{?rhel}
+BuildRequires: cmake3
+%endif
 BuildRequires: cups-devel
 BuildRequires: desktop-file-utils
 BuildRequires: findutils
@@ -342,6 +347,12 @@ Summary: RPM macros for Qt5
 %if 0%{?fedora} > 22 && 0%{?inject_optflags}
 # https://bugzilla.redhat.com/show_bug.cgi?id=1248174
 Requires: redhat-rpm-config
+%endif
+%if 0%{?fedora}
+Requires: cmake >= 3
+%endif
+%if 0%{?rhel}
+Requires: cmake3
 %endif
 # when qt5-rpm-macros was split out
 Conflicts: qt5-qtbase-devel < 5.6.0-0.23
@@ -961,6 +972,9 @@ fi
 
 
 %changelog
+* Tue Aug 02 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.1-4
+- qt5-rpm-macros: Requires: cmake(3)
+
 * Tue Jun 14 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.1-3
 - backport some xcb-plugin-related fixes
 
