@@ -62,7 +62,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.7.0
-Release: 3%{?dist}
+Release: 4%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -368,6 +368,12 @@ popd
 # ./configure: Permission denied
 # check to ensure that can't happen -- rex
 test -x configure || chmod +x configure
+
+# use proper perl interpretter so autodeps work as expected
+sed -i -e "s|^#!/usr/bin/env perl$|#!%{__perl}|" \
+ bin/fixqt4headers.pl \
+ bin/syncqt.pl \
+ mkspecs/features/data/unix/findclasslist.pl
 
 
 %build
@@ -920,6 +926,9 @@ fi
 
 
 %changelog
+* Mon Sep 12 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.7.0-4
+- use '#!/usr/bin/perl' instead of '#!/usr/bin/env perl'
+
 * Tue Jul 19 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.7.0-3
 - introduce macros.qt5-qtbase (for %%_qt5, %%_qt5_epoch, %%_qt5_version, %%_qt5_evr)
 
