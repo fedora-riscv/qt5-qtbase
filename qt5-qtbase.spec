@@ -62,7 +62,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.7.0
-Release: 4%{?dist}
+Release: 5%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -511,6 +511,9 @@ sed -i \
   -e "s|@@EVR@@|%{?epoch:%{epoch:}}%{version}-%{release}|g" \
   %{buildroot}%{rpm_macros_dir}/macros.qt5-qtbase
 
+echo "%qtwebengine_arches %{ix86} x86_64 %{arm} aarch64 mips mipsel mips64el" > %{buildroot}%{rpm_macros_dir}/macros.webengine-srpm
+echo "qtwebengine_arches lists the architectures where qtwebengine_arches is available in Fedora/EPEL" >> %{buildroot}%{rpm_macros_dir}/macros.webengine-srpm
+
 # create/own dirs
 mkdir -p %{buildroot}{%{_qt5_archdatadir}/mkspecs/modules,%{_qt5_importdir},%{_qt5_libexecdir},%{_qt5_plugindir}/{designer,iconengines,script,styles},%{_qt5_translationdir}}
 mkdir -p %{buildroot}%{_sysconfdir}/xdg/QtProject
@@ -926,6 +929,9 @@ fi
 
 
 %changelog
+* Tue Sep 13 2016 Than Ngo <than@redhat.com> - 5.7.0-5
+- add rpm macros qtwebengine_arches for qtwebengine
+
 * Mon Sep 12 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.7.0-4
 - use '#!/usr/bin/perl' instead of '#!/usr/bin/env perl'
 
