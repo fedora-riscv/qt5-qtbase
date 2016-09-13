@@ -511,8 +511,8 @@ sed -i \
   -e "s|@@EVR@@|%{?epoch:%{epoch:}}%{version}-%{release}|g" \
   %{buildroot}%{rpm_macros_dir}/macros.qt5-qtbase
 
-echo "%qtwebengine_arches %{ix86} x86_64 %{arm} aarch64 mips mipsel mips64el" > %{buildroot}%{rpm_macros_dir}/macros.webengine-srpm
-echo "qtwebengine_arches lists the architectures where qtwebengine_arches is available in Fedora/EPEL" >> %{buildroot}%{rpm_macros_dir}/macros.webengine-srpm
+echo "%qtwebengine_arches %{ix86} x86_64 %{arm} aarch64 mips mipsel mips64el" > %{buildroot}%{rpm_macros_dir}/macros.qtwebengine-srpm
+echo "qtwebengine_arches lists the architectures where qtwebengine_arches is available in Fedora/EPEL" >> %{buildroot}%{rpm_macros_dir}/macros.qtwebengine-srpm
 
 # create/own dirs
 mkdir -p %{buildroot}{%{_qt5_archdatadir}/mkspecs/modules,%{_qt5_importdir},%{_qt5_libexecdir},%{_qt5_plugindir}/{designer,iconengines,script,styles},%{_qt5_translationdir}}
@@ -691,6 +691,7 @@ fi
 %files common
 # mostly empty for now, consider: filesystem/dir ownership, licenses
 %{rpm_macros_dir}/macros.qt5-qtbase
+%{rpm_macros_dir}/macros.qtwebengine-srpm
 
 %if 0%{?docs}
 %files doc
