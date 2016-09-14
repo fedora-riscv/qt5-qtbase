@@ -62,7 +62,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.7.0
-Release: 5%{?dist}
+Release: 6%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -511,9 +511,6 @@ sed -i \
   -e "s|@@EVR@@|%{?epoch:%{epoch:}}%{version}-%{release}|g" \
   %{buildroot}%{rpm_macros_dir}/macros.qt5-qtbase
 
-echo "%qtwebengine_arches %{ix86} x86_64 %{arm} aarch64 mips mipsel mips64el" > %{buildroot}%{rpm_macros_dir}/macros.qtwebengine-srpm
-echo "qtwebengine_arches lists the architectures where qtwebengine_arches is available in Fedora/EPEL" >> %{buildroot}%{rpm_macros_dir}/macros.qtwebengine-srpm
-
 # create/own dirs
 mkdir -p %{buildroot}{%{_qt5_archdatadir}/mkspecs/modules,%{_qt5_importdir},%{_qt5_libexecdir},%{_qt5_plugindir}/{designer,iconengines,script,styles},%{_qt5_translationdir}}
 mkdir -p %{buildroot}%{_sysconfdir}/xdg/QtProject
@@ -691,7 +688,6 @@ fi
 %files common
 # mostly empty for now, consider: filesystem/dir ownership, licenses
 %{rpm_macros_dir}/macros.qt5-qtbase
-%{rpm_macros_dir}/macros.qtwebengine-srpm
 
 %if 0%{?docs}
 %files doc
@@ -930,6 +926,9 @@ fi
 
 
 %changelog
+* Wed Sep 14 2016 Than Ngo <than@redhat.com> - 5.7.0-6
+- add macros qtwebengine_arches in qt5
+
 * Tue Sep 13 2016 Than Ngo <than@redhat.com> - 5.7.0-5
 - add rpm macros qtwebengine_arches for qtwebengine
 
