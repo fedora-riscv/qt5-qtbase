@@ -57,7 +57,7 @@ BuildRequires: pkgconfig(libsystemd)
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.1
-Release: 4%{?prerelease:.%{prerelease}}%{?dist}
+Release: 5%{?prerelease:.%{prerelease}}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -141,7 +141,7 @@ Source10: macros.qt5
 %if 0%{?fedora}
 BuildRequires: cmake >= 3
 %endif
-%if 0%{?rhel}
+%if 0%{?epel}
 BuildRequires: cmake3
 %endif
 BuildRequires: cups-devel
@@ -351,7 +351,7 @@ Requires: redhat-rpm-config
 %if 0%{?fedora}
 Requires: cmake >= 3
 %endif
-%if 0%{?rhel}
+%if 0%{?epel}
 Requires: cmake3
 %endif
 # when qt5-rpm-macros was split out
@@ -972,6 +972,9 @@ fi
 
 
 %changelog
+* Tue Sep 27 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.1-5
+- cmake3 available only in epel
+
 * Tue Aug 02 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.1-4
 - qt5-rpm-macros: Requires: cmake(3)
 
