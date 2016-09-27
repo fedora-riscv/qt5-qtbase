@@ -62,7 +62,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.7.0
-Release: 6%{?dist}
+Release: 7%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -114,8 +114,6 @@ Patch61: qt5-qtbase-cxxflag.patch
 # RPM drag in gtk3 as a dependency for the GTK+3 dialog support.
 %global __requires_exclude_from ^%{_qt5_plugindir}/platformthemes/.*$
 
-# for %%check
-BuildRequires: cmake
 BuildRequires: cups-devel
 BuildRequires: desktop-file-utils
 BuildRequires: findutils
@@ -229,7 +227,7 @@ Requires: %{name}-gui%{?_isa}
 Requires: pkgconfig(egl)
 %endif
 Requires: pkgconfig(gl)
-Requires: qt5-rpm-macros
+Requires: qt5-rpm-macros >= %{version}
 %if 0%{?use_clang}
 Requires: clang >= 3.7.0
 %endif
@@ -926,6 +924,9 @@ fi
 
 
 %changelog
+* Tue Sep 27 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.7.0-7
+- drop BR: cmake (handled by qt5-rpm-macros now)
+
 * Wed Sep 14 2016 Than Ngo <than@redhat.com> - 5.7.0-6
 - add macros qtwebengine_arches in qt5
 
