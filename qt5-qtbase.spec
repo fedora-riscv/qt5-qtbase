@@ -62,7 +62,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.7.0
-Release: 8%{?dist}
+Release: 9%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -141,6 +141,8 @@ BuildRequires: pkgconfig(libpng)
 BuildRequires: pkgconfig(libudev)
 %if 0%{?fedora} > 25 || 0%{?rhel} > 7
 %global openssl -openssl
+# since openssl is loaded dynamically, add an explicit dependency
+Requires: openssl-libs%{?_isa}
 %else
 %global openssl -openssl-linked
 %endif
@@ -928,6 +930,9 @@ fi
 
 
 %changelog
+* Thu Sep 29 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.7.0-9
+- Requires: openssl-libs%%{?_isa} (#1328659)
+
 * Wed Sep 28 2016 Than Ngo <than@redhat.com> - 5.7.0-8
 - bz#1328659, load openssl libs dynamically
 
