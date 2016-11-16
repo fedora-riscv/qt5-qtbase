@@ -100,6 +100,7 @@ Patch61: qt5-qtbase-cxxflag.patch
 
 # macros, be mindful to keep sync'd with macros.qt5
 Source10: macros.qt5
+Source11: macros.qt5-srpm
 %define _qt5 %{name}
 %define _qt5_prefix %{_libdir}/qt5
 %define _qt5_archdatadir %{_libdir}/qt5
@@ -352,6 +353,12 @@ BuildArch: noarch
 %description -n qt5-rpm-macros
 RPM macros for building Qt5 packages.
 
+%package -n qt5-srpm-macros
+Summary: RPM macros for source Qt5 packages
+BuildArch: noarch
+%description -n qt5-srpm-macros
+%{summary}.
+
 
 %prep
 %setup -q -n %{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}
@@ -542,6 +549,9 @@ sed -i \
   -e "s|@@QT5_RPM_LD_FLAGS@@|%{?qt5_rpm_ld_flags}|g" \
   -e "s|@@QT5_RPM_OPT_FLAGS@@|%{?qt5_rpm_opt_flags} %{?qt5_null_flag}|g" \
   %{buildroot}%{rpm_macros_dir}/macros.qt5
+
+install -p -m644 -D %{SOURCE11} \
+  %{buildroot}%{rpm_macros_dir}/macros.qt5-srpm
 
 # create/own dirs
 mkdir -p %{buildroot}{%{_qt5_archdatadir}/mkspecs/modules,%{_qt5_importdir},%{_qt5_libexecdir},%{_qt5_plugindir}/{designer,iconengines,script,styles},%{_qt5_translationdir}}
@@ -958,10 +968,13 @@ fi
 %files -n qt5-rpm-macros
 %{rpm_macros_dir}/macros.qt5
 
+%files -n qt5-srpm-macros
+%{rpm_macros_dir}/macros.qt5-srpm
+
 
 %changelog
 * Sun Oct 16 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.2-1
-- 5.6.2
+- 5.6.2, +qt5-srpm-macros
 
 * Tue Sep 27 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.1-5
 - cmake3 available only in epel
