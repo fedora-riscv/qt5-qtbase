@@ -52,12 +52,10 @@ BuildRequires: pkgconfig(libsystemd)
 %global tests 1
 %endif
 
-#define prerelease rc
-
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
-Version: 5.6.1
-Release: 5%{?prerelease:.%{prerelease}}%{?dist}
+Version: 5.6.2
+Release: 1%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -79,10 +77,7 @@ Source6: 10-qt5-check-opengl2.sh
 Patch2: qtbase-multilib_optflags.patch
 
 # fix QTBUG-35459 (too low entityCharacterLimit=1024 for CVE-2013-4549)
-Patch4: qtbase-opensource-src-5.3.2-QTBUG-35459.patch
-
-# unconditionally enable freetype lcdfilter support
-Patch12: qtbase-opensource-src-5.2.0-enable_ft_lcdfilter.patch
+Patch4: qtbase-opensource-src-5.6.2-QTBUG-35459.patch
 
 # upstreamable patches
 
@@ -92,22 +87,16 @@ Patch12: qtbase-opensource-src-5.2.0-enable_ft_lcdfilter.patch
 Patch52: qtbase-opensource-src-5.6.0-moc_WORDSIZE.patch
 
 # arm patch
-Patch54: qtbase-opensource-src-5.6.0-arm.patch
+Patch54: qtbase-opensource-src-5.6.2-arm.patch
 
 # recently passed code review, not integrated yet
 # https://codereview.qt-project.org/126102/
-Patch60: moc-get-the-system-defines-from-the-compiler-itself.patch
+Patch60: qtbase-opensource-src-5.6.2-moc_system_defines.patch
 
 # drop -O3 and make -O2 by default
 Patch61: qt5-qtbase-cxxflag.patch
 
 ## upstream patches
-Patch101: 0001-xcb-Properly-interpret-data.l-0-field-of-XdndStatus-.patch
-Patch111: 0011-XCB-Auto-detect-xcb-glx-also-with-xcb-qt.patch
-Patch132: 0032-xcb-Fix-drop-of-text-uri-list-and-text-html.patch
-Patch133: 0033-xcb-Fix-dropping-URL-on-Firefox-window.patch
-Patch148: 0148-xcb-Disable-GLX-pbuffers-with-Chromium-in-VMs.patch
-Patch155: 0155-xcb-Fix-transient-parent-and-Qt-Window-flag.patch
 
 # macros, be mindful to keep sync'd with macros.qt5
 Source10: macros.qt5
@@ -184,6 +173,9 @@ BuildRequires: pkgconfig(xkbcommon-x11) >= 0.4.1
 Provides: bundled(libxkbcommon) = 0.4.1
 %endif
 BuildRequires: pkgconfig(xkeyboard-config)
+%if 0%{?fedora} || 0%{?rhel} > 7
+%global eglfs 1
+%endif
 %if 0%{?fedora} || 0%{?rhel} > 6
 %define egl 1
 BuildRequires: pkgconfig(egl)
@@ -365,19 +357,11 @@ RPM macros for building Qt5 packages.
 %setup -q -n %{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}
 
 %patch4 -p1 -b .QTBUG-35459
-%patch12 -p1 -b .enable_ft_lcdfilter
 
 %patch52 -p1 -b .moc_WORDSIZE
 %patch54 -p1 -b .arm
 %patch60 -p1 -b .moc_system_defines
 %patch61 -p1 -b .qt5-qtbase-cxxflag
-
-%patch101 -p1 -b .0001-xcb
-%patch111 -p1 -b .0011
-%patch132 -p1 -b .0032
-%patch133 -p1 -b .0033
-%patch148 -p1 -b .0148
-%patch155 -p1 -b .0155
 
 %define platform linux-g++
 
@@ -952,6 +936,10 @@ fi
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSX11IntegrationPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QXcbEglIntegrationPlugin.cmake
 %endif
+%if 0%{?eglfs}
+%{_qt5_plugindir}/egldeviceintegrations/libqeglfs-kms-egldevice-integration.so
+%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSKmsEglDeviceIntegrationPlugin.cmake
+%endif
 %{_qt5_plugindir}/platforms/libqlinuxfb.so
 %{_qt5_plugindir}/platforms/libqminimal.so
 %{_qt5_plugindir}/platforms/libqoffscreen.so
@@ -972,6 +960,9 @@ fi
 
 
 %changelog
+* Sun Oct 16 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.2-1
+- 5.6.2
+
 * Tue Sep 27 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.1-5
 - cmake3 available only in epel
 
