@@ -403,13 +403,13 @@ export MAKEFLAGS="%{?_smp_mflags}"
   -prefix %{_qt5_prefix} \
   -archdatadir %{_qt5_archdatadir} \
   -bindir %{_qt5_bindir} \
+  -libdir %{_qt5_libdir} \
+  -libexecdir %{_qt5_libexecdir} \
   -datadir %{_qt5_datadir} \
   -docdir %{_qt5_docdir} \
   -examplesdir %{_qt5_examplesdir} \
   -headerdir %{_qt5_headerdir} \
   -importdir %{_qt5_importdir} \
-  -libdir %{_qt5_libdir} \
-  -libexecdir %{_qt5_libexecdir} \
   -plugindir %{_qt5_plugindir} \
   -sysconfdir %{_qt5_sysconfdir} \
   -translationdir %{_qt5_translationdir} \
@@ -517,7 +517,7 @@ sed -i \
 mkdir -p %{buildroot}{%{_qt5_archdatadir}/mkspecs/modules,%{_qt5_importdir},%{_qt5_libexecdir},%{_qt5_plugindir}/{designer,iconengines,script,styles},%{_qt5_translationdir}}
 mkdir -p %{buildroot}%{_sysconfdir}/xdg/QtProject
 
-# hardlink files to %{_bindir}, add -qt5 postfix to not conflict
+# hardlink files to {_bindir}, add -qt5 postfix to not conflict
 mkdir %{buildroot}%{_bindir}
 pushd %{buildroot}%{_qt5_bindir}
 for i in * ; do
@@ -1047,7 +1047,7 @@ fi
 - backport "crash on start if system bus is not available" (QTBUG-51299)
 
 * Sat Mar 05 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.37.rc
-- %build: ./configure -journal (f24+)
+- build: ./configure -journal (f24+)
 
 * Wed Mar 02 2016 Daniel Vrátil <dvratil@fedoraproject.org> 5.6.0-0.36.rc
 - Non-bootstrapped build
