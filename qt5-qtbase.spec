@@ -1,5 +1,3 @@
-#define prerelease rc
-
 # See http://bugzilla.redhat.com/223663
 %define multilib_archs x86_64 %{ix86} %{?mips} ppc64 ppc s390x s390 sparc64 sparcv9
 %define multilib_basearchs x86_64 %{?mips64} ppc64 s390x sparc64
@@ -61,13 +59,13 @@ BuildRequires: pkgconfig(libsystemd)
 
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
-Version: 5.7.0
-Release: 10%{?dist}
+Version: 5.7.1
+Release: 1%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
 Url: http://qt-project.org/
-Source0: http://download.qt.io/official_releases/qt/5.7/%{version}%{?prerelease:-%{prerelease}}/submodules/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}.tar.xz
+Source0: http://download.qt.io/official_releases/qt/5.7/%{version}/submodules/%{qt_module}-opensource-src-%{version}.tar.xz
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1227295
 Source1: qtlogging.ini
@@ -89,9 +87,6 @@ Patch2: qtbase-multilib_optflags.patch
 # fix QTBUG-35459 (too low entityCharacterLimit=1024 for CVE-2013-4549)
 Patch4: qtbase-opensource-src-5.3.2-QTBUG-35459.patch
 
-# unconditionally enable freetype lcdfilter support
-Patch12: qtbase-opensource-src-5.2.0-enable_ft_lcdfilter.patch
-
 # upstreamable patches
 
 # Workaround moc/multilib issues
@@ -104,6 +99,9 @@ Patch54: qtbase-opensource-src-5.6.0-arm.patch
 
 # drop -O3 and make -O2 by default
 Patch61: qt5-qtbase-cxxflag.patch
+
+# Fix png system compilation
+Patch62: qt5-qtbase-5.7.1-libpng.patch
 
 ## upstream patches
 
@@ -330,14 +328,14 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 
 
 %prep
-%setup -q -n %{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}
+%setup -q -n %{qt_module}-opensource-src-%{version}
 
 %patch4 -p1 -b .QTBUG-35459
-%patch12 -p1 -b .enable_ft_lcdfilter
 
 %patch52 -p1 -b .moc_WORDSIZE
 %patch54 -p1 -b .arm
 %patch61 -p1 -b .qt5-qtbase-cxxflag
+%patch62 -p1 -b .libpng
 
 %if 0%{?inject_optflags}
 ## adjust $RPM_OPT_FLAGS
@@ -502,7 +500,7 @@ translationdir=%{_qt5_translationdir}
 
 Name: Qt5
 Description: Qt5 Configuration
-Version: %{version}
+Version: 5.7.1
 EOF
 
 # rpm macros
@@ -906,12 +904,13 @@ fi
 %{_qt5_plugindir}/egldeviceintegrations/libqeglfs-kms-integration.so
 %{_qt5_plugindir}/egldeviceintegrations/libqeglfs-x11-integration.so
 %{_qt5_plugindir}/xcbglintegrations/libqxcb-egl-integration.so
+%{_qt5_plugindir}/egldeviceintegrations/libqeglfs-kms-egldevice-integration.so
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QMinimalEglIntegrationPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSIntegrationPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSX11IntegrationPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSKmsGbmIntegrationPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QXcbEglIntegrationPlugin.cmake
-%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QGtk3ThemePlugin.cmake
+%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSKmsEglDeviceIntegrationPlugin.cmake
 %endif
 %{_qt5_plugindir}/platforms/libqlinuxfb.so
 %{_qt5_plugindir}/platforms/libqminimal.so
@@ -930,6 +929,9 @@ fi
 
 
 %changelog
+* Wed Nov 09 2016 Helio Chissini de Castro <helio@kde.org> - 5.7.1-1
+- New upstream version
+
 * Thu Oct 20 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.7.0-10
 - fix Source0 URL
 
