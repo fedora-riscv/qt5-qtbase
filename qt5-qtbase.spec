@@ -60,7 +60,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.7.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -102,6 +102,10 @@ Patch61: qt5-qtbase-cxxflag.patch
 
 # Fix png system compilation
 Patch62: qt5-qtbase-5.7.1-libpng.patch
+
+# adapted from berolinux for fedora
+# https://github.com/patch-exchange/openssl-1.1-transition/blob/master/qt5-qtbase/qtbase-5.7.0-openssl-1.1.patch
+Patch63: qt5-qtbase-5.7.11-openssl11.patch
 
 ## upstream patches
 
@@ -336,6 +340,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %patch54 -p1 -b .arm
 %patch61 -p1 -b .qt5-qtbase-cxxflag
 %patch62 -p1 -b .libpng
+%patch63 -p1 -b .openssl11
 
 %if 0%{?inject_optflags}
 ## adjust $RPM_OPT_FLAGS
@@ -929,6 +934,9 @@ fi
 
 
 %changelog
+* Thu Nov 24 2016 Than Ngo <than@redhat.com> - 5.7.1-2
+- adapted the berolinux's patch for new openssl-1.1.x
+
 * Wed Nov 09 2016 Helio Chissini de Castro <helio@kde.org> - 5.7.1-1
 - New upstream version
 
