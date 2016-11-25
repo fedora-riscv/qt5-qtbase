@@ -1,6 +1,6 @@
 diff -up qtbase-opensource-src-5.7.1/src/network/ssl/qsslcertificate_openssl.cpp.openssl11 qtbase-opensource-src-5.7.1/src/network/ssl/qsslcertificate_openssl.cpp
 --- qtbase-opensource-src-5.7.1/src/network/ssl/qsslcertificate_openssl.cpp.openssl11	2016-11-17 14:34:21.000000000 -0500
-+++ qtbase-opensource-src-5.7.1/src/network/ssl/qsslcertificate_openssl.cpp	2016-11-24 05:44:32.539671243 -0500
++++ qtbase-opensource-src-5.7.1/src/network/ssl/qsslcertificate_openssl.cpp	2016-11-24 07:51:02.131933265 -0500
 @@ -66,7 +66,7 @@ uint qHash(const QSslCertificate &key, u
      if (X509 * const x509 = key.d->x509) {
          (void)q_X509_cmp(x509, x509); // populate x509->sha1_hash
@@ -73,7 +73,7 @@ diff -up qtbase-opensource-src-5.7.1/src/network/ssl/qsslcertificate_openssl.cpp
      return info;
 diff -up qtbase-opensource-src-5.7.1/src/network/ssl/qsslcontext_openssl.cpp.openssl11 qtbase-opensource-src-5.7.1/src/network/ssl/qsslcontext_openssl.cpp
 --- qtbase-opensource-src-5.7.1/src/network/ssl/qsslcontext_openssl.cpp.openssl11	2016-11-17 14:34:21.000000000 -0500
-+++ qtbase-opensource-src-5.7.1/src/network/ssl/qsslcontext_openssl.cpp	2016-11-24 05:44:32.539671243 -0500
++++ qtbase-opensource-src-5.7.1/src/network/ssl/qsslcontext_openssl.cpp	2016-11-24 07:51:02.131933265 -0500
 @@ -110,7 +110,7 @@ void QSslContext::initSslContext(QSslCon
  init_context:
      switch (sslContext->sslConfiguration.protocol()) {
@@ -103,7 +103,7 @@ diff -up qtbase-opensource-src-5.7.1/src/network/ssl/qsslcontext_openssl.cpp.ope
  
 diff -up qtbase-opensource-src-5.7.1/src/network/ssl/qsslkey_openssl.cpp.openssl11 qtbase-opensource-src-5.7.1/src/network/ssl/qsslkey_openssl.cpp
 --- qtbase-opensource-src-5.7.1/src/network/ssl/qsslkey_openssl.cpp.openssl11	2016-11-17 14:34:21.000000000 -0500
-+++ qtbase-opensource-src-5.7.1/src/network/ssl/qsslkey_openssl.cpp	2016-11-24 05:44:32.539671243 -0500
++++ qtbase-opensource-src-5.7.1/src/network/ssl/qsslkey_openssl.cpp	2016-11-24 07:51:02.141933439 -0500
 @@ -84,28 +84,26 @@ void QSslKeyPrivate::clear(bool deep)
  
  bool QSslKeyPrivate::fromEVP_PKEY(EVP_PKEY *pkey)
@@ -191,7 +191,7 @@ diff -up qtbase-opensource-src-5.7.1/src/network/ssl/qsslkey_openssl.cpp.openssl
  }
 diff -up qtbase-opensource-src-5.7.1/src/network/ssl/qsslsocket_openssl.cpp.openssl11 qtbase-opensource-src-5.7.1/src/network/ssl/qsslsocket_openssl.cpp
 --- qtbase-opensource-src-5.7.1/src/network/ssl/qsslsocket_openssl.cpp.openssl11	2016-11-17 14:34:21.000000000 -0500
-+++ qtbase-opensource-src-5.7.1/src/network/ssl/qsslsocket_openssl.cpp	2016-11-24 05:44:32.539671243 -0500
++++ qtbase-opensource-src-5.7.1/src/network/ssl/qsslsocket_openssl.cpp	2016-11-24 07:51:02.141933439 -0500
 @@ -1519,7 +1519,7 @@ void QSslSocketBackendPrivate::continueH
      if (readBufferMaxSize)
          plainSocket->setReadBufferSize(readBufferMaxSize);
@@ -203,7 +203,7 @@ diff -up qtbase-opensource-src-5.7.1/src/network/ssl/qsslsocket_openssl.cpp.open
  #ifdef QT_DECRYPT_SSL_TRAFFIC
 diff -up qtbase-opensource-src-5.7.1/src/network/ssl/qsslsocket_openssl_symbols.cpp.openssl11 qtbase-opensource-src-5.7.1/src/network/ssl/qsslsocket_openssl_symbols.cpp
 --- qtbase-opensource-src-5.7.1/src/network/ssl/qsslsocket_openssl_symbols.cpp.openssl11	2016-11-17 14:34:21.000000000 -0500
-+++ qtbase-opensource-src-5.7.1/src/network/ssl/qsslsocket_openssl_symbols.cpp	2016-11-24 05:44:32.539671243 -0500
++++ qtbase-opensource-src-5.7.1/src/network/ssl/qsslsocket_openssl_symbols.cpp	2016-11-25 14:31:49.468240957 -0500
 @@ -145,10 +145,15 @@ DEFINEFUNC(int, ASN1_STRING_length, ASN1
  DEFINEFUNC2(int, ASN1_STRING_to_UTF8, unsigned char **a, a, ASN1_STRING *b, b, return 0, return);
  DEFINEFUNC4(long, BIO_ctrl, BIO *a, a, int b, b, long c, c, void *d, d, return -1, return)
@@ -221,7 +221,7 @@ diff -up qtbase-opensource-src-5.7.1/src/network/ssl/qsslsocket_openssl_symbols.
  DEFINEFUNC3(int, BIO_write, BIO *a, a, const void *b, b, int c, c, return -1, return)
  DEFINEFUNC(int, BN_num_bits, const BIGNUM *a, a, return 0, return)
  #ifndef OPENSSL_NO_EC
-@@ -158,7 +163,11 @@ DEFINEFUNC(int, EC_GROUP_get_degree, con
+@@ -158,9 +163,15 @@ DEFINEFUNC(int, EC_GROUP_get_degree, con
  DEFINEFUNC(int, CRYPTO_num_locks, DUMMYARG, DUMMYARG, return 0, return)
  DEFINEFUNC(void, CRYPTO_set_locking_callback, void (*a)(int, int, const char *, int), a, return, DUMMYARG)
  DEFINEFUNC(void, CRYPTO_set_id_callback, unsigned long (*a)(), a, return, DUMMYARG)
@@ -232,26 +232,21 @@ diff -up qtbase-opensource-src-5.7.1/src/network/ssl/qsslsocket_openssl_symbols.
 +#endif
  DEFINEFUNC(DSA *, DSA_new, DUMMYARG, DUMMYARG, return 0, return)
  DEFINEFUNC(void, DSA_free, DSA *a, a, return, DUMMYARG)
++DEFINEFUNC(int, RSA_bits, const RSA *a, a, return 0, return)
++DEFINEFUNC(int, DSA_bits, const DSA *a, a, return 0, return)
  DEFINEFUNC3(X509 *, d2i_X509, X509 **a, a, const unsigned char **b, b, long c, c, return 0, return)
-@@ -302,7 +311,7 @@ DEFINEFUNC2(void *, SSL_get_ex_data, con
- DEFINEFUNC2(void, SSL_set_psk_client_callback, SSL* ssl, ssl, q_psk_client_callback_t callback, callback, return, DUMMYARG)
+ DEFINEFUNC2(char *, ERR_error_string, unsigned long a, a, char *b, b, return 0, return)
+ DEFINEFUNC(unsigned long, ERR_get_error, DUMMYARG, DUMMYARG, return 0, return)
+@@ -182,6 +193,8 @@ DEFINEFUNC2(int, EVP_PKEY_set1_DSA, EVP_
+ DEFINEFUNC2(int, EVP_PKEY_set1_EC_KEY, EVP_PKEY *a, a, EC_KEY *b, b, return -1, return)
  #endif
- #if OPENSSL_VERSION_NUMBER >= 0x10000000L
--#ifndef OPENSSL_NO_SSL2
-+#if !defined(OPENSSL_NO_SSL2) && OPENSSL_VERSION_NUMBER < 0x10100000L
- DEFINEFUNC(const SSL_METHOD *, SSLv2_client_method, DUMMYARG, DUMMYARG, return 0, return)
- #endif
- #ifndef OPENSSL_NO_SSL3_METHOD
-@@ -314,7 +323,7 @@ DEFINEFUNC(const SSL_METHOD *, TLSv1_cli
- DEFINEFUNC(const SSL_METHOD *, TLSv1_1_client_method, DUMMYARG, DUMMYARG, return 0, return)
- DEFINEFUNC(const SSL_METHOD *, TLSv1_2_client_method, DUMMYARG, DUMMYARG, return 0, return)
- #endif
--#ifndef OPENSSL_NO_SSL2
-+#if !defined(OPENSSL_NO_SSL2) && OPENSSL_VERSION_NUMBER < 0x10100000L
- DEFINEFUNC(const SSL_METHOD *, SSLv2_server_method, DUMMYARG, DUMMYARG, return 0, return)
- #endif
- #ifndef OPENSSL_NO_SSL3_METHOD
-@@ -432,6 +441,9 @@ DEFINEFUNC2(size_t, EC_get_builtin_curve
+ DEFINEFUNC(void, EVP_PKEY_free, EVP_PKEY *a, a, return, DUMMYARG)
++DEFINEFUNC(DSA *, EVP_PKEY_get0_DSA, EVP_PKEY *a, a, return 0, return)
++DEFINEFUNC(RSA *, EVP_PKEY_get0_RSA, EVP_PKEY *a, a, return 0, return)
+ DEFINEFUNC(DSA *, EVP_PKEY_get1_DSA, EVP_PKEY *a, a, return 0, return)
+ DEFINEFUNC(RSA *, EVP_PKEY_get1_RSA, EVP_PKEY *a, a, return 0, return)
+ #ifndef OPENSSL_NO_EC
+@@ -432,6 +445,9 @@ DEFINEFUNC2(size_t, EC_get_builtin_curve
  DEFINEFUNC(int, EC_curve_nist2nid, const char *name, name, return 0, return)
  #endif // OPENSSL_VERSION_NUMBER >= 0x10002000L
  #endif // OPENSSL_NO_EC
@@ -261,7 +256,7 @@ diff -up qtbase-opensource-src-5.7.1/src/network/ssl/qsslsocket_openssl_symbols.
  
  DEFINEFUNC5(int, PKCS12_parse, PKCS12 *p12, p12, const char *pass, pass, EVP_PKEY **pkey, pkey, \
              X509 **cert, cert, STACK_OF(X509) **ca, ca, return 1, return);
-@@ -774,6 +786,7 @@ bool q_resolveOpenSslSymbols()
+@@ -774,6 +790,7 @@ bool q_resolveOpenSslSymbols()
      RESOLVEFUNC(CRYPTO_set_locking_callback)
      RESOLVEFUNC(DSA_new)
      RESOLVEFUNC(DSA_free)
@@ -269,7 +264,7 @@ diff -up qtbase-opensource-src-5.7.1/src/network/ssl/qsslsocket_openssl_symbols.
      RESOLVEFUNC(ERR_error_string)
      RESOLVEFUNC(ERR_get_error)
      RESOLVEFUNC(ERR_free_strings)
-@@ -795,7 +808,9 @@ bool q_resolveOpenSslSymbols()
+@@ -795,7 +812,9 @@ bool q_resolveOpenSslSymbols()
  #endif
      RESOLVEFUNC(EVP_PKEY_free)
      RESOLVEFUNC(EVP_PKEY_get1_DSA)
@@ -279,7 +274,7 @@ diff -up qtbase-opensource-src-5.7.1/src/network/ssl/qsslsocket_openssl_symbols.
  #ifndef OPENSSL_NO_EC
      RESOLVEFUNC(EVP_PKEY_get1_EC_KEY)
  #endif
-@@ -836,6 +851,7 @@ bool q_resolveOpenSslSymbols()
+@@ -836,6 +855,7 @@ bool q_resolveOpenSslSymbols()
      RESOLVEFUNC(RAND_status)
      RESOLVEFUNC(RSA_new)
      RESOLVEFUNC(RSA_free)
@@ -289,7 +284,7 @@ diff -up qtbase-opensource-src-5.7.1/src/network/ssl/qsslsocket_openssl_symbols.
      RESOLVEFUNC(sk_free)
 diff -up qtbase-opensource-src-5.7.1/src/network/ssl/qsslsocket_openssl_symbols_p.h.openssl11 qtbase-opensource-src-5.7.1/src/network/ssl/qsslsocket_openssl_symbols_p.h
 --- qtbase-opensource-src-5.7.1/src/network/ssl/qsslsocket_openssl_symbols_p.h.openssl11	2016-11-17 14:34:21.000000000 -0500
-+++ qtbase-opensource-src-5.7.1/src/network/ssl/qsslsocket_openssl_symbols_p.h	2016-11-24 07:46:54.067618403 -0500
++++ qtbase-opensource-src-5.7.1/src/network/ssl/qsslsocket_openssl_symbols_p.h	2016-11-24 07:51:02.141933439 -0500
 @@ -221,10 +221,15 @@ int q_ASN1_STRING_length(ASN1_STRING *a)
  int q_ASN1_STRING_to_UTF8(unsigned char **a, ASN1_STRING *b);
  long q_BIO_ctrl(BIO *a, int b, long c, void *d);
