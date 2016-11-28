@@ -401,6 +401,7 @@ export CFLAGS="$CFLAGS $RPM_OPT_FLAGS"
 export CXXFLAGS="$CXXFLAGS $RPM_OPT_FLAGS"
 export LDFLAGS="$LDFLAGS $RPM_LD_FLAGS"
 export MAKEFLAGS="%{?_smp_mflags}"
+export OPENSSL_LIBS="-lssl -lcrypto"
 
 ./configure -v \
   -confirm-license \
@@ -450,7 +451,8 @@ export MAKEFLAGS="%{?_smp_mflags}"
   %{?xcb} \
   %{?xkbcommon} \
   -system-zlib \
-  -no-directfb
+  -no-directfb \
+  -DOPENSSL_API_COMPAT=0x10100000L
 
 %if ! 0%{?inject_optflags}
 # ensure qmake build using optflags (which can happen if not munging qmake.conf defaults)
