@@ -65,7 +65,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.7.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -409,7 +409,9 @@ export CFLAGS="$CFLAGS $RPM_OPT_FLAGS"
 export CXXFLAGS="$CXXFLAGS $RPM_OPT_FLAGS"
 export LDFLAGS="$LDFLAGS $RPM_LD_FLAGS"
 export MAKEFLAGS="%{?_smp_mflags}"
+%if 0%{?openssl11}
 export OPENSSL_LIBS="-lssl -lcrypto"
+%endif
 
 ./configure -v \
   -confirm-license \
@@ -946,6 +948,9 @@ fi
 
 
 %changelog
+* Mon Nov 28 2016 Than Ngo <than@redhat.com> - 5.7.1-3
+- add condition for rhel
+
 * Thu Nov 24 2016 Than Ngo <than@redhat.com> - 5.7.1-2
 - adapted the berolinux's patch for new openssl-1.1.x
 
