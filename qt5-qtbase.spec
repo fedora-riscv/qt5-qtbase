@@ -411,6 +411,8 @@ export LDFLAGS="$LDFLAGS $RPM_LD_FLAGS"
 export MAKEFLAGS="%{?_smp_mflags}"
 %if 0%{?openssl11}
 export OPENSSL_LIBS="-lssl -lcrypto"
+export CFLAGS="$CFLAGS $RPM_OPT_FLAGS -DOPENSSL_API_COMPAT=0x10100000L"
+export CXXFLAGS="$CXXFLAGS $RPM_OPT_FLAGS -DOPENSSL_API_COMPAT=0x10100000L"
 %endif
 
 ./configure -v \
@@ -461,9 +463,6 @@ export OPENSSL_LIBS="-lssl -lcrypto"
   %{?xcb} \
   %{?xkbcommon} \
   -system-zlib \
-%if 0%{?openssl11}
-  -DOPENSSL_API_COMPAT=0x10100000L \ 
-%endif
   -no-directfb
 
 %if ! 0%{?inject_optflags}
