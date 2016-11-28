@@ -21,8 +21,13 @@
 
 %global rpm_macros_dir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
-## set to 1 to enable bootstrap
+# set to 1 to enable bootstrap
 %global bootstrap 0
+
+# set to 1 for openssl-1.1.x support
+%if 0%{?fedora} > 25 || 0%{?rhel} > 7
+%global openssl11 1
+%endif
 
 %if 0%{?fedora} > 21
 # use external qt_settings pkg
@@ -105,7 +110,7 @@ Patch62: qt5-qtbase-5.7.1-libpng.patch
 
 # adapted from berolinux for fedora
 # https://github.com/patch-exchange/openssl-1.1-transition/blob/master/qt5-qtbase/qtbase-5.7.0-openssl-1.1.patch
-Patch63: qt5-qtbase-5.7.11-openssl11.patch
+Patch63: qt5-qtbase-5.7.1-openssl11.patch
 
 ## upstream patches
 
@@ -340,7 +345,10 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %patch54 -p1 -b .arm
 %patch61 -p1 -b .qt5-qtbase-cxxflag
 %patch62 -p1 -b .libpng
+
+%if 0%{?openssl11}
 %patch63 -p1 -b .openssl11
+%endif
 
 %if 0%{?inject_optflags}
 ## adjust $RPM_OPT_FLAGS
@@ -451,8 +459,10 @@ export OPENSSL_LIBS="-lssl -lcrypto"
   %{?xcb} \
   %{?xkbcommon} \
   -system-zlib \
-  -no-directfb \
-  -DOPENSSL_API_COMPAT=0x10100000L
+%if 0%{?openssl11}
+  -DOPENSSL_API_COMPAT=0x10100000L \ 
+%endif
+  -no-directfb
 
 %if ! 0%{?inject_optflags}
 # ensure qmake build using optflags (which can happen if not munging qmake.conf defaults)
