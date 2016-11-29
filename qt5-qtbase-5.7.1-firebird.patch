@@ -31,3 +31,15 @@ diff -up qtbase-opensource-src-5.7.1/src/sql/drivers/ibase/qsql_ibase.pri.than q
  } else {
      !contains(LIBS, .*gds.*):!contains(LIBS, .*fbclient.*) {
          LIBS += -lgds32_ms
+diff -up qtbase-opensource-src-5.7.1/src/sql/drivers/ibase/qsql_ibase_p.h.than qtbase-opensource-src-5.7.1/src/sql/drivers/ibase/qsql_ibase_p.h
+--- qtbase-opensource-src-5.7.1/src/sql/drivers/ibase/qsql_ibase_p.h.than	2016-11-29 08:27:25.917767879 -0500
++++ qtbase-opensource-src-5.7.1/src/sql/drivers/ibase/qsql_ibase_p.h	2016-11-29 08:27:53.338244987 -0500
+@@ -52,7 +52,7 @@
+ //
+ 
+ #include <QtSql/qsqldriver.h>
+-#include <ibase.h>
++#include <firebird/ibase.h>
+ 
+ #ifdef QT_PLUGIN
+ #define Q_EXPORT_SQLDRIVER_IBASE
