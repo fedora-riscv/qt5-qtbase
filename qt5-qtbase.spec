@@ -27,6 +27,7 @@
 # set to 1 for openssl-1.1.x support
 %if 0%{?fedora} > 25 || 0%{?rhel} > 7
 %global openssl11 1
+%global firebird3x 1
 %endif
 
 %if 0%{?fedora} > 21
@@ -111,6 +112,9 @@ Patch62: qt5-qtbase-5.7.1-libpng.patch
 # adapted from berolinux for fedora
 # https://github.com/patch-exchange/openssl-1.1-transition/blob/master/qt5-qtbase/qtbase-5.7.0-openssl-1.1.patch
 Patch63: qt5-qtbase-5.7.1-openssl11.patch
+
+# support firebird version 3.x
+Patch64: qt5-qtbase-5.7.1-firebird.patch
 
 ## upstream patches
 
@@ -345,9 +349,11 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %patch54 -p1 -b .arm
 %patch61 -p1 -b .qt5-qtbase-cxxflag
 %patch62 -p1 -b .libpng
-
 %if 0%{?openssl11}
 %patch63 -p1 -b .openssl11
+%endif
+%if 0%{?firebird3x}
+%patch64 -p1 -b .firebird
 %endif
 
 %if 0%{?inject_optflags}
@@ -949,6 +955,7 @@ fi
 %changelog
 * Mon Nov 28 2016 Than Ngo <than@redhat.com> - 5.7.1-3
 - add condition for rhel
+- add support for firebird-3.x
 
 * Thu Nov 24 2016 Than Ngo <than@redhat.com> - 5.7.1-2
 - adapted the berolinux's patch for new openssl-1.1.x
