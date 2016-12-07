@@ -55,7 +55,7 @@ BuildRequires: pkgconfig(libsystemd)
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.2
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -960,6 +960,9 @@ fi
 
 
 %changelog
+* Wed Dec 07 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.2-2
+- BR: perl-generators
+
 * Sun Oct 16 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.2-1
 - 5.6.2
 
