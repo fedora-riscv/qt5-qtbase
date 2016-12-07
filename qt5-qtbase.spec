@@ -24,9 +24,9 @@
 # set to 1 to enable bootstrap
 %global bootstrap 0
 
-# set to 1 for openssl-1.1.x support
 %if 0%{?fedora} > 25 || 0%{?rhel} > 7
-%global openssl11 1
+# set to 1 for openssl-1.1.x support
+#global openssl11 1
 %global firebird3x 1
 %endif
 
@@ -150,15 +150,16 @@ BuildRequires: pkgconfig(libproxy-1.0)
 BuildRequires: pkgconfig(ice) pkgconfig(sm)
 BuildRequires: pkgconfig(libpng)
 BuildRequires: pkgconfig(libudev)
-#if 0%{?fedora} > 25 || 0%{?rhel} > 7
-%if 0
-%global openssl -openssl
+%if 0%{?fedora} > 25 || 0%{?rhel} > 7
+%global openssl -openssl-linked
+BuildRequires: compat-openssl10-devel
+#global openssl -openssl
 # since openssl is loaded dynamically, add an explicit dependency
-Requires: openssl-libs%{?_isa}
+#Requires: openssl-libs%{?_isa}
 %else
 %global openssl -openssl-linked
-%endif
 BuildRequires: pkgconfig(openssl)
+%endif
 BuildRequires: pkgconfig(libpulse) pkgconfig(libpulse-mainloop-glib)
 %if 0%{?fedora}
 %global xkbcommon -system-xkbcommon
@@ -956,7 +957,7 @@ fi
 
 %changelog
 * Wed Dec 07 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.7.1-4
-- use -openssl-linked (bug #1401459)
+- disable openssl11 (for now, FTBFS), use -openssl-linked (bug #1401459)
 - BR: perl-generators
 
 * Mon Nov 28 2016 Than Ngo <than@redhat.com> - 5.7.1-3
