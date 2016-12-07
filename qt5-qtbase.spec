@@ -66,7 +66,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.7.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -150,7 +150,8 @@ BuildRequires: pkgconfig(libproxy-1.0)
 BuildRequires: pkgconfig(ice) pkgconfig(sm)
 BuildRequires: pkgconfig(libpng)
 BuildRequires: pkgconfig(libudev)
-%if 0%{?fedora} > 25 || 0%{?rhel} > 7
+#if 0%{?fedora} > 25 || 0%{?rhel} > 7
+%if 0
 %global openssl -openssl
 # since openssl is loaded dynamically, add an explicit dependency
 Requires: openssl-libs%{?_isa}
@@ -953,6 +954,9 @@ fi
 
 
 %changelog
+* Wed Dec 07 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.7.1-4
+- use -openssl-linked (bug #1401459)
+
 * Mon Nov 28 2016 Than Ngo <than@redhat.com> - 5.7.1-3
 - add condition for rhel
 - add support for firebird-3.x
