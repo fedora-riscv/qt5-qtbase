@@ -196,6 +196,7 @@ BuildRequires: libicu-devel
 %endif
 BuildRequires: pkgconfig(xcb) pkgconfig(xcb-glx) pkgconfig(xcb-icccm) pkgconfig(xcb-image) pkgconfig(xcb-keysyms) pkgconfig(xcb-renderutil)
 BuildRequires: pkgconfig(zlib)
+BuildRequires: perl-generators
 BuildRequires: qt5-rpm-macros >= %{version}
 
 %if 0%{?tests}
@@ -956,6 +957,7 @@ fi
 %changelog
 * Wed Dec 07 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.7.1-4
 - use -openssl-linked (bug #1401459)
+- BR: perl-generators
 
 * Mon Nov 28 2016 Than Ngo <than@redhat.com> - 5.7.1-3
 - add condition for rhel
