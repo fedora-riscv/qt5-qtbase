@@ -66,7 +66,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.7.1
-Release: 5%{?dist}
+Release: 6%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -94,6 +94,8 @@ Patch2: qtbase-multilib_optflags.patch
 Patch4: qtbase-opensource-src-5.3.2-QTBUG-35459.patch
 
 # upstreamable patches
+# namespace QT_VERSION_CHECK to workaround major/minor being pre-defined (#1396755)
+Patch50: qtbase-opensource-src-5.7.1-QT_VERSION_CHECK.patch
 
 # Workaround moc/multilib issues
 # https://bugzilla.redhat.com/show_bug.cgi?id=1290020
@@ -956,6 +958,9 @@ fi
 
 
 %changelog
+* Thu Dec 08 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.7.1-6
+- namespace QT_VERSION_CHECK to workaround major/minor being pre-defined (#1396755)
+
 * Thu Dec 08 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.7.1-5
 - 5.7.1 dec5 snapshot
 
