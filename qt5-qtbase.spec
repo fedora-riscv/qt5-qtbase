@@ -97,10 +97,11 @@ Patch4: qtbase-opensource-src-5.3.2-QTBUG-35459.patch
 # namespace QT_VERSION_CHECK to workaround major/minor being pre-defined (#1396755)
 Patch50: qtbase-opensource-src-5.7.1-QT_VERSION_CHECK.patch
 
-# Workaround moc/multilib issues
+# 1. Workaround moc/multilib issues
 # https://bugzilla.redhat.com/show_bug.cgi?id=1290020
 # https://bugreports.qt.io/browse/QTBUG-49972
-Patch52: qtbase-opensource-src-5.6.0-moc_WORDSIZE.patch
+# 2. Workaround sysmacros.h (pre)defining major/minor a breaking stuff
+Patch52: qtbase-opensource-src-5.7.1-moc_macros.patch
 
 # arm patch
 Patch54: qtbase-opensource-src-5.6.0-arm.patch
@@ -350,7 +351,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 
 %patch4 -p1 -b .QTBUG-35459
 
-%patch52 -p1 -b .moc_WORDSIZE
+%patch52 -p1 -b .moc_macros
 %patch54 -p1 -b .arm
 %patch61 -p1 -b .qt5-qtbase-cxxflag
 %patch62 -p1 -b .libpng
@@ -960,6 +961,7 @@ fi
 %changelog
 * Thu Dec 08 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.7.1-6
 - namespace QT_VERSION_CHECK to workaround major/minor being pre-defined (#1396755)
+- update moc patch to define _SYS_SYSMACROS_H (#1396755)
 
 * Thu Dec 08 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.7.1-5
 - 5.7.1 dec5 snapshot
