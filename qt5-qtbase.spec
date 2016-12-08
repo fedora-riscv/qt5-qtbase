@@ -66,7 +66,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.7.1
-Release: 4%{?dist}
+Release: 5%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -956,6 +956,9 @@ fi
 
 
 %changelog
+* Thu Dec 08 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.7.1-5
+- 5.7.1 dec5 snapshot
+
 * Wed Dec 07 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.7.1-4
 - disable openssl11 (for now, FTBFS), use -openssl-linked (bug #1401459)
 - BR: perl-generators
