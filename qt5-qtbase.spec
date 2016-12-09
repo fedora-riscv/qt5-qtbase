@@ -102,7 +102,7 @@ Patch52: qtbase-opensource-src-5.6.0-moc_WORDSIZE.patch
 # arm patch
 Patch54: qtbase-opensource-src-5.6.0-arm.patch
 
-# recently passed code review, not integrated into 5.8 branch
+# recently passed code review, now integrated into 5.8 branch
 # https://codereview.qt-project.org/126102/
 Patch60: qtbase-opensource-src-5.7.1-moc_system_defines.patch
 
