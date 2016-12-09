@@ -66,7 +66,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.7.1
-Release: 6%{?dist}
+Release: 7%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -351,6 +351,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 
 %patch4 -p1 -b .QTBUG-35459
 
+%patch50 -p1 -b .QT_VERSION_CHECK
 %patch52 -p1 -b .moc_macros
 %patch54 -p1 -b .arm
 %patch61 -p1 -b .qt5-qtbase-cxxflag
@@ -959,6 +960,9 @@ fi
 
 
 %changelog
+* Thu Dec 08 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.7.1-7
+- really apply QT_VERSION_CHECK workaround (#1396755)
+
 * Thu Dec 08 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.7.1-6
 - namespace QT_VERSION_CHECK to workaround major/minor being pre-defined (#1396755)
 - update moc patch to define _SYS_SYSMACROS_H (#1396755)
