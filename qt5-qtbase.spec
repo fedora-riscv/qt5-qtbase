@@ -66,7 +66,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.7.1
-Release: 7%{?dist}
+Release: 8%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -960,6 +960,9 @@ fi
 
 
 %changelog
+* Fri Dec 09 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.7.1-8
+- update moc patch to define _SYS_SYSMACROS_H_OUTER instead (#1396755)
+
 * Thu Dec 08 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.7.1-7
 - really apply QT_VERSION_CHECK workaround (#1396755)
 
