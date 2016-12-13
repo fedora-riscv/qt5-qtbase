@@ -62,7 +62,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.7.0
-Release: 6%{?dist}
+Release: 7%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -113,6 +113,7 @@ Patch60: qtbase-opensource-src-5.7.1-moc_system_defines.patch
 Patch61: qt5-qtbase-cxxflag.patch
 
 ## upstream patches
+Patch447: 0447-REG-Fix-unwanted-cache-flush-in-Freetype-engine.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -343,6 +344,8 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %patch54 -p1 -b .arm
 %patch60 -p1 -b .moc_system_defines
 %patch61 -p1 -b .qt5-qtbase-cxxflag
+
+%patch447 -p1 -b .0447
 
 %if 0%{?inject_optflags}
 ## adjust $RPM_OPT_FLAGS
@@ -935,6 +938,9 @@ fi
 
 
 %changelog
+* Tue Dec 13 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.7.0-7
+- unwanted cache flush in Freetype engine (#1400417, QTBUG-49452)
+
 * Mon Dec 12 2016 Vitaly Zaitsev <vitaly@easycoding.org> - 5.7.0-6
 - Backported QTBUG-53071 patch to resolve problem with latest tzdata.
 - Fixed Source URL.
