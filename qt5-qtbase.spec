@@ -62,7 +62,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.7.0
-Release: 5%{?dist}
+Release: 4%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -101,10 +101,6 @@ Patch52: qtbase-opensource-src-5.6.0-moc_WORDSIZE.patch
 
 # arm patch
 Patch54: qtbase-opensource-src-5.6.0-arm.patch
-
-# recently passed code review, not integrated into 5.8 branch
-# https://codereview.qt-project.org/126102/
-Patch60: qtbase-opensource-src-5.7.1-moc_system_defines.patch
 
 # drop -O3 and make -O2 by default
 Patch61: qt5-qtbase-cxxflag.patch
@@ -337,7 +333,6 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 
 %patch52 -p1 -b .moc_WORDSIZE
 %patch54 -p1 -b .arm
-%patch60 -p1 -b .moc_system_defines
 %patch61 -p1 -b .qt5-qtbase-cxxflag
 
 %if 0%{?inject_optflags}
@@ -931,9 +926,6 @@ fi
 
 
 %changelog
-* Fri Dec 09 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.7.0-5
-- restore moc_system_defines.patch lost in 5.7.0 rebase
-
 * Mon Sep 12 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.7.0-4
 - use '#!/usr/bin/perl' instead of '#!/usr/bin/env perl'
 
