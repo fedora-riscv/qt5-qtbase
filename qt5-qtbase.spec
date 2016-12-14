@@ -1,5 +1,3 @@
-#define prerelease rc
-
 # See http://bugzilla.redhat.com/223663
 %define multilib_archs x86_64 %{ix86} %{?mips} ppc64 ppc s390x s390 sparc64 sparcv9
 %define multilib_basearchs x86_64 %{?mips64} ppc64 s390x sparc64
@@ -23,8 +21,14 @@
 
 %global rpm_macros_dir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
-## set to 1 to enable bootstrap
+# set to 1 to enable bootstrap
 %global bootstrap 0
+
+%if 0%{?fedora} > 25 || 0%{?rhel} > 7
+# set to 1 for openssl-1.1.x support
+#global openssl11 1
+%global firebird3x 1
+%endif
 
 %if 0%{?fedora} > 21
 # use external qt_settings pkg
@@ -61,13 +65,13 @@ BuildRequires: pkgconfig(libsystemd)
 
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
-Version: 5.7.0
-Release: 4%{?dist}
+Version: 5.7.1
+Release: 9%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
 Url: http://qt-project.org/
-Source0: http://download.qt.io/official_releases/qt/5.6/%{version}%{?prerelease:-%{prerelease}}/submodules/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}.tar.xz
+Source0: http://download.qt.io/official_releases/qt/5.7/%{version}/submodules/%{qt_module}-opensource-src-%{version}.tar.xz
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1227295
 Source1: qtlogging.ini
@@ -89,21 +93,35 @@ Patch2: qtbase-multilib_optflags.patch
 # fix QTBUG-35459 (too low entityCharacterLimit=1024 for CVE-2013-4549)
 Patch4: qtbase-opensource-src-5.3.2-QTBUG-35459.patch
 
-# unconditionally enable freetype lcdfilter support
-Patch12: qtbase-opensource-src-5.2.0-enable_ft_lcdfilter.patch
-
 # upstreamable patches
+# namespace QT_VERSION_CHECK to workaround major/minor being pre-defined (#1396755)
+Patch50: qtbase-opensource-src-5.7.1-QT_VERSION_CHECK.patch
 
-# Workaround moc/multilib issues
+# 1. Workaround moc/multilib issues
 # https://bugzilla.redhat.com/show_bug.cgi?id=1290020
 # https://bugreports.qt.io/browse/QTBUG-49972
-Patch52: qtbase-opensource-src-5.6.0-moc_WORDSIZE.patch
+# 2. Workaround sysmacros.h (pre)defining major/minor a breaking stuff
+Patch52: qtbase-opensource-src-5.7.1-moc_macros.patch
 
 # arm patch
 Patch54: qtbase-opensource-src-5.6.0-arm.patch
 
+# recently passed code review, now integrated into 5.8 branch
+# https://codereview.qt-project.org/126102/
+Patch60: qtbase-opensource-src-5.7.1-moc_system_defines.patch
+
 # drop -O3 and make -O2 by default
 Patch61: qt5-qtbase-cxxflag.patch
+
+# Fix png system compilation
+Patch62: qt5-qtbase-5.7.1-libpng.patch
+
+# adapted from berolinux for fedora
+# https://github.com/patch-exchange/openssl-1.1-transition/blob/master/qt5-qtbase/qtbase-5.7.0-openssl-1.1.patch
+Patch63: qt5-qtbase-5.7.1-openssl11.patch
+
+# support firebird version 3.x
+Patch64: qt5-qtbase-5.7.1-firebird.patch
 
 ## upstream patches
 
@@ -114,8 +132,6 @@ Patch61: qt5-qtbase-cxxflag.patch
 # RPM drag in gtk3 as a dependency for the GTK+3 dialog support.
 %global __requires_exclude_from ^%{_qt5_plugindir}/platformthemes/.*$
 
-# for %%check
-BuildRequires: cmake
 BuildRequires: cups-devel
 BuildRequires: desktop-file-utils
 BuildRequires: findutils
@@ -141,8 +157,16 @@ BuildRequires: pkgconfig(libproxy-1.0)
 BuildRequires: pkgconfig(ice) pkgconfig(sm)
 BuildRequires: pkgconfig(libpng)
 BuildRequires: pkgconfig(libudev)
+%if 0%{?fedora} > 25 || 0%{?rhel} > 7
+%global openssl -openssl-linked
+BuildRequires: compat-openssl10-devel
+#global openssl -openssl
+# since openssl is loaded dynamically, add an explicit dependency
+#Requires: openssl-libs%{?_isa}
+%else
 %global openssl -openssl-linked
 BuildRequires: pkgconfig(openssl)
+%endif
 BuildRequires: pkgconfig(libpulse) pkgconfig(libpulse-mainloop-glib)
 %if 0%{?fedora}
 %global xkbcommon -system-xkbcommon
@@ -180,6 +204,7 @@ BuildRequires: libicu-devel
 %endif
 BuildRequires: pkgconfig(xcb) pkgconfig(xcb-glx) pkgconfig(xcb-icccm) pkgconfig(xcb-image) pkgconfig(xcb-keysyms) pkgconfig(xcb-renderutil)
 BuildRequires: pkgconfig(zlib)
+BuildRequires: perl-generators
 BuildRequires: qt5-rpm-macros >= %{version}
 
 %if 0%{?tests}
@@ -229,7 +254,7 @@ Requires: %{name}-gui%{?_isa}
 Requires: pkgconfig(egl)
 %endif
 Requires: pkgconfig(gl)
-Requires: qt5-rpm-macros
+Requires: qt5-rpm-macros >= %{version}
 %if 0%{?use_clang}
 Requires: clang >= 3.7.0
 %endif
@@ -326,14 +351,22 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 
 
 %prep
-%setup -q -n %{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}
+%setup -q -n %{qt_module}-opensource-src-%{version}
 
 %patch4 -p1 -b .QTBUG-35459
-%patch12 -p1 -b .enable_ft_lcdfilter
 
-%patch52 -p1 -b .moc_WORDSIZE
+%patch50 -p1 -b .QT_VERSION_CHECK
+%patch52 -p1 -b .moc_macros
 %patch54 -p1 -b .arm
+%patch60 -p1 -b .moc_system_defines
 %patch61 -p1 -b .qt5-qtbase-cxxflag
+%patch62 -p1 -b .libpng
+%if 0%{?openssl11}
+%patch63 -p1 -b .openssl11
+%endif
+%if 0%{?firebird3x}
+%patch64 -p1 -b .firebird
+%endif
 
 %if 0%{?inject_optflags}
 ## adjust $RPM_OPT_FLAGS
@@ -394,6 +427,11 @@ export CFLAGS="$CFLAGS $RPM_OPT_FLAGS"
 export CXXFLAGS="$CXXFLAGS $RPM_OPT_FLAGS"
 export LDFLAGS="$LDFLAGS $RPM_LD_FLAGS"
 export MAKEFLAGS="%{?_smp_mflags}"
+%if 0%{?openssl11}
+export OPENSSL_LIBS="-lssl -lcrypto"
+export CFLAGS="$CFLAGS $RPM_OPT_FLAGS -DOPENSSL_API_COMPAT=0x10100000L"
+export CXXFLAGS="$CXXFLAGS $RPM_OPT_FLAGS -DOPENSSL_API_COMPAT=0x10100000L"
+%endif
 
 ./configure -v \
   -confirm-license \
@@ -401,13 +439,13 @@ export MAKEFLAGS="%{?_smp_mflags}"
   -prefix %{_qt5_prefix} \
   -archdatadir %{_qt5_archdatadir} \
   -bindir %{_qt5_bindir} \
+  -libdir %{_qt5_libdir} \
+  -libexecdir %{_qt5_libexecdir} \
   -datadir %{_qt5_datadir} \
   -docdir %{_qt5_docdir} \
   -examplesdir %{_qt5_examplesdir} \
   -headerdir %{_qt5_headerdir} \
   -importdir %{_qt5_importdir} \
-  -libdir %{_qt5_libdir} \
-  -libexecdir %{_qt5_libexecdir} \
   -plugindir %{_qt5_plugindir} \
   -sysconfdir %{_qt5_sysconfdir} \
   -translationdir %{_qt5_translationdir} \
@@ -498,7 +536,7 @@ translationdir=%{_qt5_translationdir}
 
 Name: Qt5
 Description: Qt5 Configuration
-Version: %{version}
+Version: 5.7.1
 EOF
 
 # rpm macros
@@ -515,7 +553,7 @@ sed -i \
 mkdir -p %{buildroot}{%{_qt5_archdatadir}/mkspecs/modules,%{_qt5_importdir},%{_qt5_libexecdir},%{_qt5_plugindir}/{designer,iconengines,script,styles},%{_qt5_translationdir}}
 mkdir -p %{buildroot}%{_sysconfdir}/xdg/QtProject
 
-# hardlink files to %{_bindir}, add -qt5 postfix to not conflict
+# hardlink files to {_bindir}, add -qt5 postfix to not conflict
 mkdir %{buildroot}%{_bindir}
 pushd %{buildroot}%{_qt5_bindir}
 for i in * ; do
@@ -902,12 +940,13 @@ fi
 %{_qt5_plugindir}/egldeviceintegrations/libqeglfs-kms-integration.so
 %{_qt5_plugindir}/egldeviceintegrations/libqeglfs-x11-integration.so
 %{_qt5_plugindir}/xcbglintegrations/libqxcb-egl-integration.so
+%{_qt5_plugindir}/egldeviceintegrations/libqeglfs-kms-egldevice-integration.so
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QMinimalEglIntegrationPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSIntegrationPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSX11IntegrationPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSKmsGbmIntegrationPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QXcbEglIntegrationPlugin.cmake
-%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QGtk3ThemePlugin.cmake
+%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSKmsEglDeviceIntegrationPlugin.cmake
 %endif
 %{_qt5_plugindir}/platforms/libqlinuxfb.so
 %{_qt5_plugindir}/platforms/libqminimal.so
@@ -926,6 +965,54 @@ fi
 
 
 %changelog
+* Fri Dec 09 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.7.1-9
+- restore moc_system_defines.patch lost in 5.7.0 rebase
+
+* Fri Dec 09 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.7.1-8
+- update moc patch to define _SYS_SYSMACROS_H_OUTER instead (#1396755)
+
+* Thu Dec 08 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.7.1-7
+- really apply QT_VERSION_CHECK workaround (#1396755)
+
+* Thu Dec 08 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.7.1-6
+- namespace QT_VERSION_CHECK to workaround major/minor being pre-defined (#1396755)
+- update moc patch to define _SYS_SYSMACROS_H (#1396755)
+
+* Thu Dec 08 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.7.1-5
+- 5.7.1 dec5 snapshot
+
+* Wed Dec 07 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.7.1-4
+- disable openssl11 (for now, FTBFS), use -openssl-linked (bug #1401459)
+- BR: perl-generators
+
+* Mon Nov 28 2016 Than Ngo <than@redhat.com> - 5.7.1-3
+- add condition for rhel
+- add support for firebird-3.x
+
+* Thu Nov 24 2016 Than Ngo <than@redhat.com> - 5.7.1-2
+- adapted the berolinux's patch for new openssl-1.1.x
+
+* Wed Nov 09 2016 Helio Chissini de Castro <helio@kde.org> - 5.7.1-1
+- New upstream version
+
+* Thu Oct 20 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.7.0-10
+- fix Source0 URL
+
+* Thu Sep 29 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.7.0-9
+- Requires: openssl-libs%%{?_isa} (#1328659)
+
+* Wed Sep 28 2016 Than Ngo <than@redhat.com> - 5.7.0-8
+- bz#1328659, load openssl libs dynamically
+
+* Tue Sep 27 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.7.0-7
+- drop BR: cmake (handled by qt5-rpm-macros now)
+
+* Wed Sep 14 2016 Than Ngo <than@redhat.com> - 5.7.0-6
+- add macros qtwebengine_arches in qt5
+
+* Tue Sep 13 2016 Than Ngo <than@redhat.com> - 5.7.0-5
+- add rpm macros qtwebengine_arches for qtwebengine
+
 * Mon Sep 12 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.7.0-4
 - use '#!/usr/bin/perl' instead of '#!/usr/bin/env perl'
 
@@ -1023,7 +1110,7 @@ fi
 - backport "crash on start if system bus is not available" (QTBUG-51299)
 
 * Sat Mar 05 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.37.rc
-- %build: ./configure -journal (f24+)
+- build: ./configure -journal (f24+)
 
 * Wed Mar 02 2016 Daniel Vrátil <dvratil@fedoraproject.org> 5.6.0-0.36.rc
 - Non-bootstrapped build
