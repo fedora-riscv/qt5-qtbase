@@ -62,12 +62,12 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.7.0
-Release: 6%{?dist}
+Release: 5%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
 Url: http://qt-project.org/
-Source0: http://download.qt.io/official_releases/qt/5.7/%{version}%{?prerelease:-%{prerelease}}/submodules/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}.tar.xz
+Source0: http://download.qt.io/official_releases/qt/5.6/%{version}%{?prerelease:-%{prerelease}}/submodules/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}.tar.xz
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1227295
 Source1: qtlogging.ini
@@ -88,9 +88,6 @@ Patch2: qtbase-multilib_optflags.patch
 
 # fix QTBUG-35459 (too low entityCharacterLimit=1024 for CVE-2013-4549)
 Patch4: qtbase-opensource-src-5.3.2-QTBUG-35459.patch
-
-# fix QTBUG-53071 (backport for Qt 5.7.0. Already in upstream since 5.7.1).
-Patch5: qtbase-opensource-src-5.7.0-QTBUG-53071.patch
 
 # unconditionally enable freetype lcdfilter support
 Patch12: qtbase-opensource-src-5.2.0-enable_ft_lcdfilter.patch
@@ -336,7 +333,6 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %setup -q -n %{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}
 
 %patch4 -p1 -b .QTBUG-35459
-%patch5 -p1 -b .QTBUG-53071
 %patch12 -p1 -b .enable_ft_lcdfilter
 
 %patch52 -p1 -b .moc_WORDSIZE
@@ -935,10 +931,6 @@ fi
 
 
 %changelog
-* Mon Dec 12 2016 Vitaly Zaitsev <vitaly@easycoding.org> - 5.7.0-6
-- Backported QTBUG-53071 patch to resolve problem with latest tzdata.
-- Fixed Source URL.
-
 * Fri Dec 09 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.7.0-5
 - restore moc_system_defines.patch lost in 5.7.0 rebase
 
