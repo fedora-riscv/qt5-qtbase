@@ -1,6 +1,6 @@
 diff -up qtbase-opensource-src-5.7.1/mkspecs/features/moc.prf.moc_system_defines qtbase-opensource-src-5.7.1/mkspecs/features/moc.prf
 --- qtbase-opensource-src-5.7.1/mkspecs/features/moc.prf.moc_system_defines	2016-12-01 02:17:04.000000000 -0600
-+++ qtbase-opensource-src-5.7.1/mkspecs/features/moc.prf	2016-12-09 10:24:12.463205987 -0600
++++ qtbase-opensource-src-5.7.1/mkspecs/features/moc.prf	2016-12-09 08:46:29.263895667 -0600
 @@ -24,8 +24,25 @@ win32:count(MOC_INCLUDEPATH, 40, >) {
      write_file($$absolute_path($$WIN_INCLUDETEMP, $$OUT_PWD), WIN_INCLUDETEMP_CONT)|error("Aborting.")
  }
@@ -63,7 +63,7 @@ diff -up qtbase-opensource-src-5.7.1/mkspecs/features/moc.prf.moc_system_defines
  INCREDIBUILD_XGE += moc_source
 diff -up qtbase-opensource-src-5.7.1/qmake/main.cpp.moc_system_defines qtbase-opensource-src-5.7.1/qmake/main.cpp
 --- qtbase-opensource-src-5.7.1/qmake/main.cpp.moc_system_defines	2016-12-01 02:17:04.000000000 -0600
-+++ qtbase-opensource-src-5.7.1/qmake/main.cpp	2016-12-09 10:24:12.463205987 -0600
++++ qtbase-opensource-src-5.7.1/qmake/main.cpp	2016-12-09 08:46:29.263895667 -0600
 @@ -42,6 +42,10 @@
  #include <sys/types.h>
  #include <sys/stat.h>
@@ -123,8 +123,8 @@ diff -up qtbase-opensource-src-5.7.1/qmake/main.cpp.moc_system_defines qtbase-op
  
      QMakeVfs vfs;
 diff -up qtbase-opensource-src-5.7.1/src/tools/moc/main.cpp.moc_system_defines qtbase-opensource-src-5.7.1/src/tools/moc/main.cpp
---- qtbase-opensource-src-5.7.1/src/tools/moc/main.cpp.moc_system_defines	2016-12-09 10:24:12.458205887 -0600
-+++ qtbase-opensource-src-5.7.1/src/tools/moc/main.cpp	2016-12-09 10:53:10.285347282 -0600
+--- qtbase-opensource-src-5.7.1/src/tools/moc/main.cpp.moc_system_defines	2016-12-09 08:46:29.257895553 -0600
++++ qtbase-opensource-src-5.7.1/src/tools/moc/main.cpp	2016-12-09 08:46:29.264895686 -0600
 @@ -259,6 +259,11 @@ int runMoc(int argc, char **argv)
      prependIncludeOption.setValueName(QStringLiteral("file"));
      parser.addOption(prependIncludeOption);
@@ -137,42 +137,27 @@ diff -up qtbase-opensource-src-5.7.1/src/tools/moc/main.cpp.moc_system_defines q
      QCommandLineOption noNotesWarningsCompatOption(QStringLiteral("n"));
      noNotesWarningsCompatOption.setDescription(QStringLiteral("Do not display notes (-nn) or warnings (-nw). Compatibility option."));
      noNotesWarningsCompatOption.setValueName(QStringLiteral("which"));
-@@ -415,7 +420,31 @@ int runMoc(int argc, char **argv)
+@@ -415,7 +420,16 @@ int runMoc(int argc, char **argv)
      moc.includes = pp.includes;
  
      // 1. preprocess
 -    moc.symbols = pp.preprocessed(moc.filename, &in);
-+    const auto includeFiles = parser.values(includeOption);
-+    for (const QString &includeName : includeFiles) {
++    foreach (const QString &includeName, parser.values(includeOption)) {
 +        QByteArray rawName = pp.resolveInclude(QFile::encodeName(includeName), moc.filename);
-+        if (rawName.isEmpty()) {
-+            fprintf(stderr, "Warning: Failed to resolve include \"%s\" for moc file %s\n",
-+                    includeName.toLocal8Bit().constData(),
-+                    moc.filename.isEmpty() ? "<standard input>" : moc.filename.constData());
-+        } else {
-+            QFile f(QFile::decodeName(rawName));
-+            if (f.open(QIODevice::ReadOnly)) {
-+                moc.symbols += Symbol(0, MOC_INCLUDE_BEGIN, rawName);
-+                moc.symbols += pp.preprocessed(rawName, &f);
-+                moc.symbols += Symbol(0, MOC_INCLUDE_END, rawName);
-+            } else {
-+                fprintf(stderr, "Warning: Cannot open %s included by moc file %s: %s\n",
-+                        rawName.constData(),
-+                        moc.filename.isEmpty() ? "<standard input>" : moc.filename.constData(),
-+                        f.errorString().toLocal8Bit().constData());
-+            }
++        QFile f(QFile::decodeName(rawName));
++        if (f.open(QIODevice::ReadOnly)) {
++            moc.symbols += Symbol(0, MOC_INCLUDE_BEGIN, rawName);
++            moc.symbols += pp.preprocessed(rawName, &f);
++            moc.symbols += Symbol(0, MOC_INCLUDE_END, rawName);
 +        }
 +    }
 +    moc.symbols += pp.preprocessed(moc.filename, &in);
-+
-+    // We obviously do not support MS extensions
-+    pp.macros.remove("_MSC_EXTENSIONS");
  
      if (!pp.preprocessOnly) {
          // 2. parse
 diff -up qtbase-opensource-src-5.7.1/src/tools/moc/preprocessor.cpp.moc_system_defines qtbase-opensource-src-5.7.1/src/tools/moc/preprocessor.cpp
 --- qtbase-opensource-src-5.7.1/src/tools/moc/preprocessor.cpp.moc_system_defines	2016-12-01 02:17:04.000000000 -0600
-+++ qtbase-opensource-src-5.7.1/src/tools/moc/preprocessor.cpp	2016-12-09 10:24:12.464206007 -0600
++++ qtbase-opensource-src-5.7.1/src/tools/moc/preprocessor.cpp	2016-12-09 09:02:14.027758422 -0600
 @@ -1008,6 +1008,37 @@ static void mergeStringLiterals(Symbols
      }
  }
@@ -256,7 +241,7 @@ diff -up qtbase-opensource-src-5.7.1/src/tools/moc/preprocessor.cpp.moc_system_d
  #if 0
 diff -up qtbase-opensource-src-5.7.1/src/tools/moc/preprocessor.h.moc_system_defines qtbase-opensource-src-5.7.1/src/tools/moc/preprocessor.h
 --- qtbase-opensource-src-5.7.1/src/tools/moc/preprocessor.h.moc_system_defines	2016-12-01 02:17:04.000000000 -0600
-+++ qtbase-opensource-src-5.7.1/src/tools/moc/preprocessor.h	2016-12-09 10:24:12.464206007 -0600
++++ qtbase-opensource-src-5.7.1/src/tools/moc/preprocessor.h	2016-12-09 08:46:29.264895686 -0600
 @@ -62,6 +62,7 @@ public:
      QList<QByteArray> frameworks;
      QSet<QByteArray> preprocessedIncludes;
@@ -266,13 +251,13 @@ diff -up qtbase-opensource-src-5.7.1/src/tools/moc/preprocessor.h.moc_system_def
  
      void parseDefineArguments(Macro *m);
 diff -up qtbase-opensource-src-5.7.1/tests/auto/tools/moc/subdir/extradefines.h.moc_system_defines qtbase-opensource-src-5.7.1/tests/auto/tools/moc/subdir/extradefines.h
---- qtbase-opensource-src-5.7.1/tests/auto/tools/moc/subdir/extradefines.h.moc_system_defines	2016-12-09 10:24:12.464206007 -0600
-+++ qtbase-opensource-src-5.7.1/tests/auto/tools/moc/subdir/extradefines.h	2016-12-09 10:24:12.464206007 -0600
+--- qtbase-opensource-src-5.7.1/tests/auto/tools/moc/subdir/extradefines.h.moc_system_defines	2016-12-09 08:46:29.264895686 -0600
++++ qtbase-opensource-src-5.7.1/tests/auto/tools/moc/subdir/extradefines.h	2016-12-09 08:46:29.264895686 -0600
 @@ -0,0 +1 @@
 +#define FOO     1
 diff -up qtbase-opensource-src-5.7.1/tests/auto/tools/moc/tst_moc.cpp.moc_system_defines qtbase-opensource-src-5.7.1/tests/auto/tools/moc/tst_moc.cpp
 --- qtbase-opensource-src-5.7.1/tests/auto/tools/moc/tst_moc.cpp.moc_system_defines	2016-12-01 02:17:04.000000000 -0600
-+++ qtbase-opensource-src-5.7.1/tests/auto/tools/moc/tst_moc.cpp	2016-12-09 10:24:12.465206027 -0600
++++ qtbase-opensource-src-5.7.1/tests/auto/tools/moc/tst_moc.cpp	2016-12-09 08:46:29.265895705 -0600
 @@ -576,6 +576,8 @@ private slots:
      void frameworkSearchPath();
      void cstyleEnums();
