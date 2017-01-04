@@ -66,7 +66,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.7.1
-Release: 11%{?dist}
+Release: 12%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -129,6 +129,12 @@ Patch64: qt5-qtbase-5.7.1-firebird.patch
 # https://bugreports.qt.io/browse/QTBUG-55583
 Patch100: qt5-qtbase-5.8-QTBUG-55583.patch
 
+# Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
+# Those themes are there for platform integration. If the required libraries are
+# not there, the platform to integrate with isn't either. Then Qt will just
+# silently ignore the plugin that fails to load. Thus, there is no need to let
+# RPM drag in gtk3 as a dependency for the GTK+3 dialog support.
+%global __requires_exclude_from ^%{_qt5_plugindir}/platformthemes/.*$
 # filter plugin provides
 %global __provides_exclude_from ^%{_qt5_plugindir}/.*\\.so$
 
@@ -966,6 +972,9 @@ fi
 
 
 %changelog
+* Wed Jan 04 2017 Kevin Kofler <Kevin@tigcc.ticalc.org> - 5.7.1-12
+- readd plugin __requires_exclude_from filter, it is still needed
+
 * Mon Jan 02 2017 Rex Dieter <rdieter@math.unl.edu> - 5.7.1-11
 - filter plugin provides, drop filter plugin excludes (no longer needed)
 
