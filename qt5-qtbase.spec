@@ -66,7 +66,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.7.1
-Release: 12%{?dist}
+Release: 13%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -96,6 +96,11 @@ Patch4: qtbase-opensource-src-5.3.2-QTBUG-35459.patch
 # upstreamable patches
 # namespace QT_VERSION_CHECK to workaround major/minor being pre-defined (#1396755)
 Patch50: qtbase-opensource-src-5.7.1-QT_VERSION_CHECK.patch
+
+# 1381828 - Broken window scaling for some QT5 applications (#1381828)
+# This patch moves the threshold for 2x scaling from the DPI of 144 to 192,
+# the same value GNOME uses. It's not a complete solution...
+Patch51: qtbase-hidpi_scale_at_192.patch
 
 # 1. Workaround moc/multilib issues
 # https://bugzilla.redhat.com/show_bug.cgi?id=1290020
@@ -363,6 +368,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %patch100 -p1 -b .QTBUG-55583
 
 %patch50 -p1 -b .QT_VERSION_CHECK
+%patch51 -p1 -b .hidpi_scale_at_192
 %patch52 -p1 -b .moc_macros
 %patch54 -p1 -b .arm
 %patch60 -p1 -b .moc_system_defines
@@ -972,6 +978,9 @@ fi
 
 
 %changelog
+* Tue Jan 24 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.7.1-13
+- Broken window scaling (#1381828)
+
 * Wed Jan 04 2017 Kevin Kofler <Kevin@tigcc.ticalc.org> - 5.7.1-12
 - readd plugin __requires_exclude_from filter, it is still needed
 
