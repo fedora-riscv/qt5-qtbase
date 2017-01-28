@@ -22,13 +22,7 @@
 %global rpm_macros_dir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
 # set to 1 to enable bootstrap
-%global bootstrap 1
-
-%if 0%{?fedora} > 25 || 0%{?rhel} > 7
-# set to 1 for openssl-1.1.x support
-#global openssl11 1
-%global firebird3x 1
-%endif
+%global bootstrap 0
 
 %if 0%{?fedora} > 21
 # use external qt_settings pkg
@@ -66,7 +60,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.8.0
-Release: 1%{?dist}
+Release: 5%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -261,8 +255,7 @@ Requires: clang >= 3.7.0
 Summary: API documentation for %{name}
 License: GFDL
 Requires: %{name} = %{version}-%{release}
-BuildRequires: qt5-qhelpgenerator
-BuildRequires: qt5-qdoc
+BuildRequires: qt5-doctools
 BuildArch: noarch
 
 %description doc
@@ -357,9 +350,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %if 0%{?openssl11}
 %patch63 -p1 -b .openssl11
 %endif
-%if 0%{?firebird3x}
 %patch64 -p1 -b .firebird
-%endif
 
 %if 0%{?inject_optflags}
 ## adjust $RPM_OPT_FLAGS
@@ -994,6 +985,20 @@ fi
 
 
 %changelog
+* Sat Jan 28 2017 Helio Chissini de Castro <helio@kde.org> - 5.8.0-5
+- Really debootstrap :-P
+
+* Fri Jan 27 2017 Helio Chissini de Castro <helio@kde.org> - 5.8.0-4
+- Debootstrap
+- Use meta doctools package to build docs
+
+* Fri Jan 27 2017 Helio Chissini de Castro <helio@kde.org> - 5.8.0-3
+- Unify firebird patch for both versions
+- Bootstrap again for copr
+
+* Thu Jan 26 2017 Helio Chissini de Castro <helio@kde.org> - 5.8.0-2
+- Debootstrap after tools built. New tool needed qtattributionsscanner
+
 * Thu Jan 26 2017 Helio Chissini de Castro <helio@kde.org> - 5.8.0-1
 - Initial update for 5.8.0
 
