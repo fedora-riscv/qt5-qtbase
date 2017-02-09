@@ -66,7 +66,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.7.1
-Release: 13%{?dist}
+Release: 14%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -129,10 +129,13 @@ Patch63: qt5-qtbase-5.7.1-openssl11.patch
 Patch64: qt5-qtbase-5.7.1-firebird.patch
 
 ## upstream patches
-# 5.8 branch
+## 5.8 branch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1403500
 # https://bugreports.qt.io/browse/QTBUG-55583
 Patch100: qt5-qtbase-5.8-QTBUG-55583.patch
+# Ensure a pixel density of at least 1 for Qt::AA_EnableHighDpiScaling
+# https://bugreports.qt.io/browse/QTBUG-56140
+Patch101: qt5-qtbase-5.8-QTBUG-56140.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -366,6 +369,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 
 %patch4 -p1 -b .QTBUG-35459
 %patch100 -p1 -b .QTBUG-55583
+%patch101 -p1 -b .QTBUG-56140
 
 %patch50 -p1 -b .QT_VERSION_CHECK
 %patch51 -p1 -b .hidpi_scale_at_192
@@ -978,6 +982,9 @@ fi
 
 
 %changelog
+* Thu Feb 09 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.7.1-14
+- 5.8 backport: Ensure a pixel density of at least 1 for Qt::AA_EnableHighDpiScaling (QTBUG-56140)
+
 * Tue Jan 24 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.7.1-13
 - Broken window scaling (#1381828)
 
