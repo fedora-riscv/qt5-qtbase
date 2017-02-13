@@ -1,0 +1,38 @@
+From 10b9321c1dc19236620ba20bdf54cae73891d1ef Mon Sep 17 00:00:00 2001
+From: Anton Kudryavtsev <a.kudryavtsev@netris.ru>
+Date: Wed, 19 Oct 2016 15:30:58 +0300
+Subject: [PATCH 190/352] qxcbconnection.cpp: fix warning about unused function
+
+isXIEvent() is used iff XCB_USE_XINPUT2 is defined.
+So move declaration of the function in XCB_USE_XINPUT2 define scope.
+
+Change-Id: I6f045cd07d572ee7425ee6edc5ac73dcf0afdb37
+Reviewed-by: Edward Welbourne <edward.welbourne@qt.io>
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+---
+ src/plugins/platforms/xcb/qxcbconnection.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/plugins/platforms/xcb/qxcbconnection.cpp b/src/plugins/platforms/xcb/qxcbconnection.cpp
+index c533a2a..3d808d1 100644
+--- a/src/plugins/platforms/xcb/qxcbconnection.cpp
++++ b/src/plugins/platforms/xcb/qxcbconnection.cpp
+@@ -110,6 +110,7 @@ Q_LOGGING_CATEGORY(lcQpaScreen, "qt.qpa.screen")
+ #define XCB_GE_GENERIC 35
+ #endif
+ 
++#if defined(XCB_USE_XINPUT2)
+ // Starting from the xcb version 1.9.3 struct xcb_ge_event_t has changed:
+ // - "pad0" became "extension"
+ // - "pad1" and "pad" became "pad0"
+@@ -127,6 +128,7 @@ static inline bool isXIEvent(xcb_generic_event_t *event, int opCode)
+     qt_xcb_ge_event_t *e = (qt_xcb_ge_event_t *)event;
+     return e->extension == opCode;
+ }
++#endif // XCB_USE_XINPUT2
+ 
+ #ifdef XCB_USE_XLIB
+ static const char * const xcbConnectionErrors[] = {
+-- 
+2.9.3
+

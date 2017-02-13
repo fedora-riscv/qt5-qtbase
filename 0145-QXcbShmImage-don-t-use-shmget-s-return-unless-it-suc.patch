@@ -1,0 +1,64 @@
+From f4fff02cbb1f9399f407c15a27741c6cd1a17133 Mon Sep 17 00:00:00 2001
+From: Edward Welbourne <edward.welbourne@qt.io>
+Date: Mon, 10 Oct 2016 16:09:32 +0200
+Subject: [PATCH 145/352] QXcbShmImage: don't use shmget()'s return unless it
+ succeeds
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+When shmget() failed, we didn't set m_shm_info.shmid (not even to the
+-1 failure id) but did pass it (i.e. uninitialized noise) to shmat(),
+among other related functions.  Guard against this; handle failure
+gracefully.
+
+Task-number: QTBUG-56419
+Change-Id: Ie823c36c2ede03af6cb5d94ce7b4b5cd543c1008
+Reviewed-by: Timur Pocheptsov <timur.pocheptsov@theqtcompany.com>
+Reviewed-by: Błażej Szczygieł <spaz16@wp.pl>
+Reviewed-by: Shawn Rutledge <shawn.rutledge@qt.io>
+Reviewed-by: Joni Poikelin <joni.poikelin@qt.io>
+Reviewed-by: Laszlo Agocs <laszlo.agocs@qt.io>
+---
+ src/plugins/platforms/xcb/qxcbbackingstore.cpp | 16 +++++++++-------
+ 1 file changed, 9 insertions(+), 7 deletions(-)
+
+diff --git a/src/plugins/platforms/xcb/qxcbbackingstore.cpp b/src/plugins/platforms/xcb/qxcbbackingstore.cpp
+index 3b04c59..0b76830 100644
+--- a/src/plugins/platforms/xcb/qxcbbackingstore.cpp
++++ b/src/plugins/platforms/xcb/qxcbbackingstore.cpp
+@@ -150,12 +150,13 @@ QXcbShmImage::QXcbShmImage(QXcbScreen *screen, const QSize &size, uint depth, QI
+         return;
+ 
+     int id = shmget(IPC_PRIVATE, segmentSize, IPC_CREAT | 0600);
+-    if (id == -1)
++    if (id == -1) {
+         qWarning("QXcbShmImage: shmget() failed (%d: %s) for size %d (%dx%d)",
+                  errno, strerror(errno), segmentSize, size.width(), size.height());
+-    else
+-        m_shm_info.shmid = id;
+-    m_shm_info.shmaddr = m_xcb_image->data = (quint8 *)shmat (m_shm_info.shmid, 0, 0);
++    } else {
++        m_shm_info.shmaddr = m_xcb_image->data = (quint8 *)shmat(id, 0, 0);
++    }
++    m_shm_info.shmid = id;
+     m_shm_info.shmseg = xcb_generate_id(xcb_connection());
+ 
+     const xcb_query_extension_reply_t *shm_reply = xcb_get_extension_data(xcb_connection(), &xcb_shm_id);
+@@ -166,9 +167,10 @@ QXcbShmImage::QXcbShmImage(QXcbScreen *screen, const QSize &size, uint depth, QI
+     if (!shm_present || error || id == -1) {
+         free(error);
+ 
+-        shmdt(m_shm_info.shmaddr);
+-        shmctl(m_shm_info.shmid, IPC_RMID, 0);
+-
++        if (id != -1) {
++            shmdt(m_shm_info.shmaddr);
++            shmctl(m_shm_info.shmid, IPC_RMID, 0);
++        }
+         m_shm_info.shmaddr = 0;
+ 
+         m_xcb_image->data = (uint8_t *)malloc(segmentSize);
+-- 
+2.9.3
+

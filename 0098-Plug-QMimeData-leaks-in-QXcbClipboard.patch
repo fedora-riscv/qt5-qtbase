@@ -1,0 +1,85 @@
+From f43c9697bcae997be3eb6db9504f3d7b64601148 Mon Sep 17 00:00:00 2001
+From: Marc Mutz <marc.mutz@kdab.com>
+Date: Tue, 27 Sep 2016 14:55:09 +0200
+Subject: [PATCH 098/352] Plug QMimeData leaks in QXcbClipboard
+
+QXcbClipboard failed to delete the various QMimeData instances
+it owns.
+
+For m_xClipboard, where the two QXcbClipboardMime instances are
+never the same, fix the leak by using a scoped instead of a
+naked pointer.
+
+For m_clientClipboard, where the two QMimeData could be identical
+objects, keep the naked pointers, but delete the objects manually
+in the QXcbClipboard destructor, paying attention to the case
+where they're the same object.
+
+Change-Id: I5ce0e3e8fcec068aeb344ca806cdf2667378e946
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+---
+ src/plugins/platforms/xcb/qxcbclipboard.cpp | 12 +++++++-----
+ src/plugins/platforms/xcb/qxcbclipboard.h   |  2 +-
+ 2 files changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/src/plugins/platforms/xcb/qxcbclipboard.cpp b/src/plugins/platforms/xcb/qxcbclipboard.cpp
+index 8b75c13..d44ebae 100644
+--- a/src/plugins/platforms/xcb/qxcbclipboard.cpp
++++ b/src/plugins/platforms/xcb/qxcbclipboard.cpp
+@@ -269,8 +269,6 @@ QXcbClipboard::QXcbClipboard(QXcbConnection *c)
+ {
+     Q_ASSERT(QClipboard::Clipboard == 0);
+     Q_ASSERT(QClipboard::Selection == 1);
+-    m_xClipboard[QClipboard::Clipboard] = 0;
+-    m_xClipboard[QClipboard::Selection] = 0;
+     m_clientClipboard[QClipboard::Clipboard] = 0;
+     m_clientClipboard[QClipboard::Selection] = 0;
+     m_timestamp[QClipboard::Clipboard] = XCB_CURRENT_TIME;
+@@ -323,6 +321,10 @@ QXcbClipboard::~QXcbClipboard()
+         }
+         free(reply);
+     }
++
++    if (m_clientClipboard[QClipboard::Clipboard] != m_clientClipboard[QClipboard::Selection])
++        delete m_clientClipboard[QClipboard::Clipboard];
++    delete m_clientClipboard[QClipboard::Selection];
+ }
+ 
+ void QXcbClipboard::incrTransactionPeeker(xcb_generic_event_t *ge, bool &accepted)
+@@ -372,9 +374,9 @@ QMimeData * QXcbClipboard::mimeData(QClipboard::Mode mode)
+         return m_clientClipboard[mode];
+     } else {
+         if (!m_xClipboard[mode])
+-            m_xClipboard[mode] = new QXcbClipboardMime(mode, this);
++            m_xClipboard[mode].reset(new QXcbClipboardMime(mode, this));
+ 
+-        return m_xClipboard[mode];
++        return m_xClipboard[mode].data();
+     }
+ }
+ 
+@@ -724,7 +726,7 @@ void QXcbClipboard::handleXFixesSelectionRequest(xcb_xfixes_selection_notify_eve
+     // here we care only about the xfixes events that come from non Qt processes
+     if (event->owner != XCB_NONE && event->owner != owner()) {
+         if (!m_xClipboard[mode]) {
+-            m_xClipboard[mode] = new QXcbClipboardMime(mode, this);
++            m_xClipboard[mode].reset(new QXcbClipboardMime(mode, this));
+         } else {
+             m_xClipboard[mode]->reset();
+         }
+diff --git a/src/plugins/platforms/xcb/qxcbclipboard.h b/src/plugins/platforms/xcb/qxcbclipboard.h
+index 10f0704..f9a34f4 100644
+--- a/src/plugins/platforms/xcb/qxcbclipboard.h
++++ b/src/plugins/platforms/xcb/qxcbclipboard.h
+@@ -92,7 +92,7 @@ private:
+     QClipboard::Mode modeForAtom(xcb_atom_t atom) const;
+ 
+     // Selection and Clipboard
+-    QXcbClipboardMime *m_xClipboard[2];
++    QScopedPointer<QXcbClipboardMime> m_xClipboard[2];
+     QMimeData *m_clientClipboard[2];
+     xcb_timestamp_t m_timestamp[2];
+ 
+-- 
+2.9.3
+

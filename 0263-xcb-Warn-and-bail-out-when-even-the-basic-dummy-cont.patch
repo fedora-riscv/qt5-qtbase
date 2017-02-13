@@ -1,0 +1,36 @@
+From 3c2cb87de2554b9c4f6e2080768fe9ede00aeab3 Mon Sep 17 00:00:00 2001
+From: Laszlo Agocs <laszlo.agocs@qt.io>
+Date: Mon, 7 Nov 2016 09:54:55 +0100
+Subject: [PATCH 263/352] xcb: Warn and bail out when even the basic, dummy
+ context fails
+
+Do not move on to glGet since the behavior is undefined.
+
+Task-number: QTBUG-48986
+Change-Id: Ifd279635ed1b8441f92697965d15ae3ecb59a7e3
+Reviewed-by: Andy Nichols <andy.nichols@qt.io>
+---
+ .../platforms/xcb/gl_integrations/xcb_glx/qglxintegration.cpp      | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qglxintegration.cpp b/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qglxintegration.cpp
+index 9bdedcc..c2b7a56 100644
+--- a/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qglxintegration.cpp
++++ b/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qglxintegration.cpp
+@@ -672,8 +672,11 @@ void QGLXContext::queryDummyContext()
+     }
+ 
+     QOpenGLContext context;
+-    context.create();
+-    context.makeCurrent(surface.data());
++    if (!context.create() || !context.makeCurrent(surface.data())) {
++        qWarning("QGLXContext: Failed to create dummy context");
++        m_supportsThreading = false;
++        return;
++    }
+ 
+     m_supportsThreading = true;
+ 
+-- 
+2.9.3
+

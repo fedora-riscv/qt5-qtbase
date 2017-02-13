@@ -1,0 +1,85 @@
+From ee22c6505a1f7cf52a862b1bd9219511db893417 Mon Sep 17 00:00:00 2001
+From: Clinton Stimpson <clinton@elemtech.com>
+Date: Tue, 30 Aug 2016 07:52:17 -0600
+Subject: [PATCH 177/352] xcb: fix passing of focus from child to its top level
+ QWindow
+
+With the client message _NET_ACTIVE_WINDOW, not all window managers
+will pass focus from a child window to its root window, Detect this
+child-to-root case, and use xcb_set_input_focus() instead.
+
+Task-number: QTBUG-39362
+Change-Id: Ib32193018e3b725b323f87d7306c9ae9493d78a7
+Reviewed-by: Shawn Rutledge <shawn.rutledge@qt.io>
+Reviewed-by: Edward Welbourne <edward.welbourne@qt.io>
+Reviewed-by: Frederik Gladhorn <frederik.gladhorn@qt.io>
+---
+ src/plugins/platforms/xcb/qxcbwindow.cpp      |  3 ++-
+ tests/auto/gui/kernel/qwindow/tst_qwindow.cpp | 20 +++++++++++++++++++-
+ 2 files changed, 21 insertions(+), 2 deletions(-)
+
+diff --git a/src/plugins/platforms/xcb/qxcbwindow.cpp b/src/plugins/platforms/xcb/qxcbwindow.cpp
+index 5f402b6..25a8b41 100644
+--- a/src/plugins/platforms/xcb/qxcbwindow.cpp
++++ b/src/plugins/platforms/xcb/qxcbwindow.cpp
+@@ -1698,9 +1698,11 @@ void QXcbWindow::requestActivateWindow()
+     m_deferredActivation = false;
+ 
+     updateNetWmUserTime(connection()->time());
++    QWindow *focusWindow = QGuiApplication::focusWindow();
+ 
+     if (window()->isTopLevel()
+         && !(window()->flags() & Qt::X11BypassWindowManagerHint)
++        && (!focusWindow || !window()->isAncestorOf(focusWindow))
+         && connection()->wmSupport()->isSupportedByWM(atom(QXcbAtom::_NET_ACTIVE_WINDOW))) {
+         xcb_client_message_event_t event;
+ 
+@@ -1711,7 +1713,6 @@ void QXcbWindow::requestActivateWindow()
+         event.type = atom(QXcbAtom::_NET_ACTIVE_WINDOW);
+         event.data.data32[0] = 1;
+         event.data.data32[1] = connection()->time();
+-        QWindow *focusWindow = QGuiApplication::focusWindow();
+         event.data.data32[2] = focusWindow ? focusWindow->winId() : XCB_NONE;
+         event.data.data32[3] = 0;
+         event.data.data32[4] = 0;
+diff --git a/tests/auto/gui/kernel/qwindow/tst_qwindow.cpp b/tests/auto/gui/kernel/qwindow/tst_qwindow.cpp
+index 0cce5a0..d904d48 100644
+--- a/tests/auto/gui/kernel/qwindow/tst_qwindow.cpp
++++ b/tests/auto/gui/kernel/qwindow/tst_qwindow.cpp
+@@ -601,6 +601,24 @@ void tst_QWindow::isActive()
+     // child has focus
+     QVERIFY(window.isActive());
+ 
++    // test focus back to parent and then back to child (QTBUG-39362)
++    // also verify the cumulative FocusOut and FocusIn counts
++    // activate parent
++    window.requestActivate();
++    QTRY_COMPARE(QGuiApplication::focusWindow(), &window);
++    QVERIFY(window.isActive());
++    QCoreApplication::processEvents();
++    QTRY_COMPARE(child.received(QEvent::FocusOut), 1);
++    QTRY_COMPARE(window.received(QEvent::FocusIn), 2);
++
++    // activate child again
++    child.requestActivate();
++    QTRY_COMPARE(QGuiApplication::focusWindow(), &child);
++    QVERIFY(child.isActive());
++    QCoreApplication::processEvents();
++    QTRY_COMPARE(window.received(QEvent::FocusOut), 2);
++    QTRY_COMPARE(child.received(QEvent::FocusIn), 2);
++
+     Window dialog;
+     dialog.setTransientParent(&window);
+     dialog.setGeometry(QRect(m_availableTopLeft + QPoint(110, 100), m_testWindowSize));
+@@ -625,7 +643,7 @@ void tst_QWindow::isActive()
+     QTRY_COMPARE(QGuiApplication::focusWindow(), &window);
+     QCoreApplication::processEvents();
+     QTRY_COMPARE(dialog.received(QEvent::FocusOut), 1);
+-    QTRY_COMPARE(window.received(QEvent::FocusIn), 2);
++    QTRY_COMPARE(window.received(QEvent::FocusIn), 3);
+ 
+     QVERIFY(window.isActive());
+ 
+-- 
+2.9.3
+

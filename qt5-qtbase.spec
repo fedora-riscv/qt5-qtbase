@@ -55,7 +55,7 @@ BuildRequires: pkgconfig(libsystemd)
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -81,6 +81,11 @@ Patch4: qtbase-opensource-src-5.6.2-QTBUG-35459.patch
 
 # upstreamable patches
 
+# 1381828 - Broken window scaling for some QT5 applications (#1381828)
+# This patch moves the threshold for 2x scaling from the DPI of 144 to 192,
+# the same value GNOME uses. It's not a complete solution...
+Patch51: qtbase-hidpi_scale_at_192.patch
+
 # Workaround moc/multilib issues
 # https://bugzilla.redhat.com/show_bug.cgi?id=1290020
 # https://bugreports.qt.io/browse/QTBUG-49972
@@ -97,6 +102,20 @@ Patch60: qtbase-opensource-src-5.6.2-moc_system_defines.patch
 Patch61: qt5-qtbase-cxxflag.patch
 
 ## upstream patches
+Patch19: 0019-xcb-Don-t-send-Qt-WindowNoState-event-when-hiding-mi.patch
+Patch32: 0032-XCB-Drop-from-external-app-fix-keyboard-modifier-sta.patch
+Patch36: 0036-xcb-Use-the-state-of-the-key-event-to-process-it.patch
+Patch84: 0084-xcb-Treat-bitmap-cursors-differently-from-shaped-cur.patch
+Patch98: 0098-Plug-QMimeData-leaks-in-QXcbClipboard.patch
+Patch145: 0145-QXcbShmImage-don-t-use-shmget-s-return-unless-it-suc.patch
+Patch177: 0177-xcb-fix-passing-of-focus-from-child-to-its-top-level.patch
+Patch190: 0190-qxcbconnection.cpp-fix-warning-about-unused-function.patch
+Patch237: 0237-Stop-unloading-plugins-in-QPluginLoader-and-QFactory.patch
+Patch263: 0263-xcb-Warn-and-bail-out-when-even-the-basic-dummy-cont.patch
+Patch276: 0276-QClipboard-Fix-emitting-changed-in-XCB.patch
+
+## upstream patches (5.8 branch)
+Patch500: qt5-qtbase-5.8-QTBUG-56140.patch
 
 # macros, be mindful to keep sync'd with macros.qt5
 Source10: macros.qt5
@@ -356,8 +375,27 @@ RPM macros for building Qt5 packages.
 %prep
 %setup -q -n %{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}
 
+## upstream patches
+%patch19 -p1 -b .0019
+%patch32 -p1 -b .0032
+%patch36 -p1 -b .0036
+%patch84 -p1 -b .0084
+%patch98 -p1 -b .0098
+%patch145 -p1 -b .0145
+%patch177 -p1 -b .0177
+%patch190 -p1 -b .0190
+%patch237 -p1 -b .0237
+%patch263 -p1 -b .0263
+%patch276 -p1 -b .0276
+
+## upstream patches (5.8)
+%patch500 -p1 -b .QTBUG-56140
+
+## downstream patches
+
 %patch4 -p1 -b .QTBUG-35459
 
+%patch51 -p1 -b .hidpi_scale_at_192
 %patch52 -p1 -b .moc_WORDSIZE
 %patch54 -p1 -b .arm
 %patch60 -p1 -b .moc_system_defines
@@ -960,6 +998,11 @@ fi
 
 
 %changelog
+* Mon Feb 13 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.6.2-3
+- macros.qt5: +%%_qt5_qmldir macro
+- pull in xcb-related upstream fixes
+- backport hidpi-related patches from f25 branch
+
 * Wed Dec 07 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.2-2
 - BR: perl-generators
 

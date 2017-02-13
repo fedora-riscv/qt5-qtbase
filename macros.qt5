@@ -13,6 +13,7 @@
 %_qt5_libdir %{_libdir}
 %_qt5_libexecdir %{_qt5_archdatadir}/libexec
 %_qt5_plugindir %{_qt5_archdatadir}/plugins
+%_qt5_qmldir %{_qt5_archdatadir}/qml
 %_qt5_qmake %{_qt5_bindir}/qmake
 %_qt5_settingsdir %{_sysconfdir}/xdg
 %_qt5_sysconfdir %{_qt5_settingsdir}
