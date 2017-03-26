@@ -1,0 +1,37 @@
+diff -r -u a/config.tests/unix/ibase/ibase.cpp b/config.tests/unix/ibase/ibase.cpp
+--- a/config.tests/unix/ibase/ibase.cpp	2017-01-18 15:20:58.000000000 +0100
++++ b/config.tests/unix/ibase/ibase.cpp	2017-01-27 11:19:39.894994134 +0100
+@@ -37,7 +37,7 @@
+ **
+ ****************************************************************************/
+ 
+-#include <ibase.h>
++#include <firebird/ibase.h>
+ 
+ int main(int, char **)
+ {
+diff -r -u a/src/plugins/sqldrivers/ibase/qsql_ibase_p.h b/src/plugins/sqldrivers/ibase/qsql_ibase_p.h
+--- a/src/plugins/sqldrivers/ibase/qsql_ibase_p.h	2017-01-18 15:20:58.000000000 +0100
++++ b/src/plugins/sqldrivers/ibase/qsql_ibase_p.h	2017-01-27 11:29:10.169983782 +0100
+@@ -52,7 +52,7 @@
+ //
+ 
+ #include <QtSql/qsqldriver.h>
+-#include <ibase.h>
++#include <firebird/ibase.h>
+ 
+ #ifdef QT_PLUGIN
+ #define Q_EXPORT_SQLDRIVER_IBASE
+diff -r -u a/src/sql/configure.json b/src/sql/configure.json
+--- a/src/sql/configure.json	2017-01-18 15:20:58.000000000 +0100
++++ b/src/sql/configure.json	2017-01-27 11:23:31.186794680 +0100
+@@ -51,7 +51,8 @@
+             "test": "unix/ibase",
+             "sources": [
+                 { "libs": "-lgds32_ms", "condition": "config.win32" },
+-                { "libs": "-lgds", "condition": "!config.win32" }
++                { "libs": "-lgds", "condition": "!config.win32" },
++                { "libs": "-lfbclient", "condition": "!config.win32" }
+             ]
+         },
+         "mysql": {

@@ -24,12 +24,6 @@
 # set to 1 to enable bootstrap
 %global bootstrap 0
 
-%if 0%{?fedora} > 25 || 0%{?rhel} > 7
-# set to 1 for openssl-1.1.x support
-#global openssl11 1
-%global firebird3x 1
-%endif
-
 %if 0%{?fedora} > 21
 # use external qt_settings pkg
 %global qt_settings 1
@@ -65,13 +59,13 @@ BuildRequires: pkgconfig(libsystemd)
 
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
-Version: 5.7.1
-Release: 15%{?dist}
+Version: 5.8.0
+Release: 5%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
 Url: http://qt-project.org/
-Source0: http://download.qt.io/official_releases/qt/5.7/%{version}/submodules/%{qt_module}-opensource-src-%{version}.tar.xz
+Source0: http://download.qt.io/official_releases/qt/5.8/%{version}/submodules/%{qt_module}-opensource-src-%{version}.tar.xz
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1227295
 Source1: qtlogging.ini
@@ -95,7 +89,7 @@ Patch4: qtbase-opensource-src-5.3.2-QTBUG-35459.patch
 
 # upstreamable patches
 # namespace QT_VERSION_CHECK to workaround major/minor being pre-defined (#1396755)
-Patch50: qtbase-opensource-src-5.7.1-QT_VERSION_CHECK.patch
+Patch50: qtbase-opensource-src-5.8.0-QT_VERSION_CHECK.patch
 
 # 1381828 - Broken window scaling for some QT5 applications (#1381828)
 # This patch moves the threshold for 2x scaling from the DPI of 144 to 192,
@@ -108,36 +102,15 @@ Patch51: qtbase-hidpi_scale_at_192.patch
 # 2. Workaround sysmacros.h (pre)defining major/minor a breaking stuff
 Patch52: qtbase-opensource-src-5.7.1-moc_macros.patch
 
-# arm patch
-Patch54: qtbase-opensource-src-5.6.0-arm.patch
-
-# recently passed code review, now integrated into 5.8 branch
-# https://codereview.qt-project.org/126102/
-Patch60: qtbase-opensource-src-5.7.1-moc_system_defines.patch
-
 # drop -O3 and make -O2 by default
 Patch61: qt5-qtbase-cxxflag.patch
-
-# Fix png system compilation
-Patch62: qt5-qtbase-5.7.1-libpng.patch
 
 # adapted from berolinux for fedora
 # https://github.com/patch-exchange/openssl-1.1-transition/blob/master/qt5-qtbase/qtbase-5.7.0-openssl-1.1.patch
 Patch63: qt5-qtbase-5.7.1-openssl11.patch
 
 # support firebird version 3.x
-Patch64: qt5-qtbase-5.7.1-firebird.patch
-
-## upstream patches
-## 5.8 branch
-# https://bugzilla.redhat.com/show_bug.cgi?id=1403500
-# https://bugreports.qt.io/browse/QTBUG-55583
-Patch100: qt5-qtbase-5.8-QTBUG-55583.patch
-# Ensure a pixel density of at least 1 for Qt::AA_EnableHighDpiScaling
-# https://bugreports.qt.io/browse/QTBUG-56140
-Patch101: qt5-qtbase-5.8-QTBUG-56140.patch
-# gcc7 FTBFS fix
-Patch153: 0053-QMimeXMLProvider-add-missing-out-of-line-destructor.patch
+Patch64: qt5-qtbase-5.8.0-firebird.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -221,7 +194,7 @@ BuildRequires: libicu-devel
 BuildRequires: pkgconfig(xcb) pkgconfig(xcb-glx) pkgconfig(xcb-icccm) pkgconfig(xcb-image) pkgconfig(xcb-keysyms) pkgconfig(xcb-renderutil)
 BuildRequires: pkgconfig(zlib)
 BuildRequires: perl-generators
-BuildRequires: qt5-rpm-macros >= %{version}
+BuildRequires: qt5-rpm-macros >= 5.7.1
 
 %if 0%{?tests}
 BuildRequires: dbus-x11
@@ -270,7 +243,7 @@ Requires: %{name}-gui%{?_isa}
 Requires: pkgconfig(egl)
 %endif
 Requires: pkgconfig(gl)
-Requires: qt5-rpm-macros >= %{version}
+Requires: qt5-rpm-macros >= 5.7.1
 %if 0%{?use_clang}
 Requires: clang >= 3.7.0
 %endif
@@ -282,8 +255,7 @@ Requires: clang >= 3.7.0
 Summary: API documentation for %{name}
 License: GFDL
 Requires: %{name} = %{version}-%{release}
-BuildRequires: qt5-qhelpgenerator
-BuildRequires: qt5-qdoc
+BuildRequires: qt5-doctools
 BuildArch: noarch
 
 %description doc
@@ -370,23 +342,15 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %setup -q -n %{qt_module}-opensource-src-%{version}
 
 %patch4 -p1 -b .QTBUG-35459
-%patch100 -p1 -b .QTBUG-55583
-%patch101 -p1 -b .QTBUG-56140
-%patch153 -p1 -b .0053
 
 %patch50 -p1 -b .QT_VERSION_CHECK
 %patch51 -p1 -b .hidpi_scale_at_192
 %patch52 -p1 -b .moc_macros
-%patch54 -p1 -b .arm
-%patch60 -p1 -b .moc_system_defines
 %patch61 -p1 -b .qt5-qtbase-cxxflag
-%patch62 -p1 -b .libpng
 %if 0%{?openssl11}
 %patch63 -p1 -b .openssl11
 %endif
-%if 0%{?firebird3x}
 %patch64 -p1 -b .firebird
-%endif
 
 %if 0%{?inject_optflags}
 ## adjust $RPM_OPT_FLAGS
@@ -453,7 +417,8 @@ export CFLAGS="$CFLAGS $RPM_OPT_FLAGS -DOPENSSL_API_COMPAT=0x10100000L"
 export CXXFLAGS="$CXXFLAGS $RPM_OPT_FLAGS -DOPENSSL_API_COMPAT=0x10100000L"
 %endif
 
-./configure -v \
+./configure \
+  -verbose \
   -confirm-license \
   -opensource \
   -prefix %{_qt5_prefix} \
@@ -478,18 +443,15 @@ export CXXFLAGS="$CXXFLAGS $RPM_OPT_FLAGS -DOPENSSL_API_COMPAT=0x10100000L"
   -glib \
   -gtk \
   %{?ibase} \
-  -iconv \
   -icu \
   %{?journald} \
   %{?openssl} \
-  -optimized-qmake \
   %{!?examples:-nomake examples} \
   %{!?tests:-nomake tests} \
-  -no-pch \
   -no-rpath \
   -no-separate-debug-info \
 %ifarch %{ix86}
-  -no-sse2 \
+  -no-sse2 -no-pch \
 %endif
   -no-strip \
   -system-libjpeg \
@@ -700,6 +662,7 @@ fi
 %{_qt5_libdir}/libQt5Sql.so.5*
 %{_qt5_libdir}/libQt5Test.so.5*
 %{_qt5_libdir}/libQt5Xml.so.5*
+%{_qt5_libdir}/libQt5EglFSDeviceIntegration.so.5*
 %dir %{_qt5_libdir}/cmake/
 %dir %{_qt5_libdir}/cmake/Qt5/
 %dir %{_qt5_libdir}/cmake/Qt5Concurrent/
@@ -810,6 +773,8 @@ fi
 %{_qt5_headerdir}/QtTest/
 %{_qt5_headerdir}/QtWidgets/
 %{_qt5_headerdir}/QtXml/
+%{_qt5_headerdir}/QtEglFSDeviceIntegration
+%{_qt5_headerdir}/QtInputSupport
 %{_qt5_archdatadir}/mkspecs/
 %{_qt5_libdir}/libQt5Concurrent.prl
 %{_qt5_libdir}/libQt5Concurrent.so
@@ -835,6 +800,8 @@ fi
 %{_qt5_libdir}/libQt5XcbQpa.so
 %{_qt5_libdir}/libQt5Xml.prl
 %{_qt5_libdir}/libQt5Xml.so
+%{_qt5_libdir}/libQt5EglFSDeviceIntegration.prl
+%{_qt5_libdir}/libQt5EglFSDeviceIntegration.so
 %{_qt5_libdir}/cmake/Qt5/Qt5Config*.cmake
 %{_qt5_libdir}/cmake/Qt5Concurrent/Qt5ConcurrentConfig*.cmake
 %{_qt5_libdir}/cmake/Qt5Core/Qt5CoreConfig*.cmake
@@ -851,6 +818,7 @@ fi
 %{_qt5_libdir}/cmake/Qt5Widgets/Qt5WidgetsConfig*.cmake
 %{_qt5_libdir}/cmake/Qt5Widgets/Qt5WidgetsMacros.cmake
 %{_qt5_libdir}/cmake/Qt5Xml/Qt5XmlConfig*.cmake
+%{_qt5_libdir}/cmake/Qt5/Qt5ModuleLocation.cmake
 %{_qt5_libdir}/pkgconfig/Qt5.pc
 %{_qt5_libdir}/pkgconfig/Qt5Concurrent.pc
 %{_qt5_libdir}/pkgconfig/Qt5Core.pc
@@ -864,8 +832,9 @@ fi
 %{_qt5_libdir}/pkgconfig/Qt5Widgets.pc
 %{_qt5_libdir}/pkgconfig/Qt5Xml.pc
 %if 0%{?egl}
-%{_qt5_libdir}/libQt5EglDeviceIntegration.prl
-%{_qt5_libdir}/libQt5EglDeviceIntegration.so
+
+%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSKmsEglDeviceIntegrationPlugin.cmake
+%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QVncIntegrationPlugin.cmake
 %{_qt5_libdir}/libQt5EglFsKmsSupport.prl
 %{_qt5_libdir}/libQt5EglFsKmsSupport.so
 %endif
@@ -879,9 +848,41 @@ fi
 %{_qt5_libdir}/libQt5OpenGLExtensions.prl
 %{_qt5_libdir}/cmake/Qt5OpenGLExtensions/
 %{_qt5_libdir}/pkgconfig/Qt5OpenGLExtensions.pc
-%{_qt5_headerdir}/QtPlatformSupport/
-%{_qt5_libdir}/libQt5PlatformSupport.*a
-%{_qt5_libdir}/libQt5PlatformSupport.prl
+%{_qt5_libdir}/libQt5AccessibilitySupport.*a
+%{_qt5_libdir}/libQt5AccessibilitySupport.prl
+%{_qt5_headerdir}/QtAccessibilitySupport
+%{_qt5_libdir}/libQt5DeviceDiscoverySupport.*a
+%{_qt5_libdir}/libQt5DeviceDiscoverySupport.prl
+%{_qt5_headerdir}/QtDeviceDiscoverySupport
+%{_qt5_libdir}/libQt5EglSupport.*a
+%{_qt5_libdir}/libQt5EglSupport.prl
+%{_qt5_headerdir}/QtEglSupport
+%{_qt5_libdir}/libQt5EventDispatcherSupport.*a
+%{_qt5_libdir}/libQt5EventDispatcherSupport.prl
+%{_qt5_headerdir}/QtEventDispatcherSupport
+%{_qt5_libdir}/libQt5FbSupport.*a
+%{_qt5_libdir}/libQt5FbSupport.prl
+%{_qt5_headerdir}/QtFbSupport
+%{_qt5_libdir}/libQt5FontDatabaseSupport.*a
+%{_qt5_libdir}/libQt5FontDatabaseSupport.prl
+%{_qt5_headerdir}/QtFontDatabaseSupport
+%{_qt5_libdir}/libQt5GlxSupport.*a
+%{_qt5_libdir}/libQt5GlxSupport.prl
+%{_qt5_headerdir}/QtGlxSupport
+%{_qt5_libdir}/libQt5InputSupport.*a
+%{_qt5_libdir}/libQt5InputSupport.prl
+%{_qt5_libdir}/libQt5LinuxAccessibilitySupport.*a
+%{_qt5_libdir}/libQt5LinuxAccessibilitySupport.prl
+%{_qt5_headerdir}/QtLinuxAccessibilitySupport
+%{_qt5_libdir}/libQt5PlatformCompositorSupport.*a
+%{_qt5_libdir}/libQt5PlatformCompositorSupport.prl
+%{_qt5_headerdir}/QtPlatformCompositorSupport
+%{_qt5_libdir}/libQt5ServiceSupport.*a
+%{_qt5_libdir}/libQt5ServiceSupport.prl
+%{_qt5_headerdir}/QtServiceSupport
+%{_qt5_libdir}/libQt5ThemeSupport.*a
+%{_qt5_libdir}/libQt5ThemeSupport.prl
+%{_qt5_headerdir}/QtThemeSupport
 
 %if 0%{?examples}
 %files examples
@@ -952,7 +953,6 @@ fi
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QComposePlatformInputContextPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QIbusPlatformInputContextPlugin.cmake
 %if 0%{?egl}
-%{_qt5_libdir}/libQt5EglDeviceIntegration.so.5*
 %{_qt5_libdir}/libQt5EglFsKmsSupport.so.5*
 %{_qt5_plugindir}/platforms/libqeglfs.so
 %{_qt5_plugindir}/platforms/libqminimalegl.so
@@ -966,12 +966,12 @@ fi
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSX11IntegrationPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSKmsGbmIntegrationPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QXcbEglIntegrationPlugin.cmake
-%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSKmsEglDeviceIntegrationPlugin.cmake
 %endif
 %{_qt5_plugindir}/platforms/libqlinuxfb.so
 %{_qt5_plugindir}/platforms/libqminimal.so
 %{_qt5_plugindir}/platforms/libqoffscreen.so
 %{_qt5_plugindir}/platforms/libqxcb.so
+%{_qt5_plugindir}/platforms/libqvnc.so
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QLinuxFbIntegrationPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QMinimalIntegrationPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QOffscreenIntegrationPlugin.cmake
@@ -985,11 +985,22 @@ fi
 
 
 %changelog
-* Fri Feb 17 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.7.1-15
-- gcc7 FTBFS fix (#1423090)
+* Sat Jan 28 2017 Helio Chissini de Castro <helio@kde.org> - 5.8.0-5
+- Really debootstrap :-P
 
-* Thu Feb 09 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.7.1-14
-- 5.8 backport: Ensure a pixel density of at least 1 for Qt::AA_EnableHighDpiScaling (QTBUG-56140)
+* Fri Jan 27 2017 Helio Chissini de Castro <helio@kde.org> - 5.8.0-4
+- Debootstrap
+- Use meta doctools package to build docs
+
+* Fri Jan 27 2017 Helio Chissini de Castro <helio@kde.org> - 5.8.0-3
+- Unify firebird patch for both versions
+- Bootstrap again for copr
+
+* Thu Jan 26 2017 Helio Chissini de Castro <helio@kde.org> - 5.8.0-2
+- Debootstrap after tools built. New tool needed qtattributionsscanner
+
+* Thu Jan 26 2017 Helio Chissini de Castro <helio@kde.org> - 5.8.0-1
+- Initial update for 5.8.0
 
 * Tue Jan 24 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.7.1-13
 - Broken window scaling (#1381828)
