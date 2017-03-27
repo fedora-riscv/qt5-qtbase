@@ -1,1 +1,2 @@
 SHA512 (qtbase-opensource-src-5.8.0.tar.xz) = 36a1ba4b0dba02ae65c3b2b0aa3fb3767cbee4dbdf204c9ded7d1700e70144ce85a3a66167f86cc716a1fdd38d832962b2a752e803b0647d03032b2685da5ced
+SHA512 (0493-fix-VNC-platform-plugin-build-on-big-endian-machines.patch) = a03c6b2f321dfb596df587edf7ae5dafedf685d0239f5744e27f73d32977b203b112ef10db19aa0b85409c595214f0b65d0255fc0859fee1671736d951470558

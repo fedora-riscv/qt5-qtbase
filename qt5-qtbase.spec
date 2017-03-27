@@ -112,6 +112,10 @@ Patch63: qt5-qtbase-5.7.1-openssl11.patch
 # support firebird version 3.x
 Patch64: qt5-qtbase-5.8.0-firebird.patch
 
+## upstream patches
+#http://code.qt.io/cgit/qt/qtbase.git/commit/?id=6f64bfa654fb7e20bb75ec3b0544b81482babb44
+Patch493: 0493-fix-VNC-platform-plugin-build-on-big-endian-machines.patch
+
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
 # not there, the platform to integrate with isn't either. Then Qt will just
@@ -351,6 +355,8 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %patch63 -p1 -b .openssl11
 %endif
 %patch64 -p1 -b .firebird
+
+%patch493 -p1 -b .0493
 
 %if 0%{?inject_optflags}
 ## adjust $RPM_OPT_FLAGS
