@@ -22,7 +22,7 @@
 %global rpm_macros_dir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
 # set to 1 to enable bootstrap
-%global bootstrap 0
+%global bootstrap 1
 
 %if 0%{?fedora} > 21
 # use external qt_settings pkg
@@ -445,13 +445,15 @@ export CXXFLAGS="$CXXFLAGS $RPM_OPT_FLAGS -DOPENSSL_API_COMPAT=0x10100000L"
   %{?ibase} \
   -icu \
   %{?journald} \
+  -optimized-qmake \
   %{?openssl} \
   %{!?examples:-nomake examples} \
   %{!?tests:-nomake tests} \
+  -no-pch \
   -no-rpath \
   -no-separate-debug-info \
 %ifarch %{ix86}
-  -no-sse2 -no-pch \
+  -no-sse2 \
 %endif
   -no-strip \
   -system-libjpeg \
@@ -832,9 +834,6 @@ fi
 %{_qt5_libdir}/pkgconfig/Qt5Widgets.pc
 %{_qt5_libdir}/pkgconfig/Qt5Xml.pc
 %if 0%{?egl}
-
-%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSKmsEglDeviceIntegrationPlugin.cmake
-%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QVncIntegrationPlugin.cmake
 %{_qt5_libdir}/libQt5EglFsKmsSupport.prl
 %{_qt5_libdir}/libQt5EglFsKmsSupport.so
 %endif
@@ -966,6 +965,7 @@ fi
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSX11IntegrationPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSKmsGbmIntegrationPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QXcbEglIntegrationPlugin.cmake
+%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSKmsEglDeviceIntegrationPlugin.cmake
 %endif
 %{_qt5_plugindir}/platforms/libqlinuxfb.so
 %{_qt5_plugindir}/platforms/libqminimal.so
@@ -975,6 +975,7 @@ fi
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QLinuxFbIntegrationPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QMinimalIntegrationPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QOffscreenIntegrationPlugin.cmake
+%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QVncIntegrationPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QXcbIntegrationPlugin.cmake
 %{_qt5_plugindir}/xcbglintegrations/libqxcb-glx-integration.so
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QXcbGlxIntegrationPlugin.cmake
@@ -985,6 +986,11 @@ fi
 
 
 %changelog
+* Mon Mar 27 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.8.0-6
+- bootstrap (rawhide)
+- revert some minor changes introduced since 5.7
+- move *Plugin.cmake items to runtime (not -devel)
+
 * Sat Jan 28 2017 Helio Chissini de Castro <helio@kde.org> - 5.8.0-5
 - Really debootstrap :-P
 
