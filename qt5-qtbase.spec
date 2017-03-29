@@ -60,7 +60,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.8.0
-Release: 5%{?dist}
+Release: 7%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -992,6 +992,9 @@ fi
 
 
 %changelog
+* Wed Mar 29 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.8.0-7
+- rebuild
+
 * Mon Mar 27 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.8.0-6
 - bootstrap (rawhide)
 - revert some minor changes introduced since 5.7
