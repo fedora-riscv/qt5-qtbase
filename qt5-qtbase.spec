@@ -262,6 +262,8 @@ Requires: %{name} = %{version}-%{release}
 BuildRequires: qt5-doctools
 ## noarch build currently FTBFS, see https://bugzilla.redhat.com/1437522
 #BuildArch: noarch
+## when made arch'd
+Obsoletes: qt5-qtbase-doc < 5.8.0-8
 %description doc
 %{summary}.
 %endif
