@@ -260,8 +260,8 @@ Summary: API documentation for %{name}
 License: GFDL
 Requires: %{name} = %{version}-%{release}
 BuildRequires: qt5-doctools
-BuildArch: noarch
-
+## noarch build currently FTBFS, see https://bugzilla.redhat.com/1437522
+#BuildArch: noarch
 %description doc
 %{summary}.
 %endif
@@ -994,6 +994,7 @@ fi
 %changelog
 * Thu Mar 30 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.8.0-8
 - de-bootstrap
+- make -doc arch'd (workaround bug #1437522)
 
 * Wed Mar 29 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.8.0-7
 - rebuild
