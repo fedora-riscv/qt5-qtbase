@@ -22,7 +22,7 @@
 %global rpm_macros_dir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
 # set to 1 to enable bootstrap
-%global bootstrap 1
+#global bootstrap 1
 
 %if 0%{?fedora} > 21
 # use external qt_settings pkg
@@ -60,7 +60,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.8.0
-Release: 7%{?dist}
+Release: 8%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -992,6 +992,9 @@ fi
 
 
 %changelog
+* Thu Mar 30 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.8.0-8
+- de-bootstrap
+
 * Wed Mar 29 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.8.0-7
 - rebuild
 
