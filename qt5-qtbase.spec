@@ -21,9 +21,6 @@
 
 %global rpm_macros_dir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
-# set to 1 to enable bootstrap
-#global bootstrap 1
-
 %if 0%{?fedora} > 21
 # use external qt_settings pkg
 %global qt_settings 1
@@ -46,26 +43,18 @@ BuildRequires: pkgconfig(libsystemd)
 %global qt5_null_flag -fno-delete-null-pointer-checks
 %endif
 
-# define to build docs, need to undef this for bootstrapping
-# where qt5-qttools builds are not yet available
-# only primary archs (for now), allow secondary to bootstrap
-%if ! 0%{?bootstrap}
-%ifarch %{arm} %{ix86} x86_64 %{power64} s390 s390x aarch64
-%global docs 1
-%endif
 %global examples 1
 %global tests 1
-%endif
 
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
-Version: 5.8.0
-Release: 8%{?dist}
+Version: 5.9.0
+Release: 0.beta.3%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
 Url: http://qt-project.org/
-Source0: http://download.qt.io/official_releases/qt/5.8/%{version}/submodules/%{qt_module}-opensource-src-%{version}.tar.xz
+Source0: http://download.qt.io/development_releases/qt/5.9/%{version}-beta3/submodules/%{qt_module}-opensource-src-%{version}-beta3.tar.xz
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1227295
 Source1: qtlogging.ini
@@ -111,10 +100,6 @@ Patch63: qt5-qtbase-5.7.1-openssl11.patch
 
 # support firebird version 3.x
 Patch64: qt5-qtbase-5.8.0-firebird.patch
-
-## upstream patches
-#http://code.qt.io/cgit/qt/qtbase.git/commit/?id=6f64bfa654fb7e20bb75ec3b0544b81482babb44
-Patch493: 0493-fix-VNC-platform-plugin-build-on-big-endian-machines.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -188,7 +173,8 @@ BuildRequires: pkgconfig(sqlite3) >= 3.7
 BuildRequires: pkgconfig(harfbuzz) >= 0.9.42
 %endif
 BuildRequires: pkgconfig(icu-i18n)
-BuildRequires: pkgconfig(libpcre) >= 8.30
+BuildRequires: pkgconfig(libpcre2-posix) >= 10.20
+BuildRequires: pkgconfig(libpcre) >= 8.0
 %define pcre -system-pcre
 BuildRequires: pkgconfig(xcb-xkb)
 %else
@@ -253,20 +239,6 @@ Requires: clang >= 3.7.0
 %endif
 %description devel
 %{summary}.
-
-%if 0%{?docs}
-%package doc
-Summary: API documentation for %{name}
-License: GFDL
-Requires: %{name} = %{version}-%{release}
-BuildRequires: qt5-doctools
-## noarch build currently FTBFS, see https://bugzilla.redhat.com/1437522
-#BuildArch: noarch
-## when made arch'd
-Obsoletes: qt5-qtbase-doc < 5.8.0-8
-%description doc
-%{summary}.
-%endif
 
 %package examples
 Summary: Programming examples for %{name}
@@ -345,20 +317,18 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 
 
 %prep
-%setup -q -n %{qt_module}-opensource-src-%{version}
+%setup -q -n %{qt_module}-opensource-src-%{version}-beta3
 
 %patch4 -p1 -b .QTBUG-35459
 
 %patch50 -p1 -b .QT_VERSION_CHECK
-%patch51 -p1 -b .hidpi_scale_at_192
+#patch51 -p1 -b .hidpi_scale_at_192
 %patch52 -p1 -b .moc_macros
-%patch61 -p1 -b .qt5-qtbase-cxxflag
+#patch61 -p1 -b .qt5-qtbase-cxxflag
 %if 0%{?openssl11}
 %patch63 -p1 -b .openssl11
 %endif
 %patch64 -p1 -b .firebird
-
-%patch493 -p1 -b .0493
 
 %if 0%{?inject_optflags}
 ## adjust $RPM_OPT_FLAGS
@@ -487,22 +457,8 @@ make %{?_smp_mflags} -C qmake \
 
 make %{?_smp_mflags}
 
-%if 0%{?docs}
-# HACK to avoid multilib conflicts in noarch content
-# see also https://bugreports.qt-project.org/browse/QTBUG-42071
-QT_HASH_SEED=0; export QT_HASH_SEED
-
-make html_docs
-make qch_docs
-%endif
-
-
 %install
 make install INSTALL_ROOT=%{buildroot}
-
-%if 0%{?docs}
-make install_docs INSTALL_ROOT=%{buildroot}
-%endif
 
 install -m644 -p -D %{SOURCE1} %{buildroot}%{_qt5_datadir}/qtlogging.ini
 
@@ -720,32 +676,6 @@ fi
 # mostly empty for now, consider: filesystem/dir ownership, licenses
 %{rpm_macros_dir}/macros.qt5-qtbase
 
-%if 0%{?docs}
-%files doc
-%license LICENSE.FDL
-%doc dist/README dist/changes-5.*
-%{_qt5_docdir}/*.qch
-%if 0%{?examples}
-%if 0%{!?bootstrap}
-# included in -examples instead, see bug #1212750
-%exclude %{_qt5_docdir}/*/examples-manifest.xml
-%endif
-%endif
-%{_qt5_docdir}/qmake/
-%{_qt5_docdir}/qtconcurrent/
-%{_qt5_docdir}/qtcore/
-%{_qt5_docdir}/qtdbus/
-%{_qt5_docdir}/qtgui/
-%{_qt5_docdir}/qtnetwork/
-%{_qt5_docdir}/qtopengl/
-%{_qt5_docdir}/qtplatformheaders/
-%{_qt5_docdir}/qtprintsupport/
-%{_qt5_docdir}/qtsql/
-%{_qt5_docdir}/qttestlib/
-%{_qt5_docdir}/qtwidgets/
-%{_qt5_docdir}/qtxml/
-%endif
-
 %files devel
 %if "%{_qt5_bindir}" != "%{_bindir}"
 %dir %{_qt5_bindir}
@@ -890,12 +820,12 @@ fi
 %{_qt5_libdir}/libQt5ThemeSupport.*a
 %{_qt5_libdir}/libQt5ThemeSupport.prl
 %{_qt5_headerdir}/QtThemeSupport
+%{_qt5_libdir}/libQt5KmsSupport.*a
+%{_qt5_libdir}/libQt5KmsSupport.prl
+%{_qt5_headerdir}/QtKmsSupport
 
 %if 0%{?examples}
 %files examples
-%if 0%{!?bootstrap}
-%{_qt5_docdir}/*/examples-manifest.xml
-%endif
 %{_qt5_examplesdir}/
 %endif
 
@@ -968,12 +898,14 @@ fi
 %{_qt5_plugindir}/egldeviceintegrations/libqeglfs-x11-integration.so
 %{_qt5_plugindir}/xcbglintegrations/libqxcb-egl-integration.so
 %{_qt5_plugindir}/egldeviceintegrations/libqeglfs-kms-egldevice-integration.so
+%{_qt5_plugindir}/egldeviceintegrations/libqeglfs-emu-integration.so
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QMinimalEglIntegrationPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSIntegrationPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSX11IntegrationPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSKmsGbmIntegrationPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QXcbEglIntegrationPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSKmsEglDeviceIntegrationPlugin.cmake
+%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSEmulatorIntegrationPlugin.cmake
 %endif
 %{_qt5_plugindir}/platforms/libqlinuxfb.so
 %{_qt5_plugindir}/platforms/libqminimal.so
@@ -994,6 +926,12 @@ fi
 
 
 %changelog
+* Fri May 05 2017 Helio Chissini de Castro <helio@kde.org> - 5.9.0-0.beta.3
+- Beta 3 release
+
+* Fri Apr 14 2017 Helio Chissini de Castro <helio@kde.org> - 5.9.0-0.beta.1
+- No more docs, no more bootstrap. Docs comes now on a single package.
+
 * Thu Mar 30 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.8.0-8
 - de-bootstrap
 - make -doc arch'd (workaround bug #1437522)
