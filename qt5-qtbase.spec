@@ -66,7 +66,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.7.1
-Release: 15%{?dist}
+Release: 16%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -138,6 +138,11 @@ Patch100: qt5-qtbase-5.8-QTBUG-55583.patch
 Patch101: qt5-qtbase-5.8-QTBUG-56140.patch
 # gcc7 FTBFS fix
 Patch153: 0053-QMimeXMLProvider-add-missing-out-of-line-destructor.patch
+
+## under review
+# https://codereview.qt-project.org/#/c/180232/
+Patch401: 0001-Merge-the-QDBusMetaType-s-custom-information-to-QDBu.patch
+Patch402: 0002-Fix-some-QtDBus-crashes-during-application-destructi.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -373,6 +378,9 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %patch100 -p1 -b .QTBUG-55583
 %patch101 -p1 -b .QTBUG-56140
 %patch153 -p1 -b .0053
+
+%patch401 -p1 -b .0401
+%patch402 -p1 -b .0402
 
 %patch50 -p1 -b .QT_VERSION_CHECK
 %patch51 -p1 -b .hidpi_scale_at_192
@@ -985,6 +993,9 @@ fi
 
 
 %changelog
+* Mon May 08 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.7.1-16
+- backport recommended qtdbus patches
+
 * Fri Feb 17 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.7.1-15
 - gcc7 FTBFS fix (#1423090)
 
