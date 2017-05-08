@@ -55,7 +55,7 @@ BuildRequires: pkgconfig(libsystemd)
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.6.2
-Release: 3%{?dist}
+Release: 4%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -113,6 +113,11 @@ Patch190: 0190-qxcbconnection.cpp-fix-warning-about-unused-function.patch
 Patch237: 0237-Stop-unloading-plugins-in-QPluginLoader-and-QFactory.patch
 Patch263: 0263-xcb-Warn-and-bail-out-when-even-the-basic-dummy-cont.patch
 Patch276: 0276-QClipboard-Fix-emitting-changed-in-XCB.patch
+
+## upstream patches (under review)
+# https://codereview.qt-project.org/#/c/161056/
+Patch401: 0001-Merge-the-QDBusMetaType-s-custom-information-to-QDBu.patch
+Patch402: 0002-Fix-some-QtDBus-crashes-during-application-destructi.patch
 
 ## upstream patches (5.8 branch)
 Patch500: qt5-qtbase-5.8-QTBUG-56140.patch
@@ -387,6 +392,10 @@ RPM macros for building Qt5 packages.
 %patch237 -p1 -b .0237
 %patch263 -p1 -b .0263
 %patch276 -p1 -b .0276
+
+## upstream patches (under review)
+%patch401 -p1 -b .0401
+%patch402 -p1 -b .0402
 
 ## upstream patches (5.8)
 %patch500 -p1 -b .QTBUG-56140
@@ -998,6 +1007,9 @@ fi
 
 
 %changelog
+* Mon May 08 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.6.2-4
+- pull in recommended qtdbus patches
+
 * Mon Feb 13 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.6.2-3
 - macros.qt5: +%%_qt5_qmldir macro
 - pull in xcb-related upstream fixes
