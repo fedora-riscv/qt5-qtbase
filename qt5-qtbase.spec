@@ -49,7 +49,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.9.0
-Release: 0.beta.3%{?dist}
+Release: 0.4.beta3%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -100,6 +100,11 @@ Patch63: qt5-qtbase-5.7.1-openssl11.patch
 
 # support firebird version 3.x
 Patch64: qt5-qtbase-5.8.0-firebird.patch
+
+## upstream patches (under review)
+# https://codereview.qt-project.org/#/c/180232/
+Patch401: 0001-Merge-the-QDBusMetaType-s-custom-information-to-QDBu.patch
+Patch402: 0002-Fix-some-QtDBus-crashes-during-application-destructi.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -318,6 +323,9 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 
 %prep
 %setup -q -n %{qt_module}-opensource-src-%{version}-beta3
+
+%patch401 -p1 -b .0401
+%patch402 -p1 -b .0402
 
 %patch4 -p1 -b .QTBUG-35459
 
@@ -926,6 +934,9 @@ fi
 
 
 %changelog
+* Mon May 08 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.0-0.4.beta3
+- include recommended qtdbus patches, fix Release
+
 * Fri May 05 2017 Helio Chissini de Castro <helio@kde.org> - 5.9.0-0.beta.3
 - Beta 3 release
 
