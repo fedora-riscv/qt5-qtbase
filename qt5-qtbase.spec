@@ -49,7 +49,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.9.0
-Release: 0.5.beta3%{?dist}
+Release: 0.6.beta3%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -224,6 +224,9 @@ handling.
 
 %package common
 Summary: Common files for Qt5
+# offer upgrade path for qtquick1 somewhere... may as well be here -- rex
+Obsoletes: qt5-qtquick1 < 5.9.0
+Obsoletes: qt5-qtquick1-devel < 5.9.0
 Requires: %{name} = %{version}-%{release}
 BuildArch: noarch
 %description common
@@ -934,6 +937,9 @@ fi
 
 
 %changelog
+* Tue May 16 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.0-0.6.beta3
+- -common: Obsoletes: qt5-qtquick1(-devel)
+
 * Mon May 15 2017 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 5.9.0-0.5.beta3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_26_27_Mass_Rebuild
 
