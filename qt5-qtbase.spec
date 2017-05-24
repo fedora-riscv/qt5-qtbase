@@ -49,12 +49,12 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.9.0
-Release: 0.6.beta3%{?dist}
+Release: 0.rc.1%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
 Url: http://qt-project.org/
-Source0: http://download.qt.io/development_releases/qt/5.9/%{version}-beta3/submodules/%{qt_module}-opensource-src-%{version}-beta3.tar.xz
+Source0: https://download.qt.io/development_releases/qt/5.9/%{version}-rc1/submodules/%{qt_module}-opensource-src-%{version}-rc.tar.xz
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1227295
 Source1: qtlogging.ini
@@ -325,7 +325,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 
 
 %prep
-%setup -q -n %{qt_module}-opensource-src-%{version}-beta3
+%setup -q -n %{qt_module}-opensource-src-%{version}-rc
 
 %patch401 -p1 -b .0401
 %patch402 -p1 -b .0402
@@ -495,7 +495,7 @@ translationdir=%{_qt5_translationdir}
 
 Name: Qt5
 Description: Qt5 Configuration
-Version: 5.7.1
+Version: 5.9.0
 EOF
 
 # rpm macros
@@ -937,6 +937,9 @@ fi
 
 
 %changelog
+* Tue May 09 2017 Helio Chissini de Castro <helio@kde.org> - 5.9.0-0.rc.1
+- Upstream Release Candidate 1
+
 * Tue May 16 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.0-0.6.beta3
 - -common: Obsoletes: qt5-qtquick1(-devel)
 
@@ -1024,7 +1027,7 @@ fi
 - New upstream version
 
 * Thu Oct 20 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.7.0-10
-- fix Source0 URL
+- fix Source0: https://download.qt.io/development_releases/qt/5.9/%{version}-rc1/submodules/%{qt_module}-opensource-src-%{version}-rc.tar.xz
 
 * Thu Sep 29 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.7.0-9
 - Requires: openssl-libs%%{?_isa} (#1328659)
@@ -1196,7 +1199,7 @@ fi
 - Crash in QXcbWindow::setParent() due to NULL xcbScreen (QTBUG-50081, #1291003)
 
 * Mon Dec 21 2015 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.17.beta
-- fix/update Release: tag
+- fix/update Release: 0.rc.1%{?dist}
 
 * Fri Dec 18 2015 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.16
 - 5.6.0-beta (final)
