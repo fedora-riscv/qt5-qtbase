@@ -940,9 +940,6 @@ fi
 * Wed May 24 2017 Helio Chissini de Castro <helio@kde.org> - 5.9.0-0.rc.1
 - Upstream Release Candidate 1
 
-* Tue May 09 2017 Helio Chissini de Castro <helio@kde.org> - 5.9.0-0.rc.1
-- Upstream Release Candidate 1
-
 * Tue May 16 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.0-0.6.beta3
 - -common: Obsoletes: qt5-qtquick1(-devel)
 
