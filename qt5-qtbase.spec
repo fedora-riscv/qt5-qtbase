@@ -104,7 +104,6 @@ Patch64: qt5-qtbase-5.8.0-firebird.patch
 ## upstream patches (under review)
 # https://codereview.qt-project.org/#/c/180232/
 Patch401: 0001-Merge-the-QDBusMetaType-s-custom-information-to-QDBu.patch
-Patch402: 0002-Fix-some-QtDBus-crashes-during-application-destructi.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -328,7 +327,6 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %setup -q -n %{qt_module}-opensource-src-%{version}-rc
 
 %patch401 -p1 -b .0401
-%patch402 -p1 -b .0402
 
 %patch4 -p1 -b .QTBUG-35459
 
