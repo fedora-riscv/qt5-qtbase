@@ -49,12 +49,12 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.9.0
-Release: 0.rc.1%{?dist}
+Release: 0.1.rc%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
 Url: http://qt-project.org/
-Source0: https://download.qt.io/development_releases/qt/5.9/%{version}-rc1/submodules/%{qt_module}-opensource-src-%{version}-rc.tar.xz
+Source0: https://download.qt.io/development_releases/qt/5.9/%{version}-rc/submodules/%{qt_module}-opensource-src-%{version}-rc.tar.xz
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1227295
 Source1: qtlogging.ini
@@ -935,6 +935,9 @@ fi
 
 
 %changelog
+* Fri May 26 2017 Helio Chissini de Castro <helio@kde.org> - 5.9.0-0.1.rc
+- Upstream Release Candidate retagged
+
 * Wed May 24 2017 Helio Chissini de Castro <helio@kde.org> - 5.9.0-0.rc.1
 - Upstream Release Candidate 1
 
@@ -1025,7 +1028,7 @@ fi
 - New upstream version
 
 * Thu Oct 20 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.7.0-10
-- fix Source0: https://download.qt.io/development_releases/qt/5.9/%{version}-rc1/submodules/%{qt_module}-opensource-src-%{version}-rc.tar.xz
+- fix Source0: https://download.qt.io/development_releases/qt/5.9/%{version}-rc/submodules/%{qt_module}-opensource-src-%{version}-rc.tar.xz
 
 * Thu Sep 29 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.7.0-9
 - Requires: openssl-libs%%{?_isa} (#1328659)
@@ -1197,7 +1200,7 @@ fi
 - Crash in QXcbWindow::setParent() due to NULL xcbScreen (QTBUG-50081, #1291003)
 
 * Mon Dec 21 2015 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.17.beta
-- fix/update Release: 0.rc.1%{?dist}
+- fix/update Release: 0.1.rc%{?dist}
 
 * Fri Dec 18 2015 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.16
 - 5.6.0-beta (final)
