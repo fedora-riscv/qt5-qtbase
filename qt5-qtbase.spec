@@ -935,9 +935,6 @@ fi
 
 
 %changelog
-* Tue May 31 2017 Helio Chissini de Castro <helio@kde.org> - 5.9.0-1
-- Upstream official release
-
 * Fri May 26 2017 Helio Chissini de Castro <helio@kde.org> - 5.9.0-0.1.rc
 - Upstream Release Candidate retagged
 
