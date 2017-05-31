@@ -49,7 +49,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.9.0
-Release: 0.rc.1%{?dist}
+Release: 1%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -935,6 +935,9 @@ fi
 
 
 %changelog
+* Wed May 31 2017 Helio Chissini de Castro <helio@kde.org> - 5.9.0-1
+- Upstream official release
+
 * Fri May 26 2017 Helio Chissini de Castro <helio@kde.org> - 5.9.0-0.1.rc
 - Upstream Release Candidate retagged
 
@@ -1200,7 +1203,7 @@ fi
 - Crash in QXcbWindow::setParent() due to NULL xcbScreen (QTBUG-50081, #1291003)
 
 * Mon Dec 21 2015 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.17.beta
-- fix/update Release: 0.rc.1%{?dist}
+- fix/update Release: 1%{?dist}
 
 * Fri Dec 18 2015 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.16
 - 5.6.0-beta (final)
