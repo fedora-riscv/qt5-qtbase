@@ -49,7 +49,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.9.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -213,6 +213,13 @@ Requires: %{name}-common = %{version}-%{release}
 %if 0%{?rhel}
 %define ibase -no-sql-ibase
 %define tds -no-sql-tds
+%endif
+
+# workaround gold linker bug by not using it
+# https://bugzilla.redhat.com/1458003
+# https://sourceware.org/bugzilla/show_bug.cgi?id=21074
+%if 0%{?fedora} > 26
+%global use_gold_linker -no-use-gold-linker
 %endif
 
 %description
@@ -452,6 +459,7 @@ export CXXFLAGS="$CXXFLAGS $RPM_OPT_FLAGS -DOPENSSL_API_COMPAT=0x10100000L"
   %{?xcb} \
   %{?xkbcommon} \
   -system-zlib \
+  %{?use_gold_linker} \
   -no-directfb
 
 %if ! 0%{?inject_optflags}
@@ -935,6 +943,9 @@ fi
 
 
 %changelog
+* Thu Jun 01 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.0-2
+- workaround gold linker issue with duplicate symbols (f27+, #1458003)
+
 * Wed May 31 2017 Helio Chissini de Castro <helio@kde.org> - 5.9.0-1
 - Upstream official release
 
