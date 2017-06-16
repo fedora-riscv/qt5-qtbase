@@ -387,8 +387,8 @@ sed -i -e "s|^#!/usr/bin/env perl$|#!%{__perl}|" \
  mkspecs/features/data/unix/findclasslist.pl
 
 # Fix missing private includes https://bugreports.qt.io/browse/QTBUG-37417
-sed -e '/CMAKE_NO_PRIVATE_INCLUDES\ \=\ true/d' -i
-mkspecs/features/create_cmake.prf
+sed -e '/CMAKE_NO_PRIVATE_INCLUDES\ \=\ true/d' -i \
+  mkspecs/features/create_cmake.prf
 
 
 %build
