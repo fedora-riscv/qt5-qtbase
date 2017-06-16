@@ -49,12 +49,12 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.9.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
-Url: http://qt-project.org/
-Source0: https://download.qt.io/official_releases/qt/5.9/5.9.0/submodules/qtbase-opensource-src-5.9.0.tar.xz
+Url:     http://qt-project.org/
+Source0: https://download.qt.io/official_releases/qt/5.9/%{version}/submodules/%{qt_module}-opensource-src-%{version}.tar.xz
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1227295
 Source1: qtlogging.ini
@@ -386,6 +386,10 @@ sed -i -e "s|^#!/usr/bin/env perl$|#!%{__perl}|" \
  bin/syncqt.pl \
  mkspecs/features/data/unix/findclasslist.pl
 
+# Fix missing private includes https://bugreports.qt.io/browse/QTBUG-37417
+sed -e '/CMAKE_NO_PRIVATE_INCLUDES\ \=\ true/d' -i
+mkspecs/features/create_cmake.prf
+
 
 %build
 ## FIXME/TODO:
@@ -473,6 +477,7 @@ make %{?_smp_mflags} -C qmake \
 %endif
 
 make %{?_smp_mflags}
+
 
 %install
 make install INSTALL_ROOT=%{buildroot}
@@ -943,6 +948,9 @@ fi
 
 
 %changelog
+* Fri Jun 16 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.0-3
+- create_cmake.prf: adjust CMAKE_NO_PRIVATE_INCLUDES (#1456211,QTBUG-37417)
+
 * Thu Jun 01 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.0-2
 - workaround gold linker issue with duplicate symbols (f27+, #1458003)
 
