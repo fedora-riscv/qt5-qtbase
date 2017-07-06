@@ -49,7 +49,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.9.0
-Release: 3%{?dist}
+Release: 4%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -948,6 +948,9 @@ fi
 
 
 %changelog
+* Thu Jul 06 2017 Than Ngo <than@redhat.com> - 5.9.0-4
+- fixed bz#1409600, stack overflow in QXmlSimpleReader, CVE-2016-10040
+
 * Fri Jun 16 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.0-3
 - create_cmake.prf: adjust CMAKE_NO_PRIVATE_INCLUDES (#1456211,QTBUG-37417)
 
