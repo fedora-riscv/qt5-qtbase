@@ -49,7 +49,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.9.0
-Release: 4%{?dist}
+Release: 5%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -100,6 +100,9 @@ Patch63: qt5-qtbase-5.7.1-openssl11.patch
 
 # support firebird version 3.x
 Patch64: qt5-qtbase-5.8.0-firebird.patch
+
+# fix for new mariadb
+Patch65: qtbase-opensource-src-5.9.0-mysql.patch
 
 ## upstream patches (under review)
 # https://codereview.qt-project.org/#/c/180232/
@@ -345,6 +348,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %patch63 -p1 -b .openssl11
 %endif
 %patch64 -p1 -b .firebird
+%patch65 -p1 -b .mysql
 
 %if 0%{?inject_optflags}
 ## adjust $RPM_OPT_FLAGS
@@ -948,6 +952,9 @@ fi
 
 
 %changelog
+* Fri Jul 14 2017 Than Ngo <than@redhat.com> - 5.9.0-5
+- fixed build issue with new mariadb
+
 * Thu Jul 06 2017 Than Ngo <than@redhat.com> - 5.9.0-4
 - fixed bz#1409600, stack overflow in QXmlSimpleReader, CVE-2016-10040
 
