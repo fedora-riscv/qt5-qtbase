@@ -1,0 +1,89 @@
+diff -up qtbase-opensource-src-5.7.1/src/corelib/plugin/qfactoryloader.cpp.than qtbase-opensource-src-5.7.1/src/corelib/plugin/qfactoryloader.cpp
+--- qtbase-opensource-src-5.7.1/src/corelib/plugin/qfactoryloader.cpp.than	2017-07-17 18:01:15.412236821 +0200
++++ qtbase-opensource-src-5.7.1/src/corelib/plugin/qfactoryloader.cpp	2017-07-17 18:02:15.109007120 +0200
+@@ -187,10 +187,12 @@ void QFactoryLoader::update()
+                     ++keyUsageCount;
+                 }
+             }
+-            if (keyUsageCount || keys.isEmpty())
++            if (keyUsageCount || keys.isEmpty()) {
++                library->setLoadHints(QLibrary::PreventUnloadHint); // once loaded, don't unload
+                 d->libraryList += library;
+-            else
++            } else {
+                 library->release();
++            }
+         }
+     }
+ #else
+diff -up qtbase-opensource-src-5.7.1/src/corelib/plugin/qpluginloader.cpp.than qtbase-opensource-src-5.7.1/src/corelib/plugin/qpluginloader.cpp
+--- qtbase-opensource-src-5.7.1/src/corelib/plugin/qpluginloader.cpp.than	2017-07-17 18:02:31.655389105 +0200
++++ qtbase-opensource-src-5.7.1/src/corelib/plugin/qpluginloader.cpp	2017-07-17 18:04:34.596792308 +0200
+@@ -154,6 +154,7 @@ QPluginLoader::QPluginLoader(const QStri
+     : QObject(parent), d(0), did_load(false)
+ {
+     setFileName(fileName);
++    setLoadHints(QLibrary::PreventUnloadHint);
+ }
+ 
+ /*!
+@@ -348,7 +349,7 @@ static QString locatePlugin(const QStrin
+ void QPluginLoader::setFileName(const QString &fileName)
+ {
+ #if defined(QT_SHARED)
+-    QLibrary::LoadHints lh;
++    QLibrary::LoadHints lh = QLibrary::PreventUnloadHint;
+     if (d) {
+         lh = d->loadHints();
+         d->release();
+@@ -394,7 +395,7 @@ QString QPluginLoader::errorString() con
+     \brief Give the load() function some hints on how it should behave.
+ 
+     You can give hints on how the symbols in the plugin are
+-    resolved. By default, none of the hints are set.
++    resolved. By default since Qt 5.7, QLibrary::PreventUnloadHint is set.
+ 
+     See the documentation of QLibrary::loadHints for a complete
+     description of how this property works.
+diff -up qtbase-opensource-src-5.7.1/src/network/bearer/qnetworkconfigmanager_p.cpp.than qtbase-opensource-src-5.7.1/src/network/bearer/qnetworkconfigmanager_p.cpp
+--- qtbase-opensource-src-5.7.1/src/network/bearer/qnetworkconfigmanager_p.cpp.than	2017-07-17 10:11:45.915973856 +0200
++++ qtbase-opensource-src-5.7.1/src/network/bearer/qnetworkconfigmanager_p.cpp	2017-07-17 10:15:08.622262320 +0200
+@@ -40,8 +40,6 @@
+ #include "qnetworkconfigmanager_p.h"
+ #include "qbearerplugin_p.h"
+ 
+-#include <QtCore/private/qfactoryloader_p.h>
+-
+ #include <QtCore/qdebug.h>
+ #include <QtCore/qtimer.h>
+ #include <QtCore/qstringlist.h>
+@@ -60,7 +58,9 @@
+ QT_BEGIN_NAMESPACE
+ 
+ QNetworkConfigurationManagerPrivate::QNetworkConfigurationManagerPrivate()
+-    : QObject(), pollTimer(0), mutex(QMutex::Recursive), forcedPolling(0), firstUpdate(true)
++    : QObject(), pollTimer(0), mutex(QMutex::Recursive),
++      loader(QBearerEngineFactoryInterface_iid, QLatin1String("/bearer")),
++      forcedPolling(0), firstUpdate(true)
+ {
+     qRegisterMetaType<QNetworkConfiguration>();
+     qRegisterMetaType<QNetworkConfigurationPrivatePointer>();
+diff -up qtbase-opensource-src-5.7.1/src/network/bearer/qnetworkconfigmanager_p.h.than qtbase-opensource-src-5.7.1/src/network/bearer/qnetworkconfigmanager_p.h
+--- qtbase-opensource-src-5.7.1/src/network/bearer/qnetworkconfigmanager_p.h.than	2017-07-17 10:31:53.723102056 +0200
++++ qtbase-opensource-src-5.7.1/src/network/bearer/qnetworkconfigmanager_p.h	2017-07-17 10:32:43.543213865 +0200
+@@ -54,6 +54,7 @@
+ #include "qnetworkconfigmanager.h"
+ #include "qnetworkconfiguration_p.h"
+ 
++#include <QtCore/private/qfactoryloader_p.h>
+ #include <QtCore/qmutex.h>
+ #include <QtCore/qset.h>
+ 
+@@ -117,6 +118,7 @@ private:
+ private:
+     mutable QMutex mutex;
+ 
++    QFactoryLoader loader;
+     QList<QBearerEngine *> sessionEngines;
+ 
+     QSet<QString> onlineConfigurations;

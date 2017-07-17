@@ -66,7 +66,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.7.1
-Release: 18%{?dist}
+Release: 19%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -127,6 +127,9 @@ Patch63: qt5-qtbase-5.7.1-openssl11.patch
 
 # support firebird version 3.x
 Patch64: qt5-qtbase-5.7.1-firebird.patch
+
+# Segfault in QDBusConnectionPrivate::closeConnection -> QObject::disconnect on exit
+Patch65: qt5-qtbase-5.7.1-bz#1364717.patch
 
 ## upstream patches
 ## 5.8 branch
@@ -395,6 +398,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %if 0%{?firebird3x}
 %patch64 -p1 -b .firebird
 %endif
+%patch65 -p1 -b .bz#1364717
 
 %if 0%{?inject_optflags}
 ## adjust $RPM_OPT_FLAGS
@@ -993,6 +997,9 @@ fi
 
 
 %changelog
+* Mon Jul 17 2017 Than Ngo <than@redhat.com> - 5.7.1-19
+- fixed bz#1364717, Segfault in QDBusConnectionPrivate::closeConnection -> QObject::disconnect on exit
+
 * Fri Jul 07 2017 Than Ngo <than@redhat.com> - 5.7.1-18
 - fixed bz#1409600, stack overflow in QXmlSimpleReader, CVE-2016-10040
 
