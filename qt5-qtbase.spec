@@ -632,7 +632,18 @@ popd
 
 install -p -m755 -D %{SOURCE6} %{buildroot}%{_sysconfdir}/X11/xinit/xinitrc.d/10-qt5-check-opengl2.sh
 
-
+# fix bz#1442553 multilib issue
+privat_header_file=%{buildroot}%{_qt5_headerdir}/QtCore/%{version}/QtCore/private/qconfig_p.h
+grep -v QT_FEATURE_sse2 $privat_header_file > ${privat_header_file}.me
+mv ${privat_header_file}.me ${privat_header_file}
+cat >>${privat_header_file}<<EOF
+#if defined(__x86_64__)
+#define QT_FEATURE_sse2 1
+#elif defined(__i386__)
+#define QT_FEATURE_sse2 -1
+#endif
+EOF
+ 
 %check
 %if 0%{?tests}
 ## see tests/README for expected environment (running a plasma session essentially)
@@ -999,6 +1010,7 @@ fi
 %changelog
 * Mon Jul 17 2017 Than Ngo <than@redhat.com> - 5.7.1-19
 - fixed bz#1364717, Segfault in QDBusConnectionPrivate::closeConnection -> QObject::disconnect on exit
+- fixed bz#1442553, multilib issue 
 
 * Fri Jul 07 2017 Than Ngo <than@redhat.com> - 5.7.1-18
 - fixed bz#1409600, stack overflow in QXmlSimpleReader, CVE-2016-10040
