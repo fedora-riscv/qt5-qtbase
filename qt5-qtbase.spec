@@ -49,7 +49,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.9.0
-Release: 5%{?dist}
+Release: 6%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -574,6 +574,17 @@ popd
 
 install -p -m755 -D %{SOURCE6} %{buildroot}%{_sysconfdir}/X11/xinit/xinitrc.d/10-qt5-check-opengl2.sh
 
+# fix bz#1442553 multilib issue
+privat_header_file=%{buildroot}%{_qt5_headerdir}/QtCore/%{version}/QtCore/private/qconfig_p.h
+grep -v QT_FEATURE_sse2 $privat_header_file > ${privat_header_file}.me
+mv ${privat_header_file}.me ${privat_header_file}
+cat >>${privat_header_file}<<EOF
+#if defined(__x86_64__)
+#define QT_FEATURE_sse2 1
+#elif defined(__i386__)
+#define QT_FEATURE_sse2 -1
+#endif
+EOF
 
 %check
 %if 0%{?tests}
@@ -952,6 +963,9 @@ fi
 
 
 %changelog
+* Tue Jul 18 2017 Than Ngo <than@redhat.com> - 5.9.0-6
+- fixed bz#1442553, multilib issue
+
 * Fri Jul 14 2017 Than Ngo <than@redhat.com> - 5.9.0-5
 - fixed build issue with new mariadb
 
