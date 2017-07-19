@@ -48,8 +48,8 @@ BuildRequires: pkgconfig(libsystemd)
 
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
-Version: 5.9.0
-Release: 6%{?dist}
+Version: 5.9.1
+Release: 1%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -99,14 +99,13 @@ Patch61: qt5-qtbase-cxxflag.patch
 Patch63: qt5-qtbase-5.7.1-openssl11.patch
 
 # support firebird version 3.x
-Patch64: qt5-qtbase-5.8.0-firebird.patch
+Patch64: qt5-qtbase-5.9.1-firebird.patch
 
 # fix for new mariadb
 Patch65: qtbase-opensource-src-5.9.0-mysql.patch
 
-## upstream patches (under review)
-# https://codereview.qt-project.org/#/c/180232/
-Patch401: 0001-Merge-the-QDBusMetaType-s-custom-information-to-QDBu.patch
+## upstream patches (5.9 branch)
+Patch486: 0086-Fix-detection-of-AT-SPI.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -124,6 +123,8 @@ BuildRequires: libjpeg-devel
 BuildRequires: libmng-devel
 BuildRequires: libtiff-devel
 BuildRequires: pkgconfig(alsa)
+# required for -accessibility
+BuildRequires: pkgconfig(atspi-2)
 %if 0%{?use_clang}
 BuildRequires: clang >= 3.7.0
 %endif
@@ -336,8 +337,6 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %prep
 %setup -q -n %{qt_module}-opensource-src-%{version}
 
-%patch401 -p1 -b .0401
-
 %patch4 -p1 -b .QTBUG-35459
 
 %patch50 -p1 -b .QT_VERSION_CHECK
@@ -349,6 +348,8 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %endif
 %patch64 -p1 -b .firebird
 %patch65 -p1 -b .mysql
+
+%patch486 -p1 -b .0086
 
 %if 0%{?inject_optflags}
 ## adjust $RPM_OPT_FLAGS
@@ -585,6 +586,7 @@ cat >>${privat_header_file}<<EOF
 #define QT_FEATURE_sse2 -1
 #endif
 EOF
+
 
 %check
 %if 0%{?tests}
@@ -963,6 +965,9 @@ fi
 
 
 %changelog
+* Wed Jul 19 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.1-1
+- 5.9.1
+
 * Tue Jul 18 2017 Than Ngo <than@redhat.com> - 5.9.0-6
 - fixed bz#1442553, multilib issue
 

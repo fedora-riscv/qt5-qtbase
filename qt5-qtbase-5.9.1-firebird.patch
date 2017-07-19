@@ -1,0 +1,37 @@
+diff -up qtbase-opensource-src-5.9.1/config.tests/unix/ibase/ibase.cpp.firebird qtbase-opensource-src-5.9.1/config.tests/unix/ibase/ibase.cpp
+--- qtbase-opensource-src-5.9.1/config.tests/unix/ibase/ibase.cpp.firebird	2017-06-28 04:54:29.000000000 -0500
++++ qtbase-opensource-src-5.9.1/config.tests/unix/ibase/ibase.cpp	2017-07-16 08:28:47.833992502 -0500
+@@ -37,7 +37,7 @@
+ **
+ ****************************************************************************/
+ 
+-#include <ibase.h>
++#include <firebird/ibase.h>
+ 
+ int main(int, char **)
+ {
+diff -up qtbase-opensource-src-5.9.1/src/plugins/sqldrivers/configure.json.firebird qtbase-opensource-src-5.9.1/src/plugins/sqldrivers/configure.json
+--- qtbase-opensource-src-5.9.1/src/plugins/sqldrivers/configure.json.firebird	2017-06-28 04:54:29.000000000 -0500
++++ qtbase-opensource-src-5.9.1/src/plugins/sqldrivers/configure.json	2017-07-16 12:38:43.730108724 -0500
+@@ -50,7 +50,8 @@
+             "test": "unix/ibase",
+             "sources": [
+                 { "libs": "-lgds32_ms", "condition": "config.win32" },
+-                { "libs": "-lgds", "condition": "!config.win32" }
++                { "libs": "-lgds", "condition": "!config.win32" },
++                { "libs": "-lfbclient", "condition": "!config.win32" }
+             ]
+         },
+         "mysql": {
+diff -up qtbase-opensource-src-5.9.1/src/plugins/sqldrivers/ibase/qsql_ibase_p.h.firebird qtbase-opensource-src-5.9.1/src/plugins/sqldrivers/ibase/qsql_ibase_p.h
+--- qtbase-opensource-src-5.9.1/src/plugins/sqldrivers/ibase/qsql_ibase_p.h.firebird	2017-06-28 04:54:29.000000000 -0500
++++ qtbase-opensource-src-5.9.1/src/plugins/sqldrivers/ibase/qsql_ibase_p.h	2017-07-16 08:28:47.833992502 -0500
+@@ -52,7 +52,7 @@
+ //
+ 
+ #include <QtSql/qsqldriver.h>
+-#include <ibase.h>
++#include <firebird/ibase.h>
+ 
+ #ifdef QT_PLUGIN
+ #define Q_EXPORT_SQLDRIVER_IBASE
