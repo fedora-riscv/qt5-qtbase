@@ -1,0 +1,451 @@
+diff -up qtbase-opensource-src-5.7.1/src/gui/text/qinputcontrol.cpp.than qtbase-opensource-src-5.7.1/src/gui/text/qinputcontrol.cpp
+--- qtbase-opensource-src-5.7.1/src/gui/text/qinputcontrol.cpp.than	2017-07-19 10:48:01.809115455 +0200
++++ qtbase-opensource-src-5.7.1/src/gui/text/qinputcontrol.cpp	2017-07-19 10:48:01.809115455 +0200
+@@ -0,0 +1,82 @@
++/****************************************************************************
++**
++** Copyright (C) 2016 The Qt Company Ltd.
++** Contact: https://www.qt.io/licensing/
++**
++** This file is part of the QtGui module of the Qt Toolkit.
++**
++** $QT_BEGIN_LICENSE:LGPL21$
++** Commercial License Usage
++** Licensees holding valid commercial Qt licenses may use this file in
++** accordance with the commercial license agreement provided with the
++** Software or, alternatively, in accordance with the terms contained in
++** a written agreement between you and The Qt Company. For licensing terms
++** and conditions see http://www.qt.io/terms-conditions. For further
++** information use the contact form at http://www.qt.io/contact-us.
++**
++** GNU Lesser General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU Lesser
++** General Public License version 2.1 or version 3 as published by the Free
++** Software Foundation and appearing in the file LICENSE.LGPLv21 and
++** LICENSE.LGPLv3 included in the packaging of this file. Please review the
++** following information to ensure the GNU Lesser General Public License
++** requirements will be met: https://www.gnu.org/licenses/lgpl.html and
++** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
++**
++** As a special exception, The Qt Company gives you certain additional
++** rights. These rights are described in The Qt Company LGPL Exception
++** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
++**
++** $QT_END_LICENSE$
++**
++****************************************************************************/
++
++#include "qinputcontrol_p.h"
++#include <QtGui/qevent.h>
++
++QT_BEGIN_NAMESPACE
++
++QInputControl::QInputControl(Type type, QObject *parent)
++    : QObject(parent)
++    , m_type(type)
++{
++}
++
++QInputControl::QInputControl(Type type, QObjectPrivate &dd, QObject *parent)
++    : QObject(dd, parent)
++    , m_type(type)
++{
++}
++
++bool QInputControl::isAcceptableInput(const QKeyEvent *event) const
++{
++    const QString text = event->text();
++    if (text.isEmpty())
++        return false;
++
++    const QChar c = text.at(0);
++
++    // ZWNJ and ZWJ. This needs to go before the next test, since CTRL+SHIFT is
++    // used to input it on Windows.
++    if (c == QChar(0x200C) || c == QChar(0x200D))
++        return true;
++
++    // QTBUG-35734: ignore Ctrl/Ctrl+Shift; accept only AltGr (Alt+Ctrl) on German keyboards
++    if (event->modifiers() == Qt::ControlModifier
++            || event->modifiers() == (Qt::ShiftModifier | Qt::ControlModifier)) {
++        return false;
++    }
++
++    if (c.isPrint())
++        return true;
++
++    if (c.category() == QChar::Other_PrivateUse)
++        return true;
++
++    if (m_type == TextEdit && c == QLatin1Char('\t'))
++        return true;
++
++    return false;
++}
++
++QT_END_NAMESPACE
+diff -up qtbase-opensource-src-5.7.1/src/gui/text/qinputcontrol_p.h.than qtbase-opensource-src-5.7.1/src/gui/text/qinputcontrol_p.h
+--- qtbase-opensource-src-5.7.1/src/gui/text/qinputcontrol_p.h.than	2017-07-19 10:48:01.809115455 +0200
++++ qtbase-opensource-src-5.7.1/src/gui/text/qinputcontrol_p.h	2017-07-19 10:48:01.809115455 +0200
+@@ -0,0 +1,76 @@
++/****************************************************************************
++**
++** Copyright (C) 2016 The Qt Company Ltd.
++** Contact: https://www.qt.io/licensing/
++**
++** This file is part of the QtGui module of the Qt Toolkit.
++**
++** $QT_BEGIN_LICENSE:LGPL21$
++** Commercial License Usage
++** Licensees holding valid commercial Qt licenses may use this file in
++** accordance with the commercial license agreement provided with the
++** Software or, alternatively, in accordance with the terms contained in
++** a written agreement between you and The Qt Company. For licensing terms
++** and conditions see http://www.qt.io/terms-conditions. For further
++** information use the contact form at http://www.qt.io/contact-us.
++**
++** GNU Lesser General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU Lesser
++** General Public License version 2.1 or version 3 as published by the Free
++** Software Foundation and appearing in the file LICENSE.LGPLv21 and
++** LICENSE.LGPLv3 included in the packaging of this file. Please review the
++** following information to ensure the GNU Lesser General Public License
++** requirements will be met: https://www.gnu.org/licenses/lgpl.html and
++** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
++**
++** As a special exception, The Qt Company gives you certain additional
++** rights. These rights are described in The Qt Company LGPL Exception
++** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
++**
++** $QT_END_LICENSE$
++**
++****************************************************************************/
++
++#ifndef QINPUTCONTROL_P_H
++#define QINPUTCONTROL_P_H
++
++//
++//  W A R N I N G
++//  -------------
++//
++// This file is not part of the Qt API. It exists purely as an
++// implementation detail. This header file may change from version to
++// version without notice, or even be removed.
++//
++// We mean it.
++//
++
++#include <QtCore/qobject.h>
++#include <qglobal.h>
++
++QT_BEGIN_NAMESPACE
++
++class QKeyEvent;
++class Q_GUI_EXPORT QInputControl : public QObject
++{
++    Q_OBJECT
++public:
++    enum Type {
++        LineEdit,
++        TextEdit
++    };
++
++    explicit QInputControl(Type type, QObject *parent = nullptr);
++
++    bool isAcceptableInput(const QKeyEvent *event) const;
++
++protected:
++    explicit QInputControl(Type type, QObjectPrivate &dd, QObject *parent = nullptr);
++
++private:
++    const Type m_type;
++};
++
++QT_END_NAMESPACE
++
++#endif // QINPUTCONTROL_P_H
+diff -up qtbase-opensource-src-5.7.1/src/gui/text/text.pri.than qtbase-opensource-src-5.7.1/src/gui/text/text.pri
+--- qtbase-opensource-src-5.7.1/src/gui/text/text.pri.than	2016-12-01 09:17:04.000000000 +0100
++++ qtbase-opensource-src-5.7.1/src/gui/text/text.pri	2017-07-19 10:48:01.809115455 +0200
+@@ -43,7 +43,8 @@ HEADERS += \
+     text/qrawfont_p.h \
+     text/qglyphrun.h \
+     text/qglyphrun_p.h \
+-    text/qdistancefield_p.h
++    text/qdistancefield_p.h \
++    text/qinputcontrol_p.h
+ 
+ SOURCES += \
+     text/qfont.cpp \
+@@ -76,7 +77,8 @@ SOURCES += \
+     text/qstatictext.cpp \
+     text/qrawfont.cpp \
+     text/qglyphrun.cpp \
+-    text/qdistancefield.cpp
++    text/qdistancefield.cpp \
++    text/qinputcontrol.cpp
+ 
+ SOURCES += \
+     text/qfontengine_qpf2.cpp \
+diff -up qtbase-opensource-src-5.7.1/src/widgets/widgets/qwidgetlinecontrol.cpp.than qtbase-opensource-src-5.7.1/src/widgets/widgets/qwidgetlinecontrol.cpp
+--- qtbase-opensource-src-5.7.1/src/widgets/widgets/qwidgetlinecontrol.cpp.than	2016-12-01 09:17:04.000000000 +0100
++++ qtbase-opensource-src-5.7.1/src/widgets/widgets/qwidgetlinecontrol.cpp	2017-07-19 10:48:01.810115418 +0200
+@@ -1924,19 +1924,15 @@ void QWidgetLineControl::processKeyEvent
+         unknown = false;
+     }
+ 
+-    // QTBUG-35734: ignore Ctrl/Ctrl+Shift; accept only AltGr (Alt+Ctrl) on German keyboards
+-    if (unknown && !isReadOnly()
+-        && event->modifiers() != Qt::ControlModifier
+-        && event->modifiers() != (Qt::ControlModifier | Qt::ShiftModifier)) {
+-        QString t = event->text();
+-        if (!t.isEmpty() && t.at(0).isPrint()) {
+-            insert(t);
++    if (unknown
++        && !isReadOnly()
++        && isAcceptableInput(event)) {
++        insert(event->text());
+ #ifndef QT_NO_COMPLETER
+-            complete(event->key());
++        complete(event->key());
+ #endif
+-            event->accept();
+-            return;
+-        }
++        event->accept();
++        return;
+     }
+ 
+     if (unknown)
+diff -up qtbase-opensource-src-5.7.1/src/widgets/widgets/qwidgetlinecontrol_p.h.than qtbase-opensource-src-5.7.1/src/widgets/widgets/qwidgetlinecontrol_p.h
+--- qtbase-opensource-src-5.7.1/src/widgets/widgets/qwidgetlinecontrol_p.h.than	2016-12-01 09:17:04.000000000 +0100
++++ qtbase-opensource-src-5.7.1/src/widgets/widgets/qwidgetlinecontrol_p.h	2017-07-19 10:48:01.810115418 +0200
+@@ -64,6 +64,7 @@
+ #include "QtCore/qpoint.h"
+ #include "QtWidgets/qcompleter.h"
+ #include "QtCore/qthread.h"
++#include "QtGui/private/qinputcontrol_p.h"
+ 
+ #include "qplatformdefs.h"
+ 
+@@ -76,13 +77,14 @@
+ QT_BEGIN_NAMESPACE
+ 
+ 
+-class Q_WIDGETS_EXPORT QWidgetLineControl : public QObject
++class Q_WIDGETS_EXPORT QWidgetLineControl : public QInputControl
+ {
+     Q_OBJECT
+ 
+ public:
+     QWidgetLineControl(const QString &txt = QString())
+-        : m_cursor(0), m_preeditCursor(0), m_cursorWidth(0), m_layoutDirection(Qt::LayoutDirectionAuto),
++        : QInputControl(LineEdit)
++        , m_cursor(0), m_preeditCursor(0), m_cursorWidth(0), m_layoutDirection(Qt::LayoutDirectionAuto),
+         m_hideCursor(false), m_separator(0), m_readOnly(0),
+         m_dragEnabled(0), m_echoMode(0), m_textDirty(0), m_selDirty(0),
+         m_validInput(1), m_blinkStatus(0), m_blinkEnabled(false), m_blinkTimer(0), m_deleteAllTimer(0),
+diff -up qtbase-opensource-src-5.7.1/src/widgets/widgets/qwidgettextcontrol.cpp.than qtbase-opensource-src-5.7.1/src/widgets/widgets/qwidgettextcontrol.cpp
+--- qtbase-opensource-src-5.7.1/src/widgets/widgets/qwidgettextcontrol.cpp.than	2016-12-01 09:17:04.000000000 +0100
++++ qtbase-opensource-src-5.7.1/src/widgets/widgets/qwidgettextcontrol.cpp	2017-07-19 10:48:01.811115380 +0200
+@@ -848,21 +848,21 @@ void QWidgetTextControl::redo()
+ }
+ 
+ QWidgetTextControl::QWidgetTextControl(QObject *parent)
+-    : QObject(*new QWidgetTextControlPrivate, parent)
++    : QInputControl(QInputControl::TextEdit, *new QWidgetTextControlPrivate, parent)
+ {
+     Q_D(QWidgetTextControl);
+     d->init();
+ }
+ 
+ QWidgetTextControl::QWidgetTextControl(const QString &text, QObject *parent)
+-    : QObject(*new QWidgetTextControlPrivate, parent)
++    : QInputControl(QInputControl::TextEdit, *new QWidgetTextControlPrivate, parent)
+ {
+     Q_D(QWidgetTextControl);
+     d->init(Qt::RichText, text);
+ }
+ 
+ QWidgetTextControl::QWidgetTextControl(QTextDocument *doc, QObject *parent)
+-    : QObject(*new QWidgetTextControlPrivate, parent)
++    : QInputControl(QInputControl::TextEdit, *new QWidgetTextControlPrivate, parent)
+ {
+     Q_D(QWidgetTextControl);
+     d->init(Qt::RichText, QString(), doc);
+@@ -1361,14 +1361,7 @@ void QWidgetTextControlPrivate::keyPress
+ 
+ process:
+     {
+-        // QTBUG-35734: ignore Ctrl/Ctrl+Shift; accept only AltGr (Alt+Ctrl) on German keyboards
+-        if (e->modifiers() == Qt::ControlModifier
+-            || e->modifiers() == (Qt::ShiftModifier | Qt::ControlModifier)) {
+-            e->ignore();
+-            return;
+-        }
+-        QString text = e->text();
+-        if (!text.isEmpty() && (text.at(0).isPrint() || text.at(0) == QLatin1Char('\t'))) {
++        if (q->isAcceptableInput(e)) {
+             if (overwriteMode
+                 // no need to call deleteChar() if we have a selection, insertText
+                 // does it already
+@@ -1376,7 +1369,7 @@ process:
+                 && !cursor.atBlockEnd())
+                 cursor.deleteChar();
+ 
+-            cursor.insertText(text);
++            cursor.insertText(e->text());
+             selectionChanged();
+         } else {
+             e->ignore();
+diff -up qtbase-opensource-src-5.7.1/src/widgets/widgets/qwidgettextcontrol_p.h.than qtbase-opensource-src-5.7.1/src/widgets/widgets/qwidgettextcontrol_p.h
+--- qtbase-opensource-src-5.7.1/src/widgets/widgets/qwidgettextcontrol_p.h.than	2016-12-01 09:17:04.000000000 +0100
++++ qtbase-opensource-src-5.7.1/src/widgets/widgets/qwidgettextcontrol_p.h	2017-07-19 10:48:01.811115380 +0200
+@@ -62,6 +62,7 @@
+ #include <QtGui/qtextdocumentfragment.h>
+ #include <QtGui/qclipboard.h>
+ #include <QtCore/qmimedata.h>
++#include <QtGui/private/qinputcontrol_p.h>
+ 
+ QT_BEGIN_NAMESPACE
+ 
+@@ -74,7 +75,7 @@ class QAbstractScrollArea;
+ class QEvent;
+ class QTimerEvent;
+ 
+-class Q_WIDGETS_EXPORT QWidgetTextControl : public QObject
++class Q_WIDGETS_EXPORT QWidgetTextControl : public QInputControl
+ {
+     Q_OBJECT
+     Q_DECLARE_PRIVATE(QWidgetTextControl)
+diff -up qtbase-opensource-src-5.7.1/tests/auto/gui/text/qinputcontrol/qinputcontrol.pro.than qtbase-opensource-src-5.7.1/tests/auto/gui/text/qinputcontrol/qinputcontrol.pro
+--- qtbase-opensource-src-5.7.1/tests/auto/gui/text/qinputcontrol/qinputcontrol.pro.than	2017-07-19 10:48:01.811115380 +0200
++++ qtbase-opensource-src-5.7.1/tests/auto/gui/text/qinputcontrol/qinputcontrol.pro	2017-07-19 10:48:01.811115380 +0200
+@@ -0,0 +1,7 @@
++CONFIG += testcase
++TARGET = tst_qinputcontrol
++
++QT = core gui gui-private testlib
++
++SOURCES += \
++    tst_qinputcontrol.cpp
+diff -up qtbase-opensource-src-5.7.1/tests/auto/gui/text/qinputcontrol/tst_qinputcontrol.cpp.than qtbase-opensource-src-5.7.1/tests/auto/gui/text/qinputcontrol/tst_qinputcontrol.cpp
+--- qtbase-opensource-src-5.7.1/tests/auto/gui/text/qinputcontrol/tst_qinputcontrol.cpp.than	2017-07-19 10:48:01.811115380 +0200
++++ qtbase-opensource-src-5.7.1/tests/auto/gui/text/qinputcontrol/tst_qinputcontrol.cpp	2017-07-19 10:48:01.811115380 +0200
+@@ -0,0 +1,100 @@
++/****************************************************************************
++**
++** Copyright (C) 2016 The Qt Company Ltd.
++** Contact: https://www.qt.io/licensing/
++**
++** This file is part of the test suite of the Qt Toolkit.
++**
++** $QT_BEGIN_LICENSE:GPL-EXCEPT$
++** Commercial License Usage
++** Licensees holding valid commercial Qt licenses may use this file in
++** accordance with the commercial license agreement provided with the
++** Software or, alternatively, in accordance with the terms contained in
++** a written agreement between you and The Qt Company. For licensing terms
++** and conditions see https://www.qt.io/terms-conditions. For further
++** information use the contact form at https://www.qt.io/contact-us.
++**
++** GNU General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU
++** General Public License version 3 as published by the Free Software
++** Foundation with exceptions as appearing in the file LICENSE.GPL3-EXCEPT
++** included in the packaging of this file. Please review the following
++** information to ensure the GNU General Public License requirements will
++** be met: https://www.gnu.org/licenses/gpl-3.0.html.
++**
++** $QT_END_LICENSE$
++**
++****************************************************************************/
++
++#include <QtTest/QtTest>
++
++#include <private/qinputcontrol_p.h>
++#include <QtGui/QKeyEvent>
++
++class tst_QInputControl: public QObject
++{
++    Q_OBJECT
++private slots:
++    void isAcceptableInput_data();
++    void isAcceptableInput();
++    void tabOnlyAcceptableInputForTextEdit();
++};
++
++void tst_QInputControl::isAcceptableInput_data()
++{
++    QTest::addColumn<QString>("text");
++    QTest::addColumn<Qt::KeyboardModifiers>("modifiers");
++    QTest::addColumn<bool>("acceptable");
++
++    QTest::newRow("empty-string") << QString() << Qt::KeyboardModifiers() << false;
++    QTest::newRow("zwnj") << QString(QChar(0x200C)) << Qt::KeyboardModifiers() << true;
++    QTest::newRow("zwnj-with-ctrl") << QString(QChar(0x200C)) << Qt::KeyboardModifiers(Qt::ControlModifier) << true;
++    QTest::newRow("zwnj-with-ctrl-shift") << QString(QChar(0x200C)) << Qt::KeyboardModifiers(Qt::ControlModifier | Qt::ShiftModifier) << true;
++    QTest::newRow("zwj") << QString(QChar(0x200D)) << Qt::KeyboardModifiers() << true;
++    QTest::newRow("zwj-with-ctrl") << QString(QChar(0x200D)) << Qt::KeyboardModifiers(Qt::ControlModifier) << true;
++    QTest::newRow("zwj-with-ctrl-shift") << QString(QChar(0x200D)) << Qt::KeyboardModifiers(Qt::ControlModifier | Qt::ShiftModifier) << true;
++    QTest::newRow("printable-latin") << QString(QLatin1Char('a')) << Qt::KeyboardModifiers() << true;
++    QTest::newRow("printable-latin-with-ctrl") << QString(QLatin1Char('a')) << Qt::KeyboardModifiers(Qt::ControlModifier) << false;
++    QTest::newRow("printable-latin-with-ctrl-shift") << QString(QLatin1Char('a')) << Qt::KeyboardModifiers(Qt::ControlModifier | Qt::ShiftModifier) << false;
++    QTest::newRow("printable-hebrew") << QString(QChar(0x2135)) << Qt::KeyboardModifiers() << true;
++    QTest::newRow("private-use-area") << QString(QChar(0xE832)) << Qt::KeyboardModifiers() << true;
++    QTest::newRow("multiple-printable") << QStringLiteral("foobar") << Qt::KeyboardModifiers() << true;
++}
++
++void tst_QInputControl::isAcceptableInput()
++{
++    QFETCH(QString, text);
++    QFETCH(Qt::KeyboardModifiers, modifiers);
++    QFETCH(bool, acceptable);
++
++    QKeyEvent keyEvent(QKeyEvent::KeyPress, Qt::Key_unknown, modifiers, text);
++
++    {
++        QInputControl inputControl(QInputControl::TextEdit);
++        QCOMPARE(inputControl.isAcceptableInput(&keyEvent), acceptable);
++    }
++
++    {
++        QInputControl inputControl(QInputControl::LineEdit);
++        QCOMPARE(inputControl.isAcceptableInput(&keyEvent), acceptable);
++    }
++}
++
++void tst_QInputControl::tabOnlyAcceptableInputForTextEdit()
++{
++    QKeyEvent keyEvent(QKeyEvent::KeyPress, Qt::Key_unknown, Qt::KeyboardModifiers(), QLatin1String("\t"));
++
++    {
++        QInputControl inputControl(QInputControl::TextEdit);
++        QCOMPARE(inputControl.isAcceptableInput(&keyEvent), true);
++    }
++
++    {
++        QInputControl inputControl(QInputControl::LineEdit);
++        QCOMPARE(inputControl.isAcceptableInput(&keyEvent), false);
++    }
++}
++
++QTEST_MAIN(tst_QInputControl)
++#include "tst_qinputcontrol.moc"
++
+diff -up qtbase-opensource-src-5.7.1/tests/auto/gui/text/text.pro.than qtbase-opensource-src-5.7.1/tests/auto/gui/text/text.pro
+--- qtbase-opensource-src-5.7.1/tests/auto/gui/text/text.pro.than	2016-12-01 09:17:04.000000000 +0100
++++ qtbase-opensource-src-5.7.1/tests/auto/gui/text/text.pro	2017-07-19 10:48:01.811115380 +0200
+@@ -22,6 +22,7 @@ SUBDIRS=\
+    qtextpiecetable \
+    qtextscriptengine \
+    qtexttable \
++   qinputcontrol
+ 
+ contains(QT_CONFIG, OdfWriter):SUBDIRS += qzip qtextodfwriter
+ 
+diff -up qtbase-opensource-src-5.7.1/include/QtGui/5.7.1/QtGui/private/qinputcontrol_p.h.than qtbase-opensource-src-5.7.1/include/QtGui/5.7.1/QtGui/private/qinputcontrol_p.h
+--- qtbase-opensource-src-5.7.1/include/QtGui/5.7.1/QtGui/private/qinputcontrol_p.h.than	2017-07-19 15:24:57.111848516 +0200
++++ qtbase-opensource-src-5.7.1/include/QtGui/5.7.1/QtGui/private/qinputcontrol_p.h	2017-07-19 15:24:49.500814914 +0200
+@@ -0,0 +1 @@
++#include "../../../../../src/gui/text/qinputcontrol_p.h"

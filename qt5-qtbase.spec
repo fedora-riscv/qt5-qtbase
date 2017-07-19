@@ -66,7 +66,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.7.1
-Release: 19%{?dist}
+Release: 20%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -141,6 +141,9 @@ Patch100: qt5-qtbase-5.8-QTBUG-55583.patch
 Patch101: qt5-qtbase-5.8-QTBUG-56140.patch
 # gcc7 FTBFS fix
 Patch153: 0053-QMimeXMLProvider-add-missing-out-of-line-destructor.patch
+
+# backport to fix ZWNJ character on Persian keyboard not working
+Patch154: qt5-qtbase-bz#1120451-persian-keyboard.patch
 
 ## under review
 # https://codereview.qt-project.org/#/c/180232/
@@ -381,6 +384,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %patch100 -p1 -b .QTBUG-55583
 %patch101 -p1 -b .QTBUG-56140
 %patch153 -p1 -b .0053
+%patch154 -p1 -b .bz#1120451
 
 %patch401 -p1 -b .0401
 %patch402 -p1 -b .0402
@@ -997,6 +1001,9 @@ fi
 
 
 %changelog
+* Wed Jul 19 2017 Than Ngo <than@redhat.com> - 5.7.1-20
+- backported to fix bz#1120451, ZWNJ character on Persian keyboard not working 
+
 * Mon Jul 17 2017 Than Ngo <than@redhat.com> - 5.7.1-19
 - fixed bz#1364717, Segfault in QDBusConnectionPrivate::closeConnection -> QObject::disconnect on exit
 
