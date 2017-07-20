@@ -528,7 +528,7 @@ make %{?_smp_mflags} -C qmake \
   QMAKE_LFLAGS_RELEASE="${LDFLAGS:-$RPM_LD_FLAGS}" \
   QMAKE_STRIP=
 %endif
-
+make distclean
 make %{?_smp_mflags}
 
 %if 0%{?docs}
