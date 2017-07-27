@@ -1,20 +1,24 @@
 # See http://bugzilla.redhat.com/223663
-%define multilib_archs x86_64 %{ix86} %{?mips} ppc64 ppc s390x s390 sparc64 sparcv9
-%define multilib_basearchs x86_64 %{?mips64} ppc64 s390x sparc64
+%global multilib_archs x86_64 %{ix86} %{?mips} ppc64 ppc s390x s390 sparc64 sparcv9
+%global multilib_basearchs x86_64 %{?mips64} ppc64 s390x sparc64
+
+# support openssl-1.1
+%global openssl11 1
+%global openssl -openssl-linked
 
 # support qtchooser (adds qtchooser .conf file)
-%define qtchooser 1
+%global qtchooser 1
 %if 0%{?qtchooser}
-%define priority 10
+%global priority 10
 %ifarch %{multilib_basearchs}
-%define priority 15
+%global priority 15
 %endif
 %endif
 
-%define platform linux-g++
+%global platform linux-g++
 
 %if 0%{?use_clang}
-%define platform linux-clang
+%global platform linux-clang
 %endif
 
 %global qt_module qtbase
@@ -49,7 +53,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.9.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -94,9 +98,8 @@ Patch52: qtbase-opensource-src-5.7.1-moc_macros.patch
 # drop -O3 and make -O2 by default
 Patch61: qt5-qtbase-cxxflag.patch
 
-# adapted from berolinux for fedora
-# https://github.com/patch-exchange/openssl-1.1-transition/blob/master/qt5-qtbase/qtbase-5.7.0-openssl-1.1.patch
-Patch63: qt5-qtbase-5.7.1-openssl11.patch
+# backport from upstream
+Patch63: qt5-qtbase-5.9.1-openssl11.patch
 
 # support firebird version 3.x
 Patch64: qt5-qtbase-5.9.1-firebird.patch
@@ -143,16 +146,7 @@ BuildRequires: pkgconfig(libproxy-1.0)
 BuildRequires: pkgconfig(ice) pkgconfig(sm)
 BuildRequires: pkgconfig(libpng)
 BuildRequires: pkgconfig(libudev)
-%if 0%{?fedora} > 25 || 0%{?rhel} > 7
-%global openssl -openssl-linked
-BuildRequires: compat-openssl10-devel
-#global openssl -openssl
-# since openssl is loaded dynamically, add an explicit dependency
-#Requires: openssl-libs%{?_isa}
-%else
-%global openssl -openssl-linked
 BuildRequires: pkgconfig(openssl)
-%endif
 BuildRequires: pkgconfig(libpulse) pkgconfig(libpulse-mainloop-glib)
 %if 0%{?fedora}
 %global xkbcommon -system-xkbcommon
@@ -170,7 +164,7 @@ Provides: bundled(libxkbcommon) = 0.4.1
 %endif
 BuildRequires: pkgconfig(xkeyboard-config)
 %if 0%{?fedora} || 0%{?rhel} > 6
-%define egl 1
+%global egl 1
 BuildRequires: pkgconfig(egl)
 BuildRequires: pkgconfig(gbm)
 BuildRequires: pkgconfig(glesv2)
@@ -183,11 +177,11 @@ BuildRequires: pkgconfig(harfbuzz) >= 0.9.42
 BuildRequires: pkgconfig(icu-i18n)
 BuildRequires: pkgconfig(libpcre2-posix) >= 10.20
 BuildRequires: pkgconfig(libpcre) >= 8.0
-%define pcre -system-pcre
+%global pcre -system-pcre
 BuildRequires: pkgconfig(xcb-xkb)
 %else
 BuildRequires: libicu-devel
-%define pcre -qt-pcre
+%global pcre -qt-pcre
 %endif
 BuildRequires: pkgconfig(xcb) pkgconfig(xcb-glx) pkgconfig(xcb-icccm) pkgconfig(xcb-image) pkgconfig(xcb-keysyms) pkgconfig(xcb-renderutil)
 BuildRequires: pkgconfig(zlib)
@@ -215,8 +209,8 @@ Requires: %{name}-common = %{version}-%{release}
 
 ## Sql drivers
 %if 0%{?rhel}
-%define ibase -no-sql-ibase
-%define tds -no-sql-tds
+%global ibase -no-sql-ibase
+%global tds -no-sql-tds
 %endif
 
 # workaround gold linker bug by not using it
@@ -414,11 +408,6 @@ export CFLAGS="$CFLAGS $RPM_OPT_FLAGS"
 export CXXFLAGS="$CXXFLAGS $RPM_OPT_FLAGS"
 export LDFLAGS="$LDFLAGS $RPM_LD_FLAGS"
 export MAKEFLAGS="%{?_smp_mflags}"
-%if 0%{?openssl11}
-export OPENSSL_LIBS="-lssl -lcrypto"
-export CFLAGS="$CFLAGS $RPM_OPT_FLAGS -DOPENSSL_API_COMPAT=0x10100000L"
-export CXXFLAGS="$CXXFLAGS $RPM_OPT_FLAGS -DOPENSSL_API_COMPAT=0x10100000L"
-%endif
 
 ./configure \
   -verbose \
@@ -965,6 +954,9 @@ fi
 
 
 %changelog
+* Thu Jul 27 2017 Than Ngo <than@redhat.com> - 5.9.1-3
+- fixed bz#1401459, backport openssl-1.1 support
+
 * Thu Jul 27 2017 Fedora Release Engineering <releng@fedoraproject.org> - 5.9.1-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Mass_Rebuild
 
