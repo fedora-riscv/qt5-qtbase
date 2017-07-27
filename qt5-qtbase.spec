@@ -146,7 +146,7 @@ BuildRequires: pkgconfig(libproxy-1.0)
 BuildRequires: pkgconfig(ice) pkgconfig(sm)
 BuildRequires: pkgconfig(libpng)
 BuildRequires: pkgconfig(libudev)
-BuildRequires: pkgconfig(openssl)
+BuildRequires: openssl-devel
 BuildRequires: pkgconfig(libpulse) pkgconfig(libpulse-mainloop-glib)
 %if 0%{?fedora}
 %global xkbcommon -system-xkbcommon
