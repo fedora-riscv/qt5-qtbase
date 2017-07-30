@@ -53,7 +53,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.9.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -954,6 +954,9 @@ fi
 
 
 %changelog
+* Sun Jul 30 2017 Florian Weimer <fweimer@redhat.com> - 5.9.1-4
+- Rebuild with binutils fix for ppc64le (#1475636)
+
 * Thu Jul 27 2017 Than Ngo <than@redhat.com> - 5.9.1-3
 - fixed bz#1401459, backport openssl-1.1 support
 
