@@ -53,7 +53,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.9.1
-Release: 4%{?dist}
+Release: 5%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -576,6 +576,9 @@ cat >>${privat_header_file}<<EOF
 #endif
 EOF
 
+# install privat headers for qtxcb
+mkdir -p %{buildroot}%{_qt5_headerdir}/QtXcb
+install -m 644 src/plugins/platforms/xcb/*.h %{buildroot}%{_qt5_headerdir}/QtXcb/
 
 %check
 %if 0%{?tests}
@@ -740,6 +743,7 @@ fi
 %{_qt5_headerdir}/QtSql/
 %{_qt5_headerdir}/QtTest/
 %{_qt5_headerdir}/QtWidgets/
+%{_qt5_headerdir}/QtXcb/
 %{_qt5_headerdir}/QtXml/
 %{_qt5_headerdir}/QtEglFSDeviceIntegration
 %{_qt5_headerdir}/QtInputSupport
@@ -954,6 +958,9 @@ fi
 
 
 %changelog
+* Wed Aug 02 2017 Than Ngo <than@redhat.com> - 5.9.1-5
+- added privat headers for Qt5 Xcb
+
 * Sun Jul 30 2017 Florian Weimer <fweimer@redhat.com> - 5.9.1-4
 - Rebuild with binutils fix for ppc64le (#1475636)
 
