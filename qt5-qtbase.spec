@@ -334,9 +334,9 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %patch4 -p1 -b .QTBUG-35459
 
 %patch50 -p1 -b .QT_VERSION_CHECK
-#patch51 -p1 -b .hidpi_scale_at_192
+%patch51 -p1 -b .hidpi_scale_at_192
 %patch52 -p1 -b .moc_macros
-#patch61 -p1 -b .qt5-qtbase-cxxflag
+%patch61 -p1 -b .qt5-qtbase-cxxflag
 %if 0%{?openssl11}
 %patch63 -p1 -b .openssl11
 %endif
