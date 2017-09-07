@@ -1,34 +1,29 @@
 # See http://bugzilla.redhat.com/223663
-%define multilib_archs x86_64 %{ix86} %{?mips} ppc64 ppc s390x s390 sparc64 sparcv9
-%define multilib_basearchs x86_64 %{?mips64} ppc64 s390x sparc64
+%global multilib_archs x86_64 %{ix86} %{?mips} ppc64 ppc s390x s390 sparc64 sparcv9
+%global multilib_basearchs x86_64 %{?mips64} ppc64 s390x sparc64
+
+# support openssl-1.1
+%global openssl11 1
+%global openssl -openssl-linked
 
 # support qtchooser (adds qtchooser .conf file)
-%define qtchooser 1
+%global qtchooser 1
 %if 0%{?qtchooser}
-%define priority 10
+%global priority 10
 %ifarch %{multilib_basearchs}
-%define priority 15
+%global priority 15
 %endif
 %endif
 
-%define platform linux-g++
+%global platform linux-g++
 
 %if 0%{?use_clang}
-%define platform linux-clang
+%global platform linux-clang
 %endif
 
 %global qt_module qtbase
 
 %global rpm_macros_dir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
-
-# set to 1 to enable bootstrap
-%global bootstrap 0
-
-%if 0%{?fedora} > 25 || 0%{?rhel} > 7
-# set to 1 for openssl-1.1.x support
-#global openssl11 1
-%global firebird3x 1
-%endif
 
 %if 0%{?fedora} > 21
 # use external qt_settings pkg
@@ -52,26 +47,18 @@ BuildRequires: pkgconfig(libsystemd)
 %global qt5_null_flag -fno-delete-null-pointer-checks
 %endif
 
-# define to build docs, need to undef this for bootstrapping
-# where qt5-qttools builds are not yet available
-# only primary archs (for now), allow secondary to bootstrap
-%if ! 0%{?bootstrap}
-%ifarch %{arm} %{ix86} x86_64 %{power64} s390 s390x aarch64
-%global docs 1
-%endif
 %global examples 1
 %global tests 1
-%endif
 
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
-Version: 5.7.1
-Release: 20%{?dist}
+Version: 5.9.1
+Release: 1%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
-Url: http://qt-project.org/
-Source0: http://download.qt.io/official_releases/qt/5.7/%{version}/submodules/%{qt_module}-opensource-src-%{version}.tar.xz
+Url:     http://qt-project.org/
+Source0: https://download.qt.io/official_releases/qt/5.9/%{version}/submodules/%{qt_module}-opensource-src-%{version}.tar.xz
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1227295
 Source1: qtlogging.ini
@@ -95,7 +82,7 @@ Patch4: qtbase-opensource-src-5.3.2-QTBUG-35459.patch
 
 # upstreamable patches
 # namespace QT_VERSION_CHECK to workaround major/minor being pre-defined (#1396755)
-Patch50: qtbase-opensource-src-5.7.1-QT_VERSION_CHECK.patch
+Patch50: qtbase-opensource-src-5.8.0-QT_VERSION_CHECK.patch
 
 # 1381828 - Broken window scaling for some QT5 applications (#1381828)
 # This patch moves the threshold for 2x scaling from the DPI of 144 to 192,
@@ -108,47 +95,20 @@ Patch51: qtbase-hidpi_scale_at_192.patch
 # 2. Workaround sysmacros.h (pre)defining major/minor a breaking stuff
 Patch52: qtbase-opensource-src-5.7.1-moc_macros.patch
 
-# arm patch
-Patch54: qtbase-opensource-src-5.6.0-arm.patch
-
-# recently passed code review, now integrated into 5.8 branch
-# https://codereview.qt-project.org/126102/
-Patch60: qtbase-opensource-src-5.7.1-moc_system_defines.patch
-
 # drop -O3 and make -O2 by default
 Patch61: qt5-qtbase-cxxflag.patch
 
-# Fix png system compilation
-Patch62: qt5-qtbase-5.7.1-libpng.patch
-
-# adapted from berolinux for fedora
-# https://github.com/patch-exchange/openssl-1.1-transition/blob/master/qt5-qtbase/qtbase-5.7.0-openssl-1.1.patch
-Patch63: qt5-qtbase-5.7.1-openssl11.patch
+# backport from upstream
+Patch63: qt5-qtbase-5.9.1-openssl11.patch
 
 # support firebird version 3.x
-Patch64: qt5-qtbase-5.7.1-firebird.patch
+Patch64: qt5-qtbase-5.9.1-firebird.patch
 
-# Segfault in QDBusConnectionPrivate::closeConnection -> QObject::disconnect on exit
-Patch65: qt5-qtbase-5.7.1-bz#1364717.patch
+# fix for new mariadb
+Patch65: qtbase-opensource-src-5.9.0-mysql.patch
 
-## upstream patches
-## 5.8 branch
-# https://bugzilla.redhat.com/show_bug.cgi?id=1403500
-# https://bugreports.qt.io/browse/QTBUG-55583
-Patch100: qt5-qtbase-5.8-QTBUG-55583.patch
-# Ensure a pixel density of at least 1 for Qt::AA_EnableHighDpiScaling
-# https://bugreports.qt.io/browse/QTBUG-56140
-Patch101: qt5-qtbase-5.8-QTBUG-56140.patch
-# gcc7 FTBFS fix
-Patch153: 0053-QMimeXMLProvider-add-missing-out-of-line-destructor.patch
-
-# backport to fix ZWNJ character on Persian keyboard not working
-Patch154: qt5-qtbase-bz#1120451-persian-keyboard.patch
-
-## under review
-# https://codereview.qt-project.org/#/c/180232/
-Patch401: 0001-Merge-the-QDBusMetaType-s-custom-information-to-QDBu.patch
-Patch402: 0002-Fix-some-QtDBus-crashes-during-application-destructi.patch
+## upstream patches (5.9 branch)
+Patch486: 0086-Fix-detection-of-AT-SPI.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -166,6 +126,8 @@ BuildRequires: libjpeg-devel
 BuildRequires: libmng-devel
 BuildRequires: libtiff-devel
 BuildRequires: pkgconfig(alsa)
+# required for -accessibility
+BuildRequires: pkgconfig(atspi-2)
 %if 0%{?use_clang}
 BuildRequires: clang >= 3.7.0
 %endif
@@ -184,16 +146,7 @@ BuildRequires: pkgconfig(libproxy-1.0)
 BuildRequires: pkgconfig(ice) pkgconfig(sm)
 BuildRequires: pkgconfig(libpng)
 BuildRequires: pkgconfig(libudev)
-%if 0%{?fedora} > 25 || 0%{?rhel} > 7
-%global openssl -openssl-linked
-BuildRequires: compat-openssl10-devel
-#global openssl -openssl
-# since openssl is loaded dynamically, add an explicit dependency
-#Requires: openssl-libs%{?_isa}
-%else
-%global openssl -openssl-linked
-BuildRequires: pkgconfig(openssl)
-%endif
+BuildRequires: openssl-devel
 BuildRequires: pkgconfig(libpulse) pkgconfig(libpulse-mainloop-glib)
 %if 0%{?fedora}
 %global xkbcommon -system-xkbcommon
@@ -211,7 +164,7 @@ Provides: bundled(libxkbcommon) = 0.4.1
 %endif
 BuildRequires: pkgconfig(xkeyboard-config)
 %if 0%{?fedora} || 0%{?rhel} > 6
-%define egl 1
+%global egl 1
 BuildRequires: pkgconfig(egl)
 BuildRequires: pkgconfig(gbm)
 BuildRequires: pkgconfig(glesv2)
@@ -222,17 +175,18 @@ BuildRequires: pkgconfig(sqlite3) >= 3.7
 BuildRequires: pkgconfig(harfbuzz) >= 0.9.42
 %endif
 BuildRequires: pkgconfig(icu-i18n)
-BuildRequires: pkgconfig(libpcre) >= 8.30
-%define pcre -system-pcre
+BuildRequires: pkgconfig(libpcre2-posix) >= 10.20
+BuildRequires: pkgconfig(libpcre) >= 8.0
+%global pcre -system-pcre
 BuildRequires: pkgconfig(xcb-xkb)
 %else
 BuildRequires: libicu-devel
-%define pcre -qt-pcre
+%global pcre -qt-pcre
 %endif
 BuildRequires: pkgconfig(xcb) pkgconfig(xcb-glx) pkgconfig(xcb-icccm) pkgconfig(xcb-image) pkgconfig(xcb-keysyms) pkgconfig(xcb-renderutil)
 BuildRequires: pkgconfig(zlib)
 BuildRequires: perl-generators
-BuildRequires: qt5-rpm-macros >= %{version}
+BuildRequires: qt5-rpm-macros >= 5.7.1
 
 %if 0%{?tests}
 BuildRequires: dbus-x11
@@ -255,8 +209,15 @@ Requires: %{name}-common = %{version}-%{release}
 
 ## Sql drivers
 %if 0%{?rhel}
-%define ibase -no-sql-ibase
-%define tds -no-sql-tds
+%global ibase -no-sql-ibase
+%global tds -no-sql-tds
+%endif
+
+# workaround gold linker bug by not using it
+# https://bugzilla.redhat.com/1458003
+# https://sourceware.org/bugzilla/show_bug.cgi?id=21074
+%if 0%{?fedora} > 26
+%global use_gold_linker -no-use-gold-linker
 %endif
 
 %description
@@ -267,6 +228,9 @@ handling.
 
 %package common
 Summary: Common files for Qt5
+# offer upgrade path for qtquick1 somewhere... may as well be here -- rex
+Obsoletes: qt5-qtquick1 < 5.9.0
+Obsoletes: qt5-qtquick1-devel < 5.9.0
 Requires: %{name} = %{version}-%{release}
 BuildArch: noarch
 %description common
@@ -281,25 +245,12 @@ Requires: %{name}-gui%{?_isa}
 Requires: pkgconfig(egl)
 %endif
 Requires: pkgconfig(gl)
-Requires: qt5-rpm-macros >= %{version}
+Requires: qt5-rpm-macros >= 5.7.1
 %if 0%{?use_clang}
 Requires: clang >= 3.7.0
 %endif
 %description devel
 %{summary}.
-
-%if 0%{?docs}
-%package doc
-Summary: API documentation for %{name}
-License: GFDL
-Requires: %{name} = %{version}-%{release}
-BuildRequires: qt5-qhelpgenerator
-BuildRequires: qt5-qdoc
-BuildArch: noarch
-
-%description doc
-%{summary}.
-%endif
 
 %package examples
 Summary: Programming examples for %{name}
@@ -381,28 +332,18 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %setup -q -n %{qt_module}-opensource-src-%{version}
 
 %patch4 -p1 -b .QTBUG-35459
-%patch100 -p1 -b .QTBUG-55583
-%patch101 -p1 -b .QTBUG-56140
-%patch153 -p1 -b .0053
-%patch154 -p1 -b .bz#1120451
-
-%patch401 -p1 -b .0401
-%patch402 -p1 -b .0402
 
 %patch50 -p1 -b .QT_VERSION_CHECK
 %patch51 -p1 -b .hidpi_scale_at_192
 %patch52 -p1 -b .moc_macros
-%patch54 -p1 -b .arm
-%patch60 -p1 -b .moc_system_defines
 %patch61 -p1 -b .qt5-qtbase-cxxflag
-%patch62 -p1 -b .libpng
 %if 0%{?openssl11}
 %patch63 -p1 -b .openssl11
 %endif
-%if 0%{?firebird3x}
 %patch64 -p1 -b .firebird
-%endif
-%patch65 -p1 -b .bz#1364717
+%patch65 -p1 -b .mysql
+
+%patch486 -p1 -b .0086
 
 %if 0%{?inject_optflags}
 ## adjust $RPM_OPT_FLAGS
@@ -444,6 +385,10 @@ sed -i -e "s|^#!/usr/bin/env perl$|#!%{__perl}|" \
  bin/syncqt.pl \
  mkspecs/features/data/unix/findclasslist.pl
 
+# Fix missing private includes https://bugreports.qt.io/browse/QTBUG-37417
+sed -e '/CMAKE_NO_PRIVATE_INCLUDES\ \=\ true/d' -i \
+  mkspecs/features/create_cmake.prf
+
 
 %build
 ## FIXME/TODO:
@@ -463,13 +408,9 @@ export CFLAGS="$CFLAGS $RPM_OPT_FLAGS"
 export CXXFLAGS="$CXXFLAGS $RPM_OPT_FLAGS"
 export LDFLAGS="$LDFLAGS $RPM_LD_FLAGS"
 export MAKEFLAGS="%{?_smp_mflags}"
-%if 0%{?openssl11}
-export OPENSSL_LIBS="-lssl -lcrypto"
-export CFLAGS="$CFLAGS $RPM_OPT_FLAGS -DOPENSSL_API_COMPAT=0x10100000L"
-export CXXFLAGS="$CXXFLAGS $RPM_OPT_FLAGS -DOPENSSL_API_COMPAT=0x10100000L"
-%endif
 
-./configure -v \
+./configure \
+  -verbose \
   -confirm-license \
   -opensource \
   -prefix %{_qt5_prefix} \
@@ -494,11 +435,10 @@ export CXXFLAGS="$CXXFLAGS $RPM_OPT_FLAGS -DOPENSSL_API_COMPAT=0x10100000L"
   -glib \
   -gtk \
   %{?ibase} \
-  -iconv \
   -icu \
   %{?journald} \
-  %{?openssl} \
   -optimized-qmake \
+  %{?openssl} \
   %{!?examples:-nomake examples} \
   %{!?tests:-nomake tests} \
   -no-pch \
@@ -517,6 +457,7 @@ export CXXFLAGS="$CXXFLAGS $RPM_OPT_FLAGS -DOPENSSL_API_COMPAT=0x10100000L"
   %{?xcb} \
   %{?xkbcommon} \
   -system-zlib \
+  %{?use_gold_linker} \
   -no-directfb
 
 %if ! 0%{?inject_optflags}
@@ -528,25 +469,18 @@ make %{?_smp_mflags} -C qmake \
   QMAKE_LFLAGS_RELEASE="${LDFLAGS:-$RPM_LD_FLAGS}" \
   QMAKE_STRIP=
 %endif
-make distclean
+
+# Remove /usr/include from .qmake.stash to fix build with gcc 6
+# (gcc can't find <stdlib.h> if -isystem /usr/include is present,
+# and Qt for some reason generates it
+mv .qmake.stash .qmake.stash.old
+cat .qmake.stash.old | sed -e 's@\(/usr/local/include\) \\@\1@g'| sed -e '/\/usr\/include$/ { d; }' > .qmake.stash
+
 make %{?_smp_mflags}
-
-%if 0%{?docs}
-# HACK to avoid multilib conflicts in noarch content
-# see also https://bugreports.qt-project.org/browse/QTBUG-42071
-QT_HASH_SEED=0; export QT_HASH_SEED
-
-make html_docs
-make qch_docs
-%endif
 
 
 %install
 make install INSTALL_ROOT=%{buildroot}
-
-%if 0%{?docs}
-make install_docs INSTALL_ROOT=%{buildroot}
-%endif
 
 install -m644 -p -D %{SOURCE1} %{buildroot}%{_qt5_datadir}/qtlogging.ini
 
@@ -572,7 +506,7 @@ translationdir=%{_qt5_translationdir}
 
 Name: Qt5
 Description: Qt5 Configuration
-Version: 5.7.1
+Version: 5.9.1
 EOF
 
 # rpm macros
@@ -636,6 +570,21 @@ popd
 
 install -p -m755 -D %{SOURCE6} %{buildroot}%{_sysconfdir}/X11/xinit/xinitrc.d/10-qt5-check-opengl2.sh
 
+# fix bz#1442553 multilib issue
+privat_header_file=%{buildroot}%{_qt5_headerdir}/QtCore/%{version}/QtCore/private/qconfig_p.h
+grep -v QT_FEATURE_sse2 $privat_header_file > ${privat_header_file}.me
+mv ${privat_header_file}.me ${privat_header_file}
+cat >>${privat_header_file}<<EOF
+#if defined(__x86_64__)
+#define QT_FEATURE_sse2 1
+#elif defined(__i386__)
+#define QT_FEATURE_sse2 -1
+#endif
+EOF
+
+# install privat headers for qtxcb
+mkdir -p %{buildroot}%{_qt5_headerdir}/QtXcb
+install -m 644 src/plugins/platforms/xcb/*.h %{buildroot}%{_qt5_headerdir}/QtXcb/
 
 %check
 %if 0%{?tests}
@@ -716,6 +665,7 @@ fi
 %{_qt5_libdir}/libQt5Sql.so.5*
 %{_qt5_libdir}/libQt5Test.so.5*
 %{_qt5_libdir}/libQt5Xml.so.5*
+%{_qt5_libdir}/libQt5EglFSDeviceIntegration.so.5*
 %dir %{_qt5_libdir}/cmake/
 %dir %{_qt5_libdir}/cmake/Qt5/
 %dir %{_qt5_libdir}/cmake/Qt5Concurrent/
@@ -763,32 +713,6 @@ fi
 # mostly empty for now, consider: filesystem/dir ownership, licenses
 %{rpm_macros_dir}/macros.qt5-qtbase
 
-%if 0%{?docs}
-%files doc
-%license LICENSE.FDL
-%doc dist/README dist/changes-5.*
-%{_qt5_docdir}/*.qch
-%if 0%{?examples}
-%if 0%{!?bootstrap}
-# included in -examples instead, see bug #1212750
-%exclude %{_qt5_docdir}/*/examples-manifest.xml
-%endif
-%endif
-%{_qt5_docdir}/qmake/
-%{_qt5_docdir}/qtconcurrent/
-%{_qt5_docdir}/qtcore/
-%{_qt5_docdir}/qtdbus/
-%{_qt5_docdir}/qtgui/
-%{_qt5_docdir}/qtnetwork/
-%{_qt5_docdir}/qtopengl/
-%{_qt5_docdir}/qtplatformheaders/
-%{_qt5_docdir}/qtprintsupport/
-%{_qt5_docdir}/qtsql/
-%{_qt5_docdir}/qttestlib/
-%{_qt5_docdir}/qtwidgets/
-%{_qt5_docdir}/qtxml/
-%endif
-
 %files devel
 %if "%{_qt5_bindir}" != "%{_bindir}"
 %dir %{_qt5_bindir}
@@ -825,7 +749,10 @@ fi
 %{_qt5_headerdir}/QtSql/
 %{_qt5_headerdir}/QtTest/
 %{_qt5_headerdir}/QtWidgets/
+%{_qt5_headerdir}/QtXcb/
 %{_qt5_headerdir}/QtXml/
+%{_qt5_headerdir}/QtEglFSDeviceIntegration
+%{_qt5_headerdir}/QtInputSupport
 %{_qt5_archdatadir}/mkspecs/
 %{_qt5_libdir}/libQt5Concurrent.prl
 %{_qt5_libdir}/libQt5Concurrent.so
@@ -851,6 +778,8 @@ fi
 %{_qt5_libdir}/libQt5XcbQpa.so
 %{_qt5_libdir}/libQt5Xml.prl
 %{_qt5_libdir}/libQt5Xml.so
+%{_qt5_libdir}/libQt5EglFSDeviceIntegration.prl
+%{_qt5_libdir}/libQt5EglFSDeviceIntegration.so
 %{_qt5_libdir}/cmake/Qt5/Qt5Config*.cmake
 %{_qt5_libdir}/cmake/Qt5Concurrent/Qt5ConcurrentConfig*.cmake
 %{_qt5_libdir}/cmake/Qt5Core/Qt5CoreConfig*.cmake
@@ -867,6 +796,7 @@ fi
 %{_qt5_libdir}/cmake/Qt5Widgets/Qt5WidgetsConfig*.cmake
 %{_qt5_libdir}/cmake/Qt5Widgets/Qt5WidgetsMacros.cmake
 %{_qt5_libdir}/cmake/Qt5Xml/Qt5XmlConfig*.cmake
+%{_qt5_libdir}/cmake/Qt5/Qt5ModuleLocation.cmake
 %{_qt5_libdir}/pkgconfig/Qt5.pc
 %{_qt5_libdir}/pkgconfig/Qt5Concurrent.pc
 %{_qt5_libdir}/pkgconfig/Qt5Core.pc
@@ -880,8 +810,6 @@ fi
 %{_qt5_libdir}/pkgconfig/Qt5Widgets.pc
 %{_qt5_libdir}/pkgconfig/Qt5Xml.pc
 %if 0%{?egl}
-%{_qt5_libdir}/libQt5EglDeviceIntegration.prl
-%{_qt5_libdir}/libQt5EglDeviceIntegration.so
 %{_qt5_libdir}/libQt5EglFsKmsSupport.prl
 %{_qt5_libdir}/libQt5EglFsKmsSupport.so
 %endif
@@ -895,15 +823,47 @@ fi
 %{_qt5_libdir}/libQt5OpenGLExtensions.prl
 %{_qt5_libdir}/cmake/Qt5OpenGLExtensions/
 %{_qt5_libdir}/pkgconfig/Qt5OpenGLExtensions.pc
-%{_qt5_headerdir}/QtPlatformSupport/
-%{_qt5_libdir}/libQt5PlatformSupport.*a
-%{_qt5_libdir}/libQt5PlatformSupport.prl
+%{_qt5_libdir}/libQt5AccessibilitySupport.*a
+%{_qt5_libdir}/libQt5AccessibilitySupport.prl
+%{_qt5_headerdir}/QtAccessibilitySupport
+%{_qt5_libdir}/libQt5DeviceDiscoverySupport.*a
+%{_qt5_libdir}/libQt5DeviceDiscoverySupport.prl
+%{_qt5_headerdir}/QtDeviceDiscoverySupport
+%{_qt5_libdir}/libQt5EglSupport.*a
+%{_qt5_libdir}/libQt5EglSupport.prl
+%{_qt5_headerdir}/QtEglSupport
+%{_qt5_libdir}/libQt5EventDispatcherSupport.*a
+%{_qt5_libdir}/libQt5EventDispatcherSupport.prl
+%{_qt5_headerdir}/QtEventDispatcherSupport
+%{_qt5_libdir}/libQt5FbSupport.*a
+%{_qt5_libdir}/libQt5FbSupport.prl
+%{_qt5_headerdir}/QtFbSupport
+%{_qt5_libdir}/libQt5FontDatabaseSupport.*a
+%{_qt5_libdir}/libQt5FontDatabaseSupport.prl
+%{_qt5_headerdir}/QtFontDatabaseSupport
+%{_qt5_libdir}/libQt5GlxSupport.*a
+%{_qt5_libdir}/libQt5GlxSupport.prl
+%{_qt5_headerdir}/QtGlxSupport
+%{_qt5_libdir}/libQt5InputSupport.*a
+%{_qt5_libdir}/libQt5InputSupport.prl
+%{_qt5_libdir}/libQt5LinuxAccessibilitySupport.*a
+%{_qt5_libdir}/libQt5LinuxAccessibilitySupport.prl
+%{_qt5_headerdir}/QtLinuxAccessibilitySupport
+%{_qt5_libdir}/libQt5PlatformCompositorSupport.*a
+%{_qt5_libdir}/libQt5PlatformCompositorSupport.prl
+%{_qt5_headerdir}/QtPlatformCompositorSupport
+%{_qt5_libdir}/libQt5ServiceSupport.*a
+%{_qt5_libdir}/libQt5ServiceSupport.prl
+%{_qt5_headerdir}/QtServiceSupport
+%{_qt5_libdir}/libQt5ThemeSupport.*a
+%{_qt5_libdir}/libQt5ThemeSupport.prl
+%{_qt5_headerdir}/QtThemeSupport
+%{_qt5_libdir}/libQt5KmsSupport.*a
+%{_qt5_libdir}/libQt5KmsSupport.prl
+%{_qt5_headerdir}/QtKmsSupport
 
 %if 0%{?examples}
 %files examples
-%if 0%{!?bootstrap}
-%{_qt5_docdir}/*/examples-manifest.xml
-%endif
 %{_qt5_examplesdir}/
 %endif
 
@@ -968,7 +928,6 @@ fi
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QComposePlatformInputContextPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QIbusPlatformInputContextPlugin.cmake
 %if 0%{?egl}
-%{_qt5_libdir}/libQt5EglDeviceIntegration.so.5*
 %{_qt5_libdir}/libQt5EglFsKmsSupport.so.5*
 %{_qt5_plugindir}/platforms/libqeglfs.so
 %{_qt5_plugindir}/platforms/libqminimalegl.so
@@ -977,20 +936,24 @@ fi
 %{_qt5_plugindir}/egldeviceintegrations/libqeglfs-x11-integration.so
 %{_qt5_plugindir}/xcbglintegrations/libqxcb-egl-integration.so
 %{_qt5_plugindir}/egldeviceintegrations/libqeglfs-kms-egldevice-integration.so
+%{_qt5_plugindir}/egldeviceintegrations/libqeglfs-emu-integration.so
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QMinimalEglIntegrationPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSIntegrationPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSX11IntegrationPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSKmsGbmIntegrationPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QXcbEglIntegrationPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSKmsEglDeviceIntegrationPlugin.cmake
+%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSEmulatorIntegrationPlugin.cmake
 %endif
 %{_qt5_plugindir}/platforms/libqlinuxfb.so
 %{_qt5_plugindir}/platforms/libqminimal.so
 %{_qt5_plugindir}/platforms/libqoffscreen.so
 %{_qt5_plugindir}/platforms/libqxcb.so
+%{_qt5_plugindir}/platforms/libqvnc.so
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QLinuxFbIntegrationPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QMinimalIntegrationPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QOffscreenIntegrationPlugin.cmake
+%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QVncIntegrationPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QXcbIntegrationPlugin.cmake
 %{_qt5_plugindir}/xcbglintegrations/libqxcb-glx-integration.so
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QXcbGlxIntegrationPlugin.cmake
@@ -1001,6 +964,9 @@ fi
 
 
 %changelog
+* Thu Sep 07 2017 Daniel Vrátil <dvratil@fedoraproject.org> - 5.9.1-1
+- Qt 5.9.1
+
 * Wed Jul 19 2017 Than Ngo <than@redhat.com> - 5.7.1-20
 - backported to fix bz#1120451, ZWNJ character on Persian keyboard not working 
 
