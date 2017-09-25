@@ -3,7 +3,9 @@
 %global multilib_basearchs x86_64 %{?mips64} ppc64 s390x sparc64
 
 # support openssl-1.1
+%if 0%{?fedora} > 26
 %global openssl11 1
+%endif
 %global openssl -openssl-linked
 
 # support qtchooser (adds qtchooser .conf file)
@@ -53,7 +55,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.9.1
-Release: 5%{?dist}
+Release: 6%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -109,6 +111,7 @@ Patch65: qtbase-opensource-src-5.9.0-mysql.patch
 
 ## upstream patches (5.9 branch)
 Patch486: 0086-Fix-detection-of-AT-SPI.patch
+Patch902: 0502-Only-call-mysql_library_end-once-when-using-MariaDB.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -284,7 +287,11 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 
 %package mysql
 Summary: MySQL driver for Qt5's SQL classes
+%if 0%{?fedora} > 27
+BuildRequires: mariadb-connector-c-devel
+%else
 BuildRequires: mysql-devel
+%endif
 Requires: %{name}%{?_isa} = %{version}-%{release}
 %description mysql
 %{summary}.
@@ -958,6 +965,11 @@ fi
 
 
 %changelog
+* Mon Sep 25 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.1-6
+- enable openssl11 support only for f27+ (for now)
+- Use mariadb-connector-c-devel, f28+ (#1493909)
+- Backport upstream mariadb patch
+
 * Wed Aug 02 2017 Than Ngo <than@redhat.com> - 5.9.1-5
 - added privat headers for Qt5 Xcb
 
