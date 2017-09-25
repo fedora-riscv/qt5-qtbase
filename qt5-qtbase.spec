@@ -348,7 +348,9 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %patch63 -p1 -b .openssl11
 %endif
 %patch64 -p1 -b .firebird
+%if 0%{?fedora} > 27
 %patch65 -p1 -b .mysql
+%endif
 
 %patch486 -p1 -b .0086
 
