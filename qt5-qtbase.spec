@@ -55,7 +55,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.9.1
-Release: 6%{?dist}
+Release: 7%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -353,6 +353,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %endif
 
 %patch486 -p1 -b .0086
+%patch902 -p1 -b .0502
 
 %if 0%{?inject_optflags}
 ## adjust $RPM_OPT_FLAGS
@@ -967,10 +968,13 @@ fi
 
 
 %changelog
+* Tue Sep 26 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.1-7
+- actually apply mariadb-related patch (#1491316)
+
 * Mon Sep 25 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.1-6
 - enable openssl11 support only for f27+ (for now)
 - Use mariadb-connector-c-devel, f28+ (#1493909)
-- Backport upstream mariadb patch
+- Backport upstream mariadb patch (#1491316)
 
 * Wed Aug 02 2017 Than Ngo <than@redhat.com> - 5.9.1-5
 - added privat headers for Qt5 Xcb
