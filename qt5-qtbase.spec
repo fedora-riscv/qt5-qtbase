@@ -55,7 +55,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.9.1
-Release: 7%{?dist}
+Release: 8%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -111,6 +111,7 @@ Patch65: qtbase-opensource-src-5.9.0-mysql.patch
 
 ## upstream patches (5.9 branch)
 Patch486: 0086-Fix-detection-of-AT-SPI.patch
+# refreshed/updated with https://codereview.qt-project.org/#/c/206850/
 Patch902: 0502-Only-call-mysql_library_end-once-when-using-MariaDB.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
@@ -968,6 +969,9 @@ fi
 
 
 %changelog
+* Wed Sep 27 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.1-8
+- refresh mariadb patch wrt cr#206850 (#1491316)
+
 * Tue Sep 26 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.1-7
 - actually apply mariadb-related patch (#1491316)
 
