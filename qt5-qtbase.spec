@@ -55,7 +55,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.9.1
-Release: 8%{?dist}
+Release: 9%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -969,6 +969,9 @@ fi
 
 
 %changelog
+* Wed Sep 27 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.1-9
+- refresh mariadb patch to actually match cr#206850 logic (#1491316)
+
 * Wed Sep 27 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.1-8
 - refresh mariadb patch wrt cr#206850 (#1491316)
 
