@@ -1,8 +1,13 @@
 diff --git a/src/plugins/sqldrivers/configure.json b/src/plugins/sqldrivers/configure.json
-index 234f880..d53f035 100644
+index 234f880..7b13671 100644
 --- a/src/plugins/sqldrivers/configure.json
 +++ b/src/plugins/sqldrivers/configure.json
-@@ -54,7 +54,8 @@
+@@ -50,11 +50,12 @@
+         "ibase": {
+             "label": "InterBase",
+             "test": {
+-                "include": "ibase.h"
++                "include": "firebird/ibase.h"
              },
              "sources": [
                  { "libs": "-lgds32_ms", "condition": "config.win32" },
