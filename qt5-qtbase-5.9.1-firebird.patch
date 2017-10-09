@@ -1,20 +1,9 @@
-diff -up qtbase-opensource-src-5.9.1/config.tests/unix/ibase/ibase.cpp.firebird qtbase-opensource-src-5.9.1/config.tests/unix/ibase/ibase.cpp
---- qtbase-opensource-src-5.9.1/config.tests/unix/ibase/ibase.cpp.firebird	2017-06-28 04:54:29.000000000 -0500
-+++ qtbase-opensource-src-5.9.1/config.tests/unix/ibase/ibase.cpp	2017-07-16 08:28:47.833992502 -0500
-@@ -37,7 +37,7 @@
- **
- ****************************************************************************/
- 
--#include <ibase.h>
-+#include <firebird/ibase.h>
- 
- int main(int, char **)
- {
-diff -up qtbase-opensource-src-5.9.1/src/plugins/sqldrivers/configure.json.firebird qtbase-opensource-src-5.9.1/src/plugins/sqldrivers/configure.json
---- qtbase-opensource-src-5.9.1/src/plugins/sqldrivers/configure.json.firebird	2017-06-28 04:54:29.000000000 -0500
-+++ qtbase-opensource-src-5.9.1/src/plugins/sqldrivers/configure.json	2017-07-16 12:38:43.730108724 -0500
-@@ -50,7 +50,8 @@
-             "test": "unix/ibase",
+diff --git a/src/plugins/sqldrivers/configure.json b/src/plugins/sqldrivers/configure.json
+index 234f880..d53f035 100644
+--- a/src/plugins/sqldrivers/configure.json
++++ b/src/plugins/sqldrivers/configure.json
+@@ -54,7 +54,8 @@
+             },
              "sources": [
                  { "libs": "-lgds32_ms", "condition": "config.win32" },
 -                { "libs": "-lgds", "condition": "!config.win32" }
@@ -23,15 +12,16 @@ diff -up qtbase-opensource-src-5.9.1/src/plugins/sqldrivers/configure.json.fireb
              ]
          },
          "mysql": {
-diff -up qtbase-opensource-src-5.9.1/src/plugins/sqldrivers/ibase/qsql_ibase_p.h.firebird qtbase-opensource-src-5.9.1/src/plugins/sqldrivers/ibase/qsql_ibase_p.h
---- qtbase-opensource-src-5.9.1/src/plugins/sqldrivers/ibase/qsql_ibase_p.h.firebird	2017-06-28 04:54:29.000000000 -0500
-+++ qtbase-opensource-src-5.9.1/src/plugins/sqldrivers/ibase/qsql_ibase_p.h	2017-07-16 08:28:47.833992502 -0500
+diff --git a/src/plugins/sqldrivers/ibase/qsql_ibase_p.h b/src/plugins/sqldrivers/ibase/qsql_ibase_p.h
+index c7cee41..6a9c56c 100644
+--- a/src/plugins/sqldrivers/ibase/qsql_ibase_p.h
++++ b/src/plugins/sqldrivers/ibase/qsql_ibase_p.h
 @@ -52,7 +52,7 @@
  //
- 
+
  #include <QtSql/qsqldriver.h>
 -#include <ibase.h>
 +#include <firebird/ibase.h>
- 
+
  #ifdef QT_PLUGIN
  #define Q_EXPORT_SQLDRIVER_IBASE
