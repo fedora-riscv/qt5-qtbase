@@ -3,7 +3,9 @@
 %global multilib_basearchs x86_64 %{?mips64} ppc64 s390x sparc64
 
 # support openssl-1.1
+%if 0%{?fedora} > 26
 %global openssl11 1
+%endif
 %global openssl -openssl-linked
 
 # support qtchooser (adds qtchooser .conf file)
@@ -52,7 +54,7 @@ BuildRequires: pkgconfig(libsystemd)
 
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
-Version: 5.9.1
+Version: 5.9.2
 Release: 1%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
@@ -108,7 +110,6 @@ Patch64: qt5-qtbase-5.9.1-firebird.patch
 Patch65: qtbase-opensource-src-5.9.0-mysql.patch
 
 ## upstream patches (5.9 branch)
-Patch486: 0086-Fix-detection-of-AT-SPI.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -284,7 +285,11 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 
 %package mysql
 Summary: MySQL driver for Qt5's SQL classes
+%if 0%{?fedora} > 27
+BuildRequires: mariadb-connector-c-devel
+%else
 BuildRequires: mysql-devel
+%endif
 Requires: %{name}%{?_isa} = %{version}-%{release}
 %description mysql
 %{summary}.
@@ -341,9 +346,9 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %patch63 -p1 -b .openssl11
 %endif
 %patch64 -p1 -b .firebird
+%if 0%{?fedora} > 27
 %patch65 -p1 -b .mysql
-
-%patch486 -p1 -b .0086
+%endif
 
 %if 0%{?inject_optflags}
 ## adjust $RPM_OPT_FLAGS
@@ -470,12 +475,6 @@ make %{?_smp_mflags} -C qmake \
   QMAKE_STRIP=
 %endif
 
-# Remove /usr/include from .qmake.stash to fix build with gcc 6
-# (gcc can't find <stdlib.h> if -isystem /usr/include is present,
-# and Qt for some reason generates it
-mv .qmake.stash .qmake.stash.old
-cat .qmake.stash.old | sed -e 's@\(/usr/local/include\) \\@\1@g'| sed -e '/\/usr\/include$/ { d; }' > .qmake.stash
-
 make %{?_smp_mflags}
 
 
@@ -506,7 +505,7 @@ translationdir=%{_qt5_translationdir}
 
 Name: Qt5
 Description: Qt5 Configuration
-Version: 5.9.1
+Version: 5.9.2
 EOF
 
 # rpm macros
@@ -964,29 +963,105 @@ fi
 
 
 %changelog
-* Thu Sep 07 2017 Daniel Vrátil <dvratil@fedoraproject.org> - 5.9.1-1
-- Qt 5.9.1
+* Mon Oct 09 2017 Jan Grulich <jgrulich@redhat.com> - 5.9.2-1
+- 5.9.2
 
-* Wed Jul 19 2017 Than Ngo <than@redhat.com> - 5.7.1-20
-- backported to fix bz#1120451, ZWNJ character on Persian keyboard not working 
+* Wed Sep 27 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.1-9
+- refresh mariadb patch to actually match cr#206850 logic (#1491316)
 
-* Mon Jul 17 2017 Than Ngo <than@redhat.com> - 5.7.1-19
-- fixed bz#1364717, Segfault in QDBusConnectionPrivate::closeConnection -> QObject::disconnect on exit
+* Wed Sep 27 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.1-8
+- refresh mariadb patch wrt cr#206850 (#1491316)
 
-* Fri Jul 07 2017 Than Ngo <than@redhat.com> - 5.7.1-18
+* Tue Sep 26 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.1-7
+- actually apply mariadb-related patch (#1491316)
+
+* Mon Sep 25 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.1-6
+- enable openssl11 support only for f27+ (for now)
+- Use mariadb-connector-c-devel, f28+ (#1493909)
+- Backport upstream mariadb patch (#1491316)
+
+* Wed Aug 02 2017 Than Ngo <than@redhat.com> - 5.9.1-5
+- added privat headers for Qt5 Xcb
+
+* Sun Jul 30 2017 Florian Weimer <fweimer@redhat.com> - 5.9.1-4
+- Rebuild with binutils fix for ppc64le (#1475636)
+
+* Thu Jul 27 2017 Than Ngo <than@redhat.com> - 5.9.1-3
+- fixed bz#1401459, backport openssl-1.1 support
+
+* Thu Jul 27 2017 Fedora Release Engineering <releng@fedoraproject.org> - 5.9.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Mass_Rebuild
+
+* Wed Jul 19 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.1-1
+- 5.9.1
+
+* Tue Jul 18 2017 Than Ngo <than@redhat.com> - 5.9.0-6
+- fixed bz#1442553, multilib issue
+
+* Fri Jul 14 2017 Than Ngo <than@redhat.com> - 5.9.0-5
+- fixed build issue with new mariadb
+
+* Thu Jul 06 2017 Than Ngo <than@redhat.com> - 5.9.0-4
 - fixed bz#1409600, stack overflow in QXmlSimpleReader, CVE-2016-10040
 
-* Mon May 15 2017 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 5.7.1-17
+* Fri Jun 16 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.0-3
+- create_cmake.prf: adjust CMAKE_NO_PRIVATE_INCLUDES (#1456211,QTBUG-37417)
+
+* Thu Jun 01 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.0-2
+- workaround gold linker issue with duplicate symbols (f27+, #1458003)
+
+* Wed May 31 2017 Helio Chissini de Castro <helio@kde.org> - 5.9.0-1
+- Upstream official release
+
+* Fri May 26 2017 Helio Chissini de Castro <helio@kde.org> - 5.9.0-0.1.rc
+- Upstream Release Candidate retagged
+
+* Wed May 24 2017 Helio Chissini de Castro <helio@kde.org> - 5.9.0-0.rc.1
+- Upstream Release Candidate 1
+
+* Tue May 16 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.0-0.6.beta3
+- -common: Obsoletes: qt5-qtquick1(-devel)
+
+* Mon May 15 2017 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 5.9.0-0.5.beta3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_26_27_Mass_Rebuild
 
-* Mon May 08 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.7.1-16
-- backport recommended qtdbus patches
+* Mon May 08 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.0-0.4.beta3
+- include recommended qtdbus patches, fix Release
 
-* Fri Feb 17 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.7.1-15
-- gcc7 FTBFS fix (#1423090)
+* Fri May 05 2017 Helio Chissini de Castro <helio@kde.org> - 5.9.0-0.beta.3
+- Beta 3 release
 
-* Thu Feb 09 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.7.1-14
-- 5.8 backport: Ensure a pixel density of at least 1 for Qt::AA_EnableHighDpiScaling (QTBUG-56140)
+* Fri Apr 14 2017 Helio Chissini de Castro <helio@kde.org> - 5.9.0-0.beta.1
+- No more docs, no more bootstrap. Docs comes now on a single package.
+
+* Thu Mar 30 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.8.0-8
+- de-bootstrap
+- make -doc arch'd (workaround bug #1437522)
+
+* Wed Mar 29 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.8.0-7
+- rebuild
+
+* Mon Mar 27 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.8.0-6
+- bootstrap (rawhide)
+- revert some minor changes introduced since 5.7
+- move *Plugin.cmake items to runtime (not -devel)
+
+* Sat Jan 28 2017 Helio Chissini de Castro <helio@kde.org> - 5.8.0-5
+- Really debootstrap :-P
+
+* Fri Jan 27 2017 Helio Chissini de Castro <helio@kde.org> - 5.8.0-4
+- Debootstrap
+- Use meta doctools package to build docs
+
+* Fri Jan 27 2017 Helio Chissini de Castro <helio@kde.org> - 5.8.0-3
+- Unify firebird patch for both versions
+- Bootstrap again for copr
+
+* Thu Jan 26 2017 Helio Chissini de Castro <helio@kde.org> - 5.8.0-2
+- Debootstrap after tools built. New tool needed qtattributionsscanner
+
+* Thu Jan 26 2017 Helio Chissini de Castro <helio@kde.org> - 5.8.0-1
+- Initial update for 5.8.0
 
 * Tue Jan 24 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.7.1-13
 - Broken window scaling (#1381828)
@@ -1031,7 +1106,7 @@ fi
 - New upstream version
 
 * Thu Oct 20 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.7.0-10
-- fix Source0 URL
+- fix Source0: https://download.qt.io/official_releases/qt/5.9/5.9.0/submodules/qtbase-opensource-src-5.9.0.tar.xz
 
 * Thu Sep 29 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.7.0-9
 - Requires: openssl-libs%%{?_isa} (#1328659)
@@ -1203,7 +1278,7 @@ fi
 - Crash in QXcbWindow::setParent() due to NULL xcbScreen (QTBUG-50081, #1291003)
 
 * Mon Dec 21 2015 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.17.beta
-- fix/update Release: tag
+- fix/update Release: 1%{?dist}
 
 * Fri Dec 18 2015 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.16
 - 5.6.0-beta (final)
