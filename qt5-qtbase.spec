@@ -55,7 +55,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.9.2
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -108,6 +108,7 @@ Patch64: qt5-qtbase-5.9.1-firebird.patch
 
 # fix for new mariadb
 Patch65: qtbase-opensource-src-5.9.0-mysql.patch
+Patch66: qtbase-mariadb.patch
 
 ## upstream patches (5.9 branch)
 
@@ -349,6 +350,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %if 0%{?fedora} > 27
 %patch65 -p1 -b .mysql
 %endif
+%patch66 -p1 -b .mariadb
 
 %if 0%{?inject_optflags}
 ## adjust $RPM_OPT_FLAGS
@@ -963,6 +965,9 @@ fi
 
 
 %changelog
+* Thu Oct 19 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.2-2
+- refresh mariadb patch support (upstreamed version apparently incomplete)
+
 * Mon Oct 09 2017 Jan Grulich <jgrulich@redhat.com> - 5.9.2-1
 - 5.9.2
 
