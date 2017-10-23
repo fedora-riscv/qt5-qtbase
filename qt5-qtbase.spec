@@ -3,7 +3,7 @@
 %global multilib_basearchs x86_64 %{?mips64} ppc64 s390x sparc64
 
 # support openssl-1.1
-%if 0%{?fedora} > 25
+%if 0%{?fedora} > 26
 %global openssl11 1
 %endif
 %global openssl -openssl-linked
