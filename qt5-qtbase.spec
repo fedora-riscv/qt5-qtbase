@@ -55,7 +55,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.9.2
-Release: 3%{?dist}
+Release: 4%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -111,6 +111,8 @@ Patch65: qtbase-opensource-src-5.9.0-mysql.patch
 Patch66: qtbase-mariadb.patch
 
 ## upstream patches (5.9 branch)
+
+Patch106: 0106-Fix-dragging-inside-a-modal-window-when-a-QShapedPix.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -340,6 +342,9 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 
 %prep
 %setup -q -n %{qt_module}-opensource-src-%{version}
+
+## upstream fixes
+%patch106 -p1
 
 %patch4 -p1 -b .QTBUG-35459
 
@@ -972,6 +977,9 @@ fi
 
 
 %changelog
+* Mon Nov 06 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.2-4
+- QListView upstream regression (#1509649, QTBUG-63846)
+
 * Mon Oct 23 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.2-3
 - pass QMAKE_*_RELEASE to configure to ensure optflags get used (#1505260)
 

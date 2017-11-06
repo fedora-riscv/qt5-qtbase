@@ -1,0 +1,45 @@
+From acdb3340321d1b8823b54f2ea492f975c6f942d8 Mon Sep 17 00:00:00 2001
+From: Andy Shaw <andy.shaw@qt.io>
+Date: Fri, 27 Oct 2017 08:36:25 +0200
+Subject: [PATCH 106/127] Fix dragging inside a modal window when a
+ QShapedPixmapWindow is used
+
+A regression was introduced with a3d59c7c7f675b0a4e128efeb781aa1c2f7db4c0
+which caused dragging to fail within a modal dialog on the XCB platform.
+By adding an exception for the QShapedPixmapWindow, which is the window
+used for the drag, we can allow that to continue to work whilst blocking
+to the other newly created windows.
+
+Task-number: QTBUG-63846
+Change-Id: I7c7f365f30fcf5f04f50dc1a7fff7a09e6e5ed6c
+Reviewed-by: Richard Moe Gustavsen <richard.gustavsen@qt.io>
+---
+ src/gui/kernel/qwindow.cpp | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/src/gui/kernel/qwindow.cpp b/src/gui/kernel/qwindow.cpp
+index 43b201e9b0..9e5b687851 100644
+--- a/src/gui/kernel/qwindow.cpp
++++ b/src/gui/kernel/qwindow.cpp
+@@ -54,6 +54,7 @@
+ #  include "qaccessible.h"
+ #endif
+ #include "qhighdpiscaling_p.h"
++#include "qshapedpixmapdndwindow_p.h"
+ 
+ #include <private/qevent_p.h>
+ 
+@@ -576,7 +577,9 @@ void QWindow::setVisible(bool visible)
+             QGuiApplicationPrivate::showModalWindow(this);
+         else
+             QGuiApplicationPrivate::hideModalWindow(this);
+-    } else if (visible && QGuiApplication::modalWindow()) {
++    // QShapedPixmapWindow is used on some platforms for showing a drag pixmap, so don't block
++    // input to this window as it is performing a drag - QTBUG-63846
++    } else if (visible && QGuiApplication::modalWindow() && !qobject_cast<QShapedPixmapWindow *>(this)) {
+         QGuiApplicationPrivate::updateBlockedStatus(this);
+     }
+ 
+-- 
+2.14.3
+
