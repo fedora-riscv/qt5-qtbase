@@ -55,7 +55,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.9.3
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -981,6 +981,9 @@ fi
 
 
 %changelog
+* Thu Nov 30 2017 Pete Walter <pwalter@fedoraproject.org> - 5.9.3-3
+- Rebuild for ICU 60.1
+
 * Thu Nov 30 2017 Than Ngo <than@redhat.com> - 5.9.3-2
 - bz#1518958, backport to fix out of bounds reads in qdnslookup_unix
 
