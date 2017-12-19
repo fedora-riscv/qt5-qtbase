@@ -1,58 +1,41 @@
---- qtbase-opensource-src-5.7.1/src/plugins/platforms/xcb/qxcbconnection.cpp	2016-12-01 02:17:04.000000000 -0600
-+++ qtbase-opensource-src-5.7.1/src/plugins/platforms/xcb.new/qxcbconnection.cpp	2017-09-20 15:41:47.057359162 -0500
-@@ -109,6 +109,9 @@
- Q_LOGGING_CATEGORY(lcQpaXInputDevices, "qt.qpa.input.devices")
- Q_LOGGING_CATEGORY(lcQpaXInputEvents, "qt.qpa.input.events")
+From 911762e077c8b2f9795171c1e628942a0a979801 Mon Sep 17 00:00:00 2001
+From: Jan Grulich <jgrulich@redhat.com>
+Date: Fri, 15 Dec 2017 11:56:12 +0100
+Subject: foo
+
+
+diff --git a/src/plugins/platforms/xcb/qxcbconnection.cpp b/src/plugins/platforms/xcb/qxcbconnection.cpp
+index 536c709..c6eb1b1 100644
+--- a/src/plugins/platforms/xcb/qxcbconnection.cpp
++++ b/src/plugins/platforms/xcb/qxcbconnection.cpp
+@@ -111,6 +111,8 @@ Q_LOGGING_CATEGORY(lcQpaXInputEvents, "qt.qpa.input.events")
  Q_LOGGING_CATEGORY(lcQpaScreen, "qt.qpa.screen")
-+Q_LOGGING_CATEGORY(lcQpaXcb, "qt.qpa.xcb")
+ Q_LOGGING_CATEGORY(lcQpaEvents, "qt.qpa.events")
+ Q_LOGGING_CATEGORY(lcQpaXcb, "qt.qpa.xcb") // for general (uncategorized) XCB logging
 +Q_LOGGING_CATEGORY(lcQpaXcbError, "qt.qpa.xcb.xcberror")
 +// TODO: How to categorize by xcberror type? (e.g. only BadWindow)
- 
+ Q_LOGGING_CATEGORY(lcQpaPeeker, "qt.qpa.peeker")
+
  // this event type was added in libxcb 1.10,
- // but we support also older version
-@@ -996,7 +999,9 @@
+@@ -964,7 +966,8 @@ void QXcbConnection::handleXcbError(xcb_generic_error_t *error)
      uint clamped_error_code = qMin<uint>(error->error_code, (sizeof(xcb_errors) / sizeof(xcb_errors[0])) - 1);
      uint clamped_major_code = qMin<uint>(error->major_code, (sizeof(xcb_protocol_request_codes) / sizeof(xcb_protocol_request_codes[0])) - 1);
- 
+
 -    qWarning("QXcbConnection: XCB error: %d (%s), sequence: %d, resource id: %d, major code: %d (%s), minor code: %d",
-+    //TODO: Make the category filterable based on the XCB Error
 +    qCWarning(lcQpaXcbError,
 +           "QXcbConnection: XCB error: %d (%s), sequence: %d, resource id: %d, major code: %d (%s), minor code: %d",
             int(error->error_code), xcb_errors[clamped_error_code],
             int(error->sequence), int(error->resource_id),
             int(error->major_code), xcb_protocol_request_codes[clamped_major_code],
-@@ -1006,19 +1011,19 @@
-     int i = 0;
-     for (; i < m_callLog.size(); ++i) {
-         if (m_callLog.at(i).sequence == error->sequence) {
--            qDebug("Caused by: %s:%d", m_callLog.at(i).file.constData(), m_callLog.at(i).line);
-+            qCDebug(lcQpaXcbError, "Caused by: %s:%d", m_callLog.at(i).file.constData(), m_callLog.at(i).line);
-             break;
-         } else if (m_callLog.at(i).sequence > error->sequence) {
--            qDebug("Caused some time before: %s:%d", m_callLog.at(i).file.constData(),
-+            qCDebug(lcQpaXcbError, "Caused some time before: %s:%d", m_callLog.at(i).file.constData(),
-                    m_callLog.at(i).line);
-             if (i > 0)
--                qDebug("and after: %s:%d", m_callLog.at(i-1).file.constData(),
-+                qCDebug(lcQpaXcbError, "and after: %s:%d", m_callLog.at(i-1).file.constData(),
-                        m_callLog.at(i-1).line);
-             break;
-         }
-     }
-     if (i == m_callLog.size() && !m_callLog.isEmpty())
--        qDebug("Caused some time after: %s:%d", qAsConst(m_callLog).first().file.constData(),
-+        qCDebug(lcQpaXcbError, "Caused some time after: %s:%d", qAsConst(m_callLog).first().file.constData(),
-                qAsConst(m_callLog).first().line);
- #endif
- }
---- qtbase-opensource-src-5.7.1/src/plugins/platforms/xcb/qxcbconnection.h	2016-12-01 02:17:04.000000000 -0600
-+++ qtbase-opensource-src-5.7.1/src/plugins/platforms/xcb.new/qxcbconnection.h	2017-09-20 15:35:55.655555316 -0500
-@@ -87,6 +87,8 @@
- Q_DECLARE_LOGGING_CATEGORY(lcQpaXInputDevices)
- Q_DECLARE_LOGGING_CATEGORY(lcQpaXInputEvents)
+diff --git a/src/plugins/platforms/xcb/qxcbconnection.h b/src/plugins/platforms/xcb/qxcbconnection.h
+index 999dc06..554611c 100644
+--- a/src/plugins/platforms/xcb/qxcbconnection.h
++++ b/src/plugins/platforms/xcb/qxcbconnection.h
+@@ -91,6 +91,7 @@ Q_DECLARE_LOGGING_CATEGORY(lcQpaXInputEvents)
  Q_DECLARE_LOGGING_CATEGORY(lcQpaScreen)
-+Q_DECLARE_LOGGING_CATEGORY(lcQpaXcb)
+ Q_DECLARE_LOGGING_CATEGORY(lcQpaEvents)
+ Q_DECLARE_LOGGING_CATEGORY(lcQpaXcb)
 +Q_DECLARE_LOGGING_CATEGORY(lcQpaXcbError)
- 
+ Q_DECLARE_LOGGING_CATEGORY(lcQpaPeeker)
+
  class QXcbVirtualDesktop;
- class QXcbScreen;

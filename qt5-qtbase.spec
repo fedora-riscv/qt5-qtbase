@@ -54,13 +54,13 @@ BuildRequires: pkgconfig(libsystemd)
 
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
-Version: 5.9.3
-Release: 3%{?dist}
+Version: 5.10.0
+Release: 1%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
 Url:     http://qt-project.org/
-Source0: https://download.qt.io/official_releases/qt/5.9/%{version}/submodules/%{qt_module}-opensource-src-%{version}.tar.xz
+Source0: https://download.qt.io/official_releases/qt/5.10/%{version}/submodules/%{qt_module}-everywhere-src-%{version}.tar.xz
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1227295
 Source1: qtlogging.ini
@@ -99,9 +99,6 @@ Patch52: qtbase-opensource-src-5.7.1-moc_macros.patch
 
 # drop -O3 and make -O2 by default
 Patch61: qt5-qtbase-cxxflag.patch
-
-# backport from upstream
-Patch63: qt5-qtbase-5.9.1-openssl11.patch
 
 # support firebird version 3.x
 Patch64: qt5-qtbase-5.9.1-firebird.patch
@@ -345,7 +342,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 
 
 %prep
-%setup -q -n %{qt_module}-opensource-src-%{version}
+%setup -q -n %{qt_module}-everywhere-src-%{version}
 
 ## upstream fixes
 %patch4 -p1 -b .QTBUG-35459
@@ -354,9 +351,6 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %patch51 -p1 -b .hidpi_scale_at_192
 %patch52 -p1 -b .moc_macros
 %patch61 -p1 -b .qt5-qtbase-cxxflag
-%if 0%{?openssl11}
-%patch63 -p1 -b .openssl11
-%endif
 %patch64 -p1 -b .firebird
 %if 0%{?fedora} > 27
 %patch65 -p1 -b .mysql
@@ -743,6 +737,7 @@ fi
 %{_bindir}/uic*
 %{_bindir}/qlalr
 %{_bindir}/fixqt4headers.pl
+%{_bindir}/qvkgen
 %{_qt5_bindir}/moc*
 %{_qt5_bindir}/qdbuscpp2xml*
 %{_qt5_bindir}/qdbusxml2cpp*
@@ -752,6 +747,7 @@ fi
 %{_qt5_bindir}/uic*
 %{_qt5_bindir}/qlalr
 %{_qt5_bindir}/fixqt4headers.pl
+%{_qt5_bindir}/qvkgen
 %if "%{_qt5_headerdir}" != "%{_includedir}"
 %dir %{_qt5_headerdir}
 %endif
@@ -770,6 +766,7 @@ fi
 %{_qt5_headerdir}/QtXml/
 %{_qt5_headerdir}/QtEglFSDeviceIntegration
 %{_qt5_headerdir}/QtInputSupport
+%{_qt5_headerdir}/QtEdidSupport
 %{_qt5_archdatadir}/mkspecs/
 %{_qt5_libdir}/libQt5Concurrent.prl
 %{_qt5_libdir}/libQt5Concurrent.so
@@ -878,6 +875,8 @@ fi
 %{_qt5_libdir}/libQt5KmsSupport.*a
 %{_qt5_libdir}/libQt5KmsSupport.prl
 %{_qt5_headerdir}/QtKmsSupport
+%{_qt5_libdir}/libQt5EdidSupport.*a
+%{_qt5_libdir}/libQt5EdidSupport.prl
 
 %if 0%{?examples}
 %files examples
@@ -981,6 +980,9 @@ fi
 
 
 %changelog
+* Fri Dec 15 2017 Jan Grulich <jgrulich@redhat.com> - 5.10.0-1
+- 5.10.0
+
 * Thu Nov 30 2017 Pete Walter <pwalter@fedoraproject.org> - 5.9.3-3
 - Rebuild for ICU 60.1
 
