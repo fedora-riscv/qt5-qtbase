@@ -351,7 +351,6 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %setup -q -n %{qt_module}-opensource-src-%{version}
 
 ## upstream fixes
-%patch100 -p1 -b .QTBUG-64742-out-of-bounds-in-qdnslookup_unix
 %patch106 -p1
 
 %patch4 -p1 -b .QTBUG-35459
@@ -369,6 +368,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %endif
 %patch66 -p1 -b .mariadb
 %patch67 -p1 -b .xcberror_filter
+%patch100 -p1 -b .QTBUG-64742-out-of-bounds-in-qdnslookup_unix
 
 %if 0%{?inject_optflags}
 ## adjust $RPM_OPT_FLAGS
