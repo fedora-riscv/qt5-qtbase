@@ -54,8 +54,8 @@ BuildRequires: pkgconfig(libsystemd)
 
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
-Version: 5.9.3
-Release: 2%{?dist}
+Version: 5.9.4
+Release: 1%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -116,7 +116,6 @@ Patch66: qtbase-mariadb.patch
 Patch67: https://bugreports.qt.io/secure/attachment/66353/xcberror_filter.patch
 
 ## upstream patches (5.9 branch)
-Patch100: qtbase-opensource-src-5.9.3-QTBUG-64742-out-of-bounds-in-qdnslookup_unix.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -131,8 +130,6 @@ BuildRequires: cups-devel
 BuildRequires: desktop-file-utils
 BuildRequires: findutils
 BuildRequires: libjpeg-devel
-BuildRequires: libmng-devel
-BuildRequires: libtiff-devel
 BuildRequires: pkgconfig(alsa)
 # required for -accessibility
 BuildRequires: pkgconfig(atspi-2)
@@ -363,7 +360,6 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %endif
 %patch66 -p1 -b .mariadb
 %patch67 -p1 -b .xcberror_filter
-%patch100 -p1 -b .QTBUG-64742-out-of-bounds-in-qdnslookup_unix
 
 %if 0%{?inject_optflags}
 ## adjust $RPM_OPT_FLAGS
@@ -523,7 +519,7 @@ translationdir=%{_qt5_translationdir}
 
 Name: Qt5
 Description: Qt5 Configuration
-Version: 5.9.2
+Version: 5.9.4
 EOF
 
 # rpm macros
@@ -981,6 +977,9 @@ fi
 
 
 %changelog
+* Tue Jan 23 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.9.4-1
+- 5.9.4
+
 * Thu Nov 30 2017 Than Ngo <than@redhat.com> - 5.9.3-2
 - bz#1518958, backport to fix out of bounds reads in qdnslookup_unix
 
