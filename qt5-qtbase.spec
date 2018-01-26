@@ -27,26 +27,22 @@
 
 %global rpm_macros_dir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
-%if 0%{?fedora} > 21
 # use external qt_settings pkg
 %global qt_settings 1
-%endif
 
 # See http://bugzilla.redhat.com/1279265
 %if 0%{?fedora} < 24
 %global inject_optflags 1
 %endif
 
-%if 0%{?fedora} > 23 || 0%{?rhel} > 6
 %global journald -journald
 BuildRequires: pkgconfig(libsystemd)
-%endif
 
 %if 0%{?fedora} > 23
 # gcc6: FTBFS
-%global qt5_deprecated_flag -Wno-deprecated-declarations
+#global qt5_deprecated_flag -Wno-deprecated-declarations
 # gcc6: Qt assumes this in places
-%global qt5_null_flag -fno-delete-null-pointer-checks
+#global qt5_null_flag -fno-delete-null-pointer-checks
 %endif
 
 %global examples 1
@@ -55,7 +51,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.10.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -225,9 +221,8 @@ Requires: %{name}-common = %{version}-%{release}
 # workaround gold linker bug by not using it
 # https://bugzilla.redhat.com/1458003
 # https://sourceware.org/bugzilla/show_bug.cgi?id=21074
-%if 0%{?fedora} > 26
-%global use_gold_linker -no-use-gold-linker
-%endif
+# reportedly fixed or worked-around, re-enable if there's evidence of problems -- rex
+#global use_gold_linker -no-use-gold-linker
 
 %description
 Qt is a software toolkit for developing applications.
@@ -980,6 +975,11 @@ fi
 
 
 %changelog
+* Fri Jan 26 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.10.0-2
+- re-enable gold linker (#1458003)
+- drop qt5_null_flag/qt5_deprecated_flag hacks (should be fixed upstream for awhile)
+- make qt_settings/journald support unconditional
+
 * Fri Dec 15 2017 Jan Grulich <jgrulich@redhat.com> - 5.10.0-1
 - 5.10.0
 
