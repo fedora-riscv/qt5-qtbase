@@ -51,7 +51,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.10.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -92,6 +92,13 @@ Patch51: qtbase-hidpi_scale_at_192.patch
 # https://bugreports.qt.io/browse/QTBUG-49972
 # 2. Workaround sysmacros.h (pre)defining major/minor a breaking stuff
 Patch52: qtbase-opensource-src-5.7.1-moc_macros.patch
+
+# QMimeType: remove unwanted *.bin as preferredSuffix for octet-stream
+# This leads to an automatically appended .bin when saving a file.
+# https://bugs.freedesktop.org/show_bug.cgi?id=101667
+# https://bugs.kde.org/382437
+# Fixed upstream in shared-mime-info 1.10
+Patch53: qtbase-fdo101667.patch
 
 # drop -O3 and make -O2 by default
 Patch61: qt5-qtbase-cxxflag.patch
@@ -345,6 +352,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %patch50 -p1 -b .QT_VERSION_CHECK
 %patch51 -p1 -b .hidpi_scale_at_192
 %patch52 -p1 -b .moc_macros
+%patch53 -p1 -b .fdo101667
 %patch61 -p1 -b .qt5-qtbase-cxxflag
 %patch64 -p1 -b .firebird
 %if 0%{?fedora} > 27
@@ -975,6 +983,9 @@ fi
 
 
 %changelog
+* Sun Jan 28 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.10.0-3
+- QMimeType: remove unwanted *.bin as preferredSuffix for octet-stream (fdo#101667,kde#382437)
+
 * Fri Jan 26 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.10.0-2
 - re-enable gold linker (#1458003)
 - drop qt5_null_flag/qt5_deprecated_flag hacks (should be fixed upstream for awhile)
