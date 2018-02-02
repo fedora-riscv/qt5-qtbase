@@ -1,0 +1,31 @@
+From a69a0e8254b79c62fad7372e8c14f66d440ad744 Mon Sep 17 00:00:00 2001
+From: Laszlo Agocs <laszlo.agocs@qt.io>
+Date: Tue, 23 Jan 2018 10:21:49 +0100
+Subject: [PATCH 50/74] glx: Avoid losing the stereo flag in QSurfaceFormat
+
+Task-number: QTBUG-59636
+Change-Id: I38394009993e92ab9db853a1450687fc48e471f5
+Reviewed-by: Andy Nichols <andy.nichols@qt.io>
+---
+ src/plugins/platforms/xcb/gl_integrations/xcb_glx/qglxintegration.cpp | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qglxintegration.cpp b/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qglxintegration.cpp
+index e2e573f0e1..fc1806f982 100644
+--- a/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qglxintegration.cpp
++++ b/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qglxintegration.cpp
+@@ -134,7 +134,11 @@ static void updateFormatFromContext(QSurfaceFormat &format)
+     }
+ 
+     format.setProfile(QSurfaceFormat::NoProfile);
++    const bool isStereo = format.testOption(QSurfaceFormat::StereoBuffers);
+     format.setOptions(QSurfaceFormat::FormatOptions());
++    // Restore flags that come from the VisualInfo/FBConfig.
++    if (isStereo)
++        format.setOption(QSurfaceFormat::StereoBuffers);
+ 
+     if (format.renderableType() == QSurfaceFormat::OpenGL) {
+         if (format.version() < qMakePair(3, 0)) {
+-- 
+2.14.3
+

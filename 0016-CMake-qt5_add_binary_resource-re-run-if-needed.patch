@@ -1,0 +1,33 @@
+From 43e444d1ffac9d63eeb2053465d02ce4a6cc7410 Mon Sep 17 00:00:00 2001
+From: Kevin Funk <kevin.funk@kdab.com>
+Date: Fri, 29 Sep 2017 23:53:29 +0200
+Subject: [PATCH 16/74] CMake: qt5_add_binary_resource: re-run if needed
+
+qt5_add_binary_resources() macro did not recompile for CMake generated
+input before this patch.
+
+Adding the input files to the DEPENDS option corrects this issue:
+
+Task-number: QTBUG-60714
+Change-Id: I0f46918c6f1079fed7ee1b21305b18ff38f863f8
+Reviewed-by: David Faure <david.faure@kdab.com>
+---
+ src/corelib/Qt5CoreMacros.cmake | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/corelib/Qt5CoreMacros.cmake b/src/corelib/Qt5CoreMacros.cmake
+index 8b65db95cb..8d3dbe3ecf 100644
+--- a/src/corelib/Qt5CoreMacros.cmake
++++ b/src/corelib/Qt5CoreMacros.cmake
+@@ -257,7 +257,7 @@ function(QT5_ADD_BINARY_RESOURCES target )
+     add_custom_command(OUTPUT ${rcc_destination}
+                        COMMAND ${Qt5Core_RCC_EXECUTABLE}
+                        ARGS ${rcc_options} --binary --name ${target} --output ${rcc_destination} ${infiles}
+-                       DEPENDS ${rc_depends} ${out_depends} VERBATIM)
++                       DEPENDS ${rc_depends} ${out_depends} ${infiles} VERBATIM)
+     add_custom_target(${target} ALL DEPENDS ${rcc_destination})
+ endfunction()
+ 
+-- 
+2.14.3
+
