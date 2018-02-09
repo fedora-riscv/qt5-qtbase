@@ -51,7 +51,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.10.0
-Release: 4%{?dist}
+Release: 5%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -77,6 +77,12 @@ Patch2: qtbase-multilib_optflags.patch
 
 # fix QTBUG-35459 (too low entityCharacterLimit=1024 for CVE-2013-4549)
 Patch4: qtbase-opensource-src-5.3.2-QTBUG-35459.patch
+
+# borrowed from opensuse
+# track private api via properly versioned symbols
+# downside: binaries produced with these differently-versioned symbols are no longer
+# compatible with qt-project.org's Qt binary releases.
+Patch8: tell-the-truth-about-private-api.patch
 
 # upstreamable patches
 # namespace QT_VERSION_CHECK to workaround major/minor being pre-defined (#1396755)
@@ -348,6 +354,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 
 ## upstream fixes
 %patch4 -p1 -b .QTBUG-35459
+%patch8 -p1
 
 %patch50 -p1 -b .QT_VERSION_CHECK
 %patch51 -p1 -b .hidpi_scale_at_192
@@ -983,6 +990,9 @@ fi
 
 
 %changelog
+* Fri Feb 09 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.10.0-5
+- track private api use via properly versioned symbols
+
 * Fri Feb 09 2018 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 5.10.0-4
 - Escape macros in %%changelog
 
