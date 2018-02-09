@@ -354,7 +354,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 
 ## upstream fixes
 %patch4 -p1 -b .QTBUG-35459
-%patch8 -p1
+#patch8 -p1
 
 %patch50 -p1 -b .QT_VERSION_CHECK
 %patch51 -p1 -b .hidpi_scale_at_192
@@ -991,7 +991,7 @@ fi
 
 %changelog
 * Fri Feb 09 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.10.0-5
-- track private api use via properly versioned symbols
+- track private api use via properly versioned symbols (unused for now)
 
 * Fri Feb 09 2018 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 5.10.0-4
 - Escape macros in %%changelog
