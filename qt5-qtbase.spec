@@ -55,7 +55,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.9.4
-Release: 3%{?dist}
+Release: 4%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -381,7 +381,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %patch116 -p1 -b .0016
 %patch445 -p1 -b .0045
 %patch150 -p1 -b .0050
-%patch168 -p1 -b .0068
+#patch168 -p1 -b .0068
 %patch169 -p1 -b .0069
 %patch170 -p1 -b .0070
 
@@ -1001,6 +1001,9 @@ fi
 
 
 %changelog
+* Tue Feb 13 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.9.4-4
+- omit 0068-QHeaderView.patch, reports of regression'y behavior
+
 * Fri Feb 02 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.9.4-3
 - 5.9 branch fixes
 
