@@ -1,13 +1,14 @@
-diff -up qtbase-opensource-src-5.9.2/src/plugins/sqldrivers/mysql/qsql_mysql.cpp.rex qtbase-opensource-src-5.9.2/src/plugins/sqldrivers/mysql/qsql_mysql.cpp
---- qtbase-opensource-src-5.9.2/src/plugins/sqldrivers/mysql/qsql_mysql.cpp.rex	2017-10-02 03:43:38.000000000 -0500
-+++ qtbase-opensource-src-5.9.2/src/plugins/sqldrivers/mysql/qsql_mysql.cpp	2017-10-19 14:56:16.752878279 -0500
-@@ -1159,14 +1159,15 @@ static void qLibraryInit()
+diff --git a/src/plugins/sqldrivers/mysql/qsql_mysql.cpp b/src/plugins/sqldrivers/mysql/qsql_mysql.cpp
+index 365f899..9ff415d 100644
+--- a/src/plugins/sqldrivers/mysql/qsql_mysql.cpp
++++ b/src/plugins/sqldrivers/mysql/qsql_mysql.cpp
+@@ -1160,14 +1160,15 @@ static void qLibraryInit()
  # endif // MYSQL_VERSION_ID
  #endif // Q_NO_MYSQL_EMBEDDED
  
 -#ifdef MARIADB_BASE_VERSION
 +#if defined(MARIADB_BASE_VERSION) || defined(MARIADB_VERSION_ID)
-     qAddPostRoutine(mysql_server_end);
+     qAddPostRoutine([]() { mysql_server_end(); });
  #endif
  }
  
