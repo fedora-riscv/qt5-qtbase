@@ -51,7 +51,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.10.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -351,7 +351,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 
 ## upstream fixes
 %patch4 -p1 -b .QTBUG-35459
-#patch8 -p1
+patch8 -p1
 
 %patch50 -p1 -b .QT_VERSION_CHECK
 %patch51 -p1 -b .hidpi_scale_at_192
@@ -986,6 +986,9 @@ fi
 
 
 %changelog
+* Tue Feb 13 2018 Jan Grulich <jgrulich@redhat.com> - 5.10.1-2
+- enable patch to track private api
+
 * Tue Feb 13 2018 Jan Grulich <jgrulich@redhat.com> - 5.10.1-1
 - 5.10.1
 
