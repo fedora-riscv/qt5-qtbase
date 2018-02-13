@@ -351,7 +351,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 
 ## upstream fixes
 %patch4 -p1 -b .QTBUG-35459
-patch8 -p1
+%patch8 -p1 -b .tell-the-truth-about-private-api
 
 %patch50 -p1 -b .QT_VERSION_CHECK
 %patch51 -p1 -b .hidpi_scale_at_192
