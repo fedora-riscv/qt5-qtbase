@@ -51,7 +51,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.10.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -105,6 +105,9 @@ Patch52: qtbase-opensource-src-5.7.1-moc_macros.patch
 # https://bugs.kde.org/382437
 # Fixed upstream in shared-mime-info 1.10
 Patch53: qtbase-fdo101667.patch
+
+# respect QMAKE_LFLAGS_RELEASE when building qmake
+Patch54: qtbase-qmake_LFLAGS.patch
 
 # drop -O3 and make -O2 by default
 Patch61: qt5-qtbase-cxxflag.patch
@@ -357,6 +360,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %patch51 -p1 -b .hidpi_scale_at_192
 %patch52 -p1 -b .moc_macros
 %patch53 -p1 -b .fdo101667
+%patch54 -p1 -b .qmake_LFLAGS
 %patch61 -p1 -b .qt5-qtbase-cxxflag
 %patch64 -p1 -b .firebird
 %if 0%{?fedora} > 27
@@ -986,6 +990,9 @@ fi
 
 
 %changelog
+* Thu Feb 15 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.10.1-3
+- qt5-qtbase: RPM build flags only partially injected (#1543888)
+
 * Tue Feb 13 2018 Jan Grulich <jgrulich@redhat.com> - 5.10.1-2
 - enable patch to track private api
 
