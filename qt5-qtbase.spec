@@ -51,7 +51,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.10.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -497,7 +497,7 @@ make %{?_smp_mflags} -C qmake \
   QMAKE_STRIP=
 %endif
 
-make %{?_smp_mflags}
+%make_build
 
 
 %install
@@ -639,7 +639,7 @@ fi
 %endif
 
 %post
-/sbin/ldconfig
+%{?ldconfig}
 %if 0%{?qtchooser}
 %{_sbindir}/update-alternatives \
   --install %{_sysconfdir}/xdg/qtchooser/5.conf \
@@ -655,7 +655,7 @@ fi
 %endif
 
 %postun
-/sbin/ldconfig
+%{?ldconfig}
 %if 0%{?qtchooser}
 if [ $1 -eq 0 ]; then
 %{_sbindir}/update-alternatives  \
@@ -669,7 +669,6 @@ fi
 %endif
 
 %files
-%{!?_licensedir:%global license %%doc}
 %license LICENSE.LGPL* LGPL_EXCEPTION.txt LICENSE.FDL
 %if 0%{?qtchooser}
 %dir %{_sysconfdir}/xdg/qtchooser
@@ -990,6 +989,10 @@ fi
 
 
 %changelog
+* Fri Feb 16 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.10.1-4
+- use %%make_build, %%ldconfig
+- drop %%_licensedir hack
+
 * Thu Feb 15 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.10.1-3
 - qt5-qtbase: RPM build flags only partially injected (#1543888)
 
