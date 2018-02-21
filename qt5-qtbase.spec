@@ -55,7 +55,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.9.4
-Release: 4%{?dist}
+Release: 5%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -103,6 +103,9 @@ Patch52: qtbase-opensource-src-5.7.1-moc_macros.patch
 # https://bugs.kde.org/382437
 # Fixed upstream in shared-mime-info 1.10
 Patch53: qtbase-fdo101667.patch
+
+# https://bugreports.qt.io/browse/QTBUG-66420
+Patch55: https://bugreports.qt.io/secure/attachment/69873/opengl-Bail-if-cached-shader-fails-to-load.patch
 
 # drop -O3 and make -O2 by default
 Patch61: qt5-qtbase-cxxflag.patch
@@ -365,6 +368,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %patch51 -p1 -b .hidpi_scale_at_192
 %patch52 -p1 -b .moc_macros
 %patch53 -p1 -b .fdo101667
+%patch55 -p1 -b .QTBUG-66420
 %patch61 -p1 -b .qt5-qtbase-cxxflag
 %if 0%{?openssl11}
 %patch63 -p1 -b .openssl11
@@ -1001,6 +1005,9 @@ fi
 
 
 %changelog
+* Wed Feb 21 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.9.4-5
+- QOpenGLShaderProgram: glProgramBinary() resulting in LINK_STATUS=FALSE not handled properly (QTBUG-66420)
+
 * Tue Feb 13 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.9.4-4
 - omit 0068-QHeaderView.patch, reports of regression'y behavior
 
