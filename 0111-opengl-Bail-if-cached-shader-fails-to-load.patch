@@ -1,9 +1,7 @@
-From 3bb3ee936f27e9749bf1a2c4bd5ded2f5167663f Mon Sep 17 00:00:00 2001
-From: Max Staudt <mstaudt@suse.de>
-Date: Mon, 12 Feb 2018 15:07:29 +0100
-Subject: [PATCH] opengl: Bail if cached shader fails to load
-References: boo#1080578, boo#1079465
-Signed-off-by: Max Staudt <mstaudt@suse.de>
+From ef20989bf05c13b18eba4aac6f464c5be71136fa Mon Sep 17 00:00:00 2001
+From: Antonio Larrosa <alarrosa@suse.com>
+Date: Fri, 16 Feb 2018 13:18:42 +0100
+Subject: [PATCH 111/111] opengl: Bail if cached shader fails to load
 
 QOpenGLProgramBinaryCache::setProgramBinary() should check
 GL_LINK_STATUS after glProgramBinary(), but doesn't.
@@ -19,32 +17,42 @@ pipeline shader.
 Checking this already in ::setProgramBinary() makes the call to
 ::link() superfluous, so we remove that as well.
 
-Many thanks to Michal Srb and Fabian Vogt for hunting this down.
-This was truly a joint effort.
-
-Cc: Michal Srb <msrb@suse.com>
-Cc: Fabian Vogt <fvogt@suse.de>
-Signed-off-by: Max Staudt <mstaudt@suse.de>
+Done-with: Max Staudt <mstaudt@suse.com>
+Done-with: Michal Srb <msrb@suse.com>
+Done-with: Fabian Vogt <fvogt@suse.de>
+Task-number: QTBUG-66420
+Change-Id: Iabb51d0eb2c0c16bde696efff623e57d15f28d82
+Reviewed-by: Jesus Fernandez <Jesus.Fernandez@qt.io>
+Reviewed-by: Laszlo Agocs <laszlo.agocs@qt.io>
+(cherry picked from commit fa091640134b3ff99a9eb92df8286d15203122bf)
 ---
- src/gui/opengl/qopenglprogrambinarycache.cpp | 11 ++++++++++-
+ src/gui/opengl/qopenglprogrambinarycache.cpp | 20 ++++++++++++++++++--
  src/gui/opengl/qopenglshaderprogram.cpp      |  8 +-------
- 2 files changed, 11 insertions(+), 8 deletions(-)
+ 2 files changed, 19 insertions(+), 9 deletions(-)
 
 diff --git a/src/gui/opengl/qopenglprogrambinarycache.cpp b/src/gui/opengl/qopenglprogrambinarycache.cpp
-index 06373e1113..f50878ab5c 100644
+index 06373e1113..d16173df83 100644
 --- a/src/gui/opengl/qopenglprogrambinarycache.cpp
 +++ b/src/gui/opengl/qopenglprogrambinarycache.cpp
-@@ -161,10 +161,19 @@ bool QOpenGLProgramBinaryCache::setProgramBinary(uint programId, uint blobFormat
+@@ -161,10 +161,26 @@ bool QOpenGLProgramBinaryCache::setProgramBinary(uint programId, uint blobFormat
      QOpenGLExtraFunctions *funcs = QOpenGLContext::currentContext()->extraFunctions();
      while (funcs->glGetError() != GL_NO_ERROR) { }
      funcs->glProgramBinary(programId, blobFormat, p, blobSize);
+-    int err = funcs->glGetError();
 +
-     int err = funcs->glGetError();
-+    GLint link_status = 0;
-+    funcs->glGetProgramiv(programId, GL_LINK_STATUS, &link_status);
-+    if (link_status != GL_TRUE || err != GL_NO_ERROR) {
-+        qCDebug(DBG_SHADER_CACHE, "Program binary failed to load for program %u, size %d, format 0x%x, link_status = 0x%x, err = 0x%x",
-+                programId, blobSize, blobFormat, link_status, err);
++    GLenum err = funcs->glGetError();
++    if (err != GL_NO_ERROR) {
++        qCDebug(DBG_SHADER_CACHE, "Program binary failed to load for program %u, size %d, "
++                                  "format 0x%x, err = 0x%x",
++                programId, blobSize, blobFormat, err);
++        return false;
++    }
++    GLint linkStatus = 0;
++    funcs->glGetProgramiv(programId, GL_LINK_STATUS, &linkStatus);
++    if (linkStatus != GL_TRUE) {
++        qCDebug(DBG_SHADER_CACHE, "Program binary failed to load for program %u, size %d, "
++                                  "format 0x%x, linkStatus = 0x%x, err = 0x%x",
++                programId, blobSize, blobFormat, linkStatus, err);
 +        return false;
 +    }
 +
@@ -75,5 +83,5 @@ index cc8af16bfe..3b82baccb3 100644
  
      bool needsSave = false;
 -- 
-2.13.6
+2.14.3
 

@@ -55,7 +55,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.9.4
-Release: 5%{?dist}
+Release: 6%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -104,9 +104,6 @@ Patch52: qtbase-opensource-src-5.7.1-moc_macros.patch
 # Fixed upstream in shared-mime-info 1.10
 Patch53: qtbase-fdo101667.patch
 
-# https://bugreports.qt.io/browse/QTBUG-66420
-Patch55: https://bugreports.qt.io/secure/attachment/69873/opengl-Bail-if-cached-shader-fails-to-load.patch
-
 # drop -O3 and make -O2 by default
 Patch61: qt5-qtbase-cxxflag.patch
 
@@ -133,6 +130,7 @@ Patch150: 0050-glx-Avoid-losing-the-stereo-flag-in-QSurfaceFormat.patch
 Patch168: 0068-QHeaderView-properly-restore-section-data-after-layo.patch
 Patch169: 0069-QSimpleDrag-Fix-mouse-release-coords-for-delayed-eve.patch
 Patch170: 0070-Fix-native-QFileDialog-initial-selection-for-remote-.patch
+Patch211: 0111-opengl-Bail-if-cached-shader-fails-to-load.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -368,7 +366,6 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %patch51 -p1 -b .hidpi_scale_at_192
 %patch52 -p1 -b .moc_macros
 %patch53 -p1 -b .fdo101667
-%patch55 -p1 -b .QTBUG-66420
 %patch61 -p1 -b .qt5-qtbase-cxxflag
 %if 0%{?openssl11}
 %patch63 -p1 -b .openssl11
@@ -388,6 +385,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 #patch168 -p1 -b .0068
 %patch169 -p1 -b .0069
 %patch170 -p1 -b .0070
+%patch211 -p1 -b .0111
 
 %if 0%{?inject_optflags}
 ## adjust $RPM_OPT_FLAGS
@@ -1005,6 +1003,9 @@ fi
 
 
 %changelog
+* Thu Feb 22 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.9.4-6
+- use upstreamed version of QOpenGLShaderProgram fix (QTBUG-66420)
+
 * Wed Feb 21 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.9.4-5
 - QOpenGLShaderProgram: glProgramBinary() resulting in LINK_STATUS=FALSE not handled properly (QTBUG-66420)
 
