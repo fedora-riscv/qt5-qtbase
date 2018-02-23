@@ -51,7 +51,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.10.1
-Release: 5%{?dist}
+Release: 6%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -494,7 +494,7 @@ export MAKEFLAGS="%{?_smp_mflags}"
 %if ! 0%{?inject_optflags}
 # ensure qmake build using optflags (which can happen if not munging qmake.conf defaults)
 make clean -C qmake
-make %{?_smp_mflags} -C qmake \
+%make_build -C qmake all binary \
   QMAKE_CFLAGS_RELEASE="${CFLAGS:-$RPM_OPT_FLAGS}" \
   QMAKE_CXXFLAGS_RELEASE="${CXXFLAGS:-$RPM_OPT_FLAGS}" \
   QMAKE_LFLAGS_RELEASE="${LDFLAGS:-$RPM_LD_FLAGS}" \
@@ -993,6 +993,9 @@ fi
 
 
 %changelog
+* Fri Feb 23 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.10.1-6
+- qt5-qtbase: RPM build flags only partially injected (#1543888)
+
 * Wed Feb 21 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.10.1-5
 - QOpenGLShaderProgram: glProgramBinary() resulting in LINK_STATUS=FALSE not handled properly (QTBUG-66420)
 
