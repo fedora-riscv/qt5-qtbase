@@ -147,6 +147,8 @@ BuildRequires: pkgconfig(alsa)
 BuildRequires: pkgconfig(atspi-2)
 %if 0%{?use_clang}
 BuildRequires: clang >= 3.7.0
+%else
+BuildRequires: gcc-c++
 %endif
 # http://bugzilla.redhat.com/1196359
 %if 0%{?fedora} || 0%{?rhel} > 6
@@ -993,6 +995,9 @@ fi
 
 
 %changelog
+* Sun Feb 25 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.10.1-7
+- BR: gcc-c++
+
 * Fri Feb 23 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.10.1-6
 - qt5-qtbase: RPM build flags only partially injected (#1543888)
 
