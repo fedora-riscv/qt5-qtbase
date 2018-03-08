@@ -51,7 +51,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.10.1
-Release: 6%{?dist}
+Release: 7%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -209,7 +209,7 @@ BuildRequires: libicu-devel
 BuildRequires: pkgconfig(xcb) pkgconfig(xcb-glx) pkgconfig(xcb-icccm) pkgconfig(xcb-image) pkgconfig(xcb-keysyms) pkgconfig(xcb-renderutil)
 BuildRequires: pkgconfig(zlib)
 BuildRequires: perl-generators
-BuildRequires: qt5-rpm-macros >= 5.7.1
+BuildRequires: qt5-rpm-macros >= %{version}
 
 %if 0%{?tests}
 BuildRequires: dbus-x11
@@ -995,7 +995,8 @@ fi
 
 
 %changelog
-* Sun Feb 25 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.10.1-7
+* Thu Mar 08 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.10.1-7
+- enforce qt5-rpm-macros versioning
 - BR: gcc-c++
 
 * Fri Feb 23 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.10.1-6
