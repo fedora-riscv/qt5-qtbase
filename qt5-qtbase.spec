@@ -209,7 +209,7 @@ BuildRequires: libicu-devel
 BuildRequires: pkgconfig(xcb) pkgconfig(xcb-glx) pkgconfig(xcb-icccm) pkgconfig(xcb-image) pkgconfig(xcb-keysyms) pkgconfig(xcb-renderutil)
 BuildRequires: pkgconfig(zlib)
 BuildRequires: perl-generators
-BuildRequires: qt5-rpm-macros >= %{version}
+BuildRequires: qt5-rpm-macros = %{version}
 
 %if 0%{?tests}
 BuildRequires: dbus-x11
@@ -533,7 +533,7 @@ translationdir=%{_qt5_translationdir}
 
 Name: Qt5
 Description: Qt5 Configuration
-Version: 5.9.2
+Version: %{version}
 EOF
 
 # rpm macros
@@ -613,7 +613,11 @@ EOF
 mkdir -p %{buildroot}%{_qt5_headerdir}/QtXcb
 install -m 644 src/plugins/platforms/xcb/*.h %{buildroot}%{_qt5_headerdir}/QtXcb/
 
+
 %check
+# verify Qt5.pc
+export PKG_CONFIG_PATH=%{buildroot}%{_libdir}/pkgconfig
+test "$(pkg-config --modversion Qt5)" = "%{version}"
 %if 0%{?tests}
 ## see tests/README for expected environment (running a plasma session essentially)
 ## we are not quite there yet
@@ -622,7 +626,7 @@ export PATH=%{buildroot}%{_qt5_bindir}:$PATH
 export LD_LIBRARY_PATH=%{buildroot}%{_qt5_libdir}
 # dbus tests error out when building if session bus is not available
 dbus-launch --exit-with-session \
-make sub-tests %{?_smp_mflags} -k ||:
+%make_build sub-tests  -k ||:
 xvfb-run -a --server-args="-screen 0 1280x1024x32" \
 dbus-launch --exit-with-session \
 time \
@@ -998,6 +1002,7 @@ fi
 * Thu Mar 08 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.10.1-7
 - enforce qt5-rpm-macros versioning
 - BR: gcc-c++
+- Qt5.pc: fix version, add %%check
 
 * Fri Feb 23 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.10.1-6
 - qt5-qtbase: RPM build flags only partially injected (#1543888)
