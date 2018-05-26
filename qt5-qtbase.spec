@@ -30,33 +30,23 @@
 # use external qt_settings pkg
 %global qt_settings 1
 
-# See http://bugzilla.redhat.com/1279265
-%if 0%{?fedora} < 24
-%global inject_optflags 1
-%endif
-
 %global journald -journald
 BuildRequires: pkgconfig(libsystemd)
 
-%if 0%{?fedora} > 23
-# gcc6: FTBFS
-#global qt5_deprecated_flag -Wno-deprecated-declarations
-# gcc6: Qt assumes this in places
-#global qt5_null_flag -fno-delete-null-pointer-checks
-%endif
-
 %global examples 1
-%global tests 1
+## skip for now, until we're better at it --rex
+#global tests 1
 
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
-Version: 5.10.1
-Release: 8%{?dist}
+Version: 5.11.0
+Release: 1%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
 Url:     http://qt-project.org/
-Source0: https://download.qt.io/official_releases/qt/5.10/%{version}/submodules/%{qt_module}-everywhere-src-%{version}.tar.xz
+%global  majmin %(echo %{version} | cut -d. -f1-2)
+Source0: https://download.qt.io/official_releases/qt/%{majmin}/%{version}/submodules/%{qt_module}-everywhere-src-%{version}.tar.xz
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1227295
 Source1: qtlogging.ini
@@ -109,9 +99,6 @@ Patch53: qtbase-fdo101667.patch
 # respect QMAKE_LFLAGS_RELEASE when building qmake
 Patch54: qtbase-qmake_LFLAGS.patch
 
-# https://bugreports.qt.io/browse/QTBUG-66420
-Patch55: https://bugreports.qt.io/secure/attachment/69873/opengl-Bail-if-cached-shader-fails-to-load.patch
-
 # drop -O3 and make -O2 by default
 Patch61: qt5-qtbase-cxxflag.patch
 
@@ -120,7 +107,6 @@ Patch64: qt5-qtbase-5.9.1-firebird.patch
 
 # fix for new mariadb
 Patch65: qtbase-opensource-src-5.9.0-mysql.patch
-Patch66: qtbase-mariadb.patch
 
 # use categorized logging for xcb log entries
 # https://bugreports.qt.io/browse/QTBUG-55167
@@ -364,33 +350,16 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %patch50 -p1 -b .QT_VERSION_CHECK
 %patch51 -p1 -b .hidpi_scale_at_192
 %patch52 -p1 -b .moc_macros
-%patch53 -p1 -b .fdo101667
+# FIXME/REBASE ?
+#patch53 -p1 -b .fdo101667
 %patch54 -p1 -b .qmake_LFLAGS
-%patch55 -p1 -b .QTBUG-66420
 %patch61 -p1 -b .qt5-qtbase-cxxflag
 %patch64 -p1 -b .firebird
 %if 0%{?fedora} > 27
 %patch65 -p1 -b .mysql
 %endif
-%patch66 -p1 -b .mariadb
-%patch67 -p1 -b .xcberror_filter
-
-%if 0%{?inject_optflags}
-## adjust $RPM_OPT_FLAGS
-
-%patch2 -p1 -b .multilib_optflags
-# drop backup file(s), else they get installed too, http://bugzilla.redhat.com/639463
-rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
-
-sed -i -e "s|-O2|$RPM_OPT_FLAGS|g" \
-  mkspecs/%{platform}/qmake.conf
-
-sed -i -e "s|^\(QMAKE_LFLAGS_RELEASE.*\)|\1 $RPM_LD_FLAGS|" \
-  mkspecs/common/g++-unix.conf
-
-# undefine QMAKE_STRIP (and friends), so we get useful -debuginfo pkgs (#1065636)
-sed -i -e 's|^\(QMAKE_STRIP.*=\).*$|\1|g' mkspecs/common/linux.conf
-%endif
+# FIXME/REBASE
+#patch67 -p1 -b .xcberror_filter
 
 # move some bundled libs to ensure they're not accidentally used
 pushd src/3rdparty
@@ -493,7 +462,6 @@ export MAKEFLAGS="%{?_smp_mflags}"
   QMAKE_CXXFLAGS_RELEASE="${CXXFLAGS:-$RPM_OPT_FLAGS}" \
   QMAKE_LFLAGS_RELEASE="${LDFLAGS:-$RPM_LD_FLAGS}"
 
-%if ! 0%{?inject_optflags}
 # ensure qmake build using optflags (which can happen if not munging qmake.conf defaults)
 make clean -C qmake
 %make_build -C qmake all binary \
@@ -501,7 +469,6 @@ make clean -C qmake
   QMAKE_CXXFLAGS_RELEASE="${CXXFLAGS:-$RPM_OPT_FLAGS}" \
   QMAKE_LFLAGS_RELEASE="${LDFLAGS:-$RPM_LD_FLAGS}" \
   QMAKE_STRIP=
-%endif
 
 %make_build
 
@@ -926,8 +893,7 @@ fi
 %{_qt5_libdir}/cmake/Qt5Sql/Qt5Sql_QTDSDriverPlugin.cmake
 %endif
 
-%post gui -p /sbin/ldconfig
-%postun gui -p /sbin/ldconfig
+%ldconfig_scriptlets gui
 
 %files gui
 %dir %{_sysconfdir}/X11/xinit
@@ -992,13 +958,19 @@ fi
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QXcbIntegrationPlugin.cmake
 %{_qt5_plugindir}/xcbglintegrations/libqxcb-glx-integration.so
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QXcbGlxIntegrationPlugin.cmake
+%{_qt5_plugindir}/platformthemes/libqflatpak.so
 %{_qt5_plugindir}/platformthemes/libqgtk3.so
+%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QFlatpakThemePlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QGtk3ThemePlugin.cmake
 %{_qt5_plugindir}/printsupport/libcupsprintersupport.so
 %{_qt5_libdir}/cmake/Qt5PrintSupport/Qt5PrintSupport_QCupsPrinterSupportPlugin.cmake
 
 
 %changelog
+* Tue May 22 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.11.0-1
+- 5.11.0
+- drop support for inject_optflags (not used since f23)
+
 * Mon Apr 30 2018 Pete Walter <pwalter@fedoraproject.org> - 5.10.1-8
 - Rebuild for ICU 61.1
 
