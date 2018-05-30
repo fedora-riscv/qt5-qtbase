@@ -55,7 +55,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.9.6
-Release: 3%{?dist}
+Release: 4%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -694,7 +694,6 @@ fi
 %{_qt5_libdir}/libQt5Sql.so.5*
 %{_qt5_libdir}/libQt5Test.so.5*
 %{_qt5_libdir}/libQt5Xml.so.5*
-%{_qt5_libdir}/libQt5EglFSDeviceIntegration.so.5*
 %dir %{_qt5_libdir}/cmake/
 %dir %{_qt5_libdir}/cmake/Qt5/
 %dir %{_qt5_libdir}/cmake/Qt5Concurrent/
@@ -957,6 +956,7 @@ fi
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QComposePlatformInputContextPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QIbusPlatformInputContextPlugin.cmake
 %if 0%{?egl}
+%{_qt5_libdir}/libQt5EglFSDeviceIntegration.so.5*
 %{_qt5_libdir}/libQt5EglFsKmsSupport.so.5*
 %{_qt5_plugindir}/platforms/libqeglfs.so
 %{_qt5_plugindir}/platforms/libqminimalegl.so
@@ -993,6 +993,9 @@ fi
 
 
 %changelog
+* Wed Oct 24 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.9.6-4
+- move libQt5EglFSDeviceIntegration to -gui (#1557223)
+
 * Wed Jun 27 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.9.6-3
 - pull in candidate fix for QTBUG-68939
 
