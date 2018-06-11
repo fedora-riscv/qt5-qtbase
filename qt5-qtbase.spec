@@ -54,8 +54,8 @@ BuildRequires: pkgconfig(libsystemd)
 
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
-Version: 5.9.4
-Release: 6%{?dist}
+Version: 5.9.6
+Release: 1%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -123,14 +123,6 @@ Patch66: qtbase-mariadb.patch
 Patch67: https://bugreports.qt.io/secure/attachment/66353/xcberror_filter.patch
 
 ## upstream patches (5.9 branch)
-Patch112: 0012-Avoid-providing-bad-pixelDeltas-on-X11.patch
-Patch116: 0016-CMake-qt5_add_binary_resource-re-run-if-needed.patch
-Patch445: 0045-Handle-OOM-condition-in-the-validation-of-plugin-met.patch
-Patch150: 0050-glx-Avoid-losing-the-stereo-flag-in-QSurfaceFormat.patch
-Patch168: 0068-QHeaderView-properly-restore-section-data-after-layo.patch
-Patch169: 0069-QSimpleDrag-Fix-mouse-release-coords-for-delayed-eve.patch
-Patch170: 0070-Fix-native-QFileDialog-initial-selection-for-remote-.patch
-Patch211: 0111-opengl-Bail-if-cached-shader-fails-to-load.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -378,14 +370,6 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %patch67 -p1 -b .xcberror_filter
 
 ## upstream patches
-%patch112 -p1 -b .0012
-%patch116 -p1 -b .0016
-%patch445 -p1 -b .0045
-%patch150 -p1 -b .0050
-#patch168 -p1 -b .0068
-%patch169 -p1 -b .0069
-%patch170 -p1 -b .0070
-%patch211 -p1 -b .0111
 
 %if 0%{?inject_optflags}
 ## adjust $RPM_OPT_FLAGS
@@ -1003,6 +987,9 @@ fi
 
 
 %changelog
+* Mon Jun 11 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.9.6-1
+- 5.9.6
+
 * Thu Feb 22 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.9.4-6
 - use upstreamed version of QOpenGLShaderProgram fix (QTBUG-66420)
 
