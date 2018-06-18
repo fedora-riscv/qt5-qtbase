@@ -40,7 +40,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.11.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -89,13 +89,6 @@ Patch51: qtbase-hidpi_scale_at_192.patch
 # 2. Workaround sysmacros.h (pre)defining major/minor a breaking stuff
 Patch52: qtbase-opensource-src-5.7.1-moc_macros.patch
 
-# QMimeType: remove unwanted *.bin as preferredSuffix for octet-stream
-# This leads to an automatically appended .bin when saving a file.
-# https://bugs.freedesktop.org/show_bug.cgi?id=101667
-# https://bugs.kde.org/382437
-# Fixed upstream in shared-mime-info 1.10
-Patch53: qtbase-fdo101667.patch
-
 # respect QMAKE_LFLAGS_RELEASE when building qmake
 Patch54: qtbase-qmake_LFLAGS.patch
 
@@ -112,6 +105,9 @@ Patch65: qtbase-opensource-src-5.9.0-mysql.patch
 # https://bugreports.qt.io/browse/QTBUG-55167
 # https://bugzilla.redhat.com/show_bug.cgi?id=1497564
 Patch67: https://bugreports.qt.io/secure/attachment/66353/xcberror_filter.patch
+
+## upstream patches
+Patch217: 0217-CMake-Restore-qt5_use_modules-function.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -344,14 +340,15 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %setup -q -n %{qt_module}-everywhere-src-%{version}
 
 ## upstream fixes
+
+
+
 %patch4 -p1 -b .QTBUG-35459
 %patch8 -p1 -b .tell-the-truth-about-private-api
 
 %patch50 -p1 -b .QT_VERSION_CHECK
 %patch51 -p1 -b .hidpi_scale_at_192
 %patch52 -p1 -b .moc_macros
-# FIXME/REBASE ?
-#patch53 -p1 -b .fdo101667
 %patch54 -p1 -b .qmake_LFLAGS
 %patch61 -p1 -b .qt5-qtbase-cxxflag
 %patch64 -p1 -b .firebird
@@ -360,6 +357,9 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %endif
 # FIXME/REBASE
 #patch67 -p1 -b .xcberror_filter
+
+## upstream patches
+%patch217 -p1 -b .0217
 
 # move some bundled libs to ensure they're not accidentally used
 pushd src/3rdparty
@@ -967,6 +967,9 @@ fi
 
 
 %changelog
+* Mon Jun 18 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.11.0-3
+- backport CMake-Restore-qt5_use_modules-function.patch
+
 * Wed May 30 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.11.0-2
 - move libQt5EglFSDeviceIntegration to -gui (#1557223)
 
