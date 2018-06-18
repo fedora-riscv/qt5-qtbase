@@ -8,6 +8,12 @@
 %endif
 %global openssl -openssl-linked
 
+%if 0%{?fedora} < 29
+%ifarch %{ix86}
+%global no_sse2  -no-sse2
+%endif
+%endif
+
 # support qtchooser (adds qtchooser .conf file)
 %global qtchooser 1
 %if 0%{?qtchooser}
@@ -443,9 +449,7 @@ export MAKEFLAGS="%{?_smp_mflags}"
   -no-pch \
   -no-rpath \
   -no-separate-debug-info \
-%ifarch %{ix86}
-  -no-sse2 \
-%endif
+  %{?no_sse2} \
   -no-strip \
   -system-libjpeg \
   -system-libpng \
@@ -969,6 +973,7 @@ fi
 %changelog
 * Mon Jun 18 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.11.0-3
 - backport CMake-Restore-qt5_use_modules-function.patch
+- %%build: %%ix86 --no-sse2 on < f29 only
 
 * Wed May 30 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.11.0-2
 - move libQt5EglFSDeviceIntegration to -gui (#1557223)
