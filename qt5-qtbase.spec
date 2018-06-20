@@ -45,8 +45,8 @@ BuildRequires: pkgconfig(libsystemd)
 
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
-Version: 5.11.0
-Release: 3%{?dist}
+Version: 5.11.1
+Release: 1%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -113,7 +113,6 @@ Patch65: qtbase-opensource-src-5.9.0-mysql.patch
 Patch67: https://bugreports.qt.io/secure/attachment/66353/xcberror_filter.patch
 
 ## upstream patches
-Patch217: 0217-CMake-Restore-qt5_use_modules-function.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -197,7 +196,7 @@ BuildRequires: libicu-devel
 BuildRequires: pkgconfig(xcb) pkgconfig(xcb-glx) pkgconfig(xcb-icccm) pkgconfig(xcb-image) pkgconfig(xcb-keysyms) pkgconfig(xcb-renderutil)
 BuildRequires: pkgconfig(zlib)
 BuildRequires: perl-generators
-BuildRequires: qt5-rpm-macros = %{version}
+BuildRequires: qt5-rpm-macros
 
 %if 0%{?tests}
 BuildRequires: dbus-x11
@@ -255,7 +254,7 @@ Requires: %{name}-gui%{?_isa}
 Requires: pkgconfig(egl)
 %endif
 Requires: pkgconfig(gl)
-Requires: qt5-rpm-macros >= 5.7.1
+Requires: qt5-rpm-macros
 %if 0%{?use_clang}
 Requires: clang >= 3.7.0
 %endif
@@ -365,7 +364,6 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 #patch67 -p1 -b .xcberror_filter
 
 ## upstream patches
-%patch217 -p1 -b .0217
 
 # move some bundled libs to ensure they're not accidentally used
 pushd src/3rdparty
@@ -389,10 +387,6 @@ sed -i -e "s|^#!/usr/bin/env perl$|#!%{__perl}|" \
  bin/fixqt4headers.pl \
  bin/syncqt.pl \
  mkspecs/features/data/unix/findclasslist.pl
-
-# Fix missing private includes https://bugreports.qt.io/browse/QTBUG-37417
-sed -e '/CMAKE_NO_PRIVATE_INCLUDES\ \=\ true/d' -i \
-  mkspecs/features/create_cmake.prf
 
 
 %build
@@ -971,6 +965,12 @@ fi
 
 
 %changelog
+* Tue Jun 19 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.11.1-1
+- 5.11.1
+- relax qt5-rpm-macros dep
+- drop workaround for QTBUG-37417
+- drop CMake-Restore-qt5_use_modules-function.patch (upstreamed)
+
 * Mon Jun 18 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.11.0-3
 - backport CMake-Restore-qt5_use_modules-function.patch
 - %%build: %%ix86 --no-sse2 on < f29 only
