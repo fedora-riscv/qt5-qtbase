@@ -46,7 +46,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.11.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -111,6 +111,9 @@ Patch65: qtbase-opensource-src-5.9.0-mysql.patch
 # https://bugreports.qt.io/browse/QTBUG-55167
 # https://bugzilla.redhat.com/show_bug.cgi?id=1497564
 Patch67: https://bugreports.qt.io/secure/attachment/66353/xcberror_filter.patch
+
+# python3
+Patch68: qtbase-everywhere-src-5.11.1-python3.patch
 
 ## upstream patches
 
@@ -362,6 +365,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %endif
 # FIXME/REBASE
 #patch67 -p1 -b .xcberror_filter
+%patch68 -p1 -b .python3
 
 ## upstream patches
 
@@ -965,6 +969,9 @@ fi
 
 
 %changelog
+* Sat Jun 23 2018 Than Ngo <than@redhat.com> - 5.11.1-2
+- fixed #1592146, python3
+
 * Tue Jun 19 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.11.1-1
 - 5.11.1
 - relax qt5-rpm-macros dep
