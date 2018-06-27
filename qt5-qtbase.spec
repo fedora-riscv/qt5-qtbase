@@ -55,7 +55,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.9.6
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -125,7 +125,9 @@ Patch67: https://bugreports.qt.io/secure/attachment/66353/xcberror_filter.patch
 ## upstream patches (5.9 branch)
 # technically an upstream patch, but this is one included in 5.9.6 to revert
 # due to regression https://bugreports.qt.io/browse/QTBUG-68939
-Patch100: cbfb6bda1d1ce3e169db6a0deb9bd901076653e4.patch
+#Patch100: cbfb6bda1d1ce3e169db6a0deb9bd901076653e4.patch
+# candidate fix https://codereview.qt-project.org/#/c/233482/
+Patch100: 0001-Use-QDockArea-cached-sizehint-appropriately.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -373,7 +375,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %patch67 -p1 -b .xcberror_filter
 
 ## upstream patches
-%patch100 -p1 -R -b .QTBUG-68939
+%patch100 -p1 -b .QTBUG-68939
 
 %if 0%{?inject_optflags}
 ## adjust $RPM_OPT_FLAGS
@@ -991,6 +993,9 @@ fi
 
 
 %changelog
+* Wed Jun 27 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.9.6-3
+- pull in candidate fix for QTBUG-68939
+
 * Wed Jun 27 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.9.6-2
 - revert commit causing layout regressions (QTBUG-68939)
 
