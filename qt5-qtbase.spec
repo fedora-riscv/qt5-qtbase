@@ -46,7 +46,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.11.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -546,6 +546,7 @@ popd
   mkdir -p %{buildroot}%{_sysconfdir}/xdg/qtchooser
   pushd    %{buildroot}%{_sysconfdir}/xdg/qtchooser
   echo "%{_qt5_bindir}" >  5-%{__isa_bits}.conf
+## FIXME/TODO: verify qtchooser (still) happy if _qt5_prefix uses %%_prefix instead of %%_libdir/qt5
   echo "%{_qt5_prefix}" >> 5-%{__isa_bits}.conf
   # alternatives targets
   touch default.conf 5.conf
@@ -566,6 +567,8 @@ popd
 
 install -p -m755 -D %{SOURCE6} %{buildroot}%{_sysconfdir}/X11/xinit/xinitrc.d/10-qt5-check-opengl2.sh
 
+# f29+ enables sse2 unconditionally on ix86 -- rex
+%if 0%{?fedora} < 29
 # fix bz#1442553 multilib issue
 privat_header_file=%{buildroot}%{_qt5_headerdir}/QtCore/%{version}/QtCore/private/qconfig_p.h
 grep -v QT_FEATURE_sse2 $privat_header_file > ${privat_header_file}.me
@@ -577,6 +580,7 @@ cat >>${privat_header_file}<<EOF
 #define QT_FEATURE_sse2 -1
 #endif
 EOF
+%endif
 
 # install privat headers for qtxcb
 mkdir -p %{buildroot}%{_qt5_headerdir}/QtXcb
@@ -681,7 +685,10 @@ fi
 %{_qt5_docdir}/global/
 %{_qt5_importdir}/
 %{_qt5_translationdir}/
+%if "%{_qt5_prefix}" != "%{_prefix}"
 %dir %{_qt5_prefix}/
+%endif
+%dir %{_qt5_archdatadir}/
 %dir %{_qt5_datadir}/
 %{_qt5_datadir}/qtlogging.ini
 %dir %{_qt5_libexecdir}/
@@ -969,6 +976,11 @@ fi
 
 
 %changelog
+* Fri Jun 29 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.11.1-3
+- apply sse2-related multilib hack on < f29 only
+- safer %%_qt5_prefix, %%qt5_archdatadir ownership
+- rebuild for %%_qt5_prefix = %%_prefix
+
 * Sat Jun 23 2018 Than Ngo <than@redhat.com> - 5.11.1-2
 - fixed #1592146, python3
 
