@@ -46,7 +46,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.11.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -365,7 +365,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %endif
 # FIXME/REBASE
 #patch67 -p1 -b .xcberror_filter
-%patch68 -p1 -b .python3
+%patch68 -p1
 
 ## upstream patches
 
@@ -976,6 +976,9 @@ fi
 
 
 %changelog
+* Mon Jul 02 2018 Than Ngo <than@redhat.com> - 5.11.1-4
+- fixed bz#1597110 - BRP mangle shebangs and calculation of provides should ignore backups files
+
 * Fri Jun 29 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.11.1-3
 - apply sse2-related multilib hack on < f29 only
 - safer %%_qt5_prefix, %%qt5_archdatadir ownership
