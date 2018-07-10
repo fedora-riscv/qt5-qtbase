@@ -46,7 +46,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.11.1
-Release: 4%{?dist}
+Release: 5%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -976,6 +976,9 @@ fi
 
 
 %changelog
+* Tue Jul 10 2018 Pete Walter <pwalter@fedoraproject.org> - 5.11.1-5
+- Rebuild for ICU 62
+
 * Mon Jul 02 2018 Than Ngo <than@redhat.com> - 5.11.1-4
 - fixed bz#1597110 - BRP mangle shebangs and calculation of provides should ignore backups files
 
