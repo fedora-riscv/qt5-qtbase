@@ -46,7 +46,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.11.1
-Release: 6%{?dist}
+Release: 7%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -114,6 +114,9 @@ Patch67: https://bugreports.qt.io/secure/attachment/66353/xcberror_filter.patch
 
 # python3
 Patch68: qtbase-everywhere-src-5.11.1-python3.patch
+
+# glibc stat
+Patch69: qt5-qtbase-glibc.patch
 
 ## upstream patches
 
@@ -366,6 +369,10 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 # FIXME/REBASE
 #patch67 -p1 -b .xcberror_filter
 %patch68 -p1
+# workaround for new glibc conflict
+%if 0%{?fedora} > 28
+%patch69 -p1 -b .glibc
+%endif
 
 ## upstream patches
 
@@ -976,6 +983,9 @@ fi
 
 
 %changelog
+* Thu Jul 26 2018 Than Ngo <than@redhat.com> - 5.11.1-7
+- fixed FTBFS
+
 * Sat Jul 14 2018 Fedora Release Engineering <releng@fedoraproject.org> - 5.11.1-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
 
