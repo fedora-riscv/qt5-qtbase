@@ -317,7 +317,7 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 
 %package postgresql
 Summary: PostgreSQL driver for Qt5's SQL classes
-BuildRequires: postgresql-devel
+BuildRequires: libpq-devel
 Requires: %{name}%{?_isa} = %{version}-%{release}
 %description postgresql
 %{summary}.
