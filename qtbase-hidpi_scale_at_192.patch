@@ -1,9 +1,9 @@
 diff --git a/src/plugins/platforms/xcb/qxcbscreen.cpp b/src/plugins/platforms/xcb/qxcbscreen.cpp
-index ec0f9ba..6d0d7a6 100644
+index 7f2793b2..3ff6a924 100644
 --- a/src/plugins/platforms/xcb/qxcbscreen.cpp
 +++ b/src/plugins/platforms/xcb/qxcbscreen.cpp
-@@ -747,7 +747,7 @@ void QXcbScreen::updateGeometry(const QRect &geometry, uint8_t rotation)
-         m_sizeMillimeters = sizeInMillimeters(geometry.size(), virtualDpi());
+@@ -753,7 +753,7 @@ void QXcbScreen::updateGeometry(const QRect &geometry, uint8_t rotation)
+         m_sizeMillimeters = sizeInMillimeters(geometry.size(), m_virtualDesktop->dpi());
 
      qreal dpi = geometry.width() / physicalSize().width() * qreal(25.4);
 -    m_pixelDensity = qMax(1, qRound(dpi/96));
