@@ -45,8 +45,8 @@ BuildRequires: pkgconfig(libsystemd)
 
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
-Version: 5.11.1
-Release: 7%{?dist}
+Version: 5.11.2
+Release: 1%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -983,6 +983,9 @@ fi
 
 
 %changelog
+* Fri Sep 21 2018 Jan Grulich <jgrulich@redhat.com> - 5.11.2-1
+- 5.11.2
+
 * Thu Jul 26 2018 Than Ngo <than@redhat.com> - 5.11.1-7
 - fixed FTBFS
 
