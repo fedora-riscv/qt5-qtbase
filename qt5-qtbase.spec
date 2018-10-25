@@ -46,7 +46,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.11.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -119,6 +119,7 @@ Patch68: qtbase-everywhere-src-5.11.1-python3.patch
 Patch69: qt5-qtbase-glibc.patch
 
 ## upstream patches
+Patch500: qtbase-everywhere-src-5.11.2-rendering-issue.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -376,6 +377,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %endif
 
 ## upstream patches
+%patch500 -p1 -b .rendering-issue
 
 # move some bundled libs to ensure they're not accidentally used
 pushd src/3rdparty
@@ -984,6 +986,9 @@ fi
 
 
 %changelog
+* Thu Oct 25 2018 Than Ngo <than@redhat.com> - 5.11.2-3
+- backported patch to fix selection rendering issues if rounding leads to left-out pixels
+
 * Thu Oct 11 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.11.2-2
 - -no-use-gold-linker (#1635973)
 
