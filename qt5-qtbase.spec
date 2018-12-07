@@ -45,8 +45,8 @@ BuildRequires: pkgconfig(libsystemd)
 
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
-Version: 5.11.2
-Release: 3%{?dist}
+Version: 5.11.3
+Release: 1%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -116,9 +116,9 @@ Patch67: https://bugreports.qt.io/secure/attachment/66353/xcberror_filter.patch
 Patch68: qtbase-everywhere-src-5.11.1-python3.patch
 
 # glibc stat
-Patch69: qt5-qtbase-glibc.patch
 
 ## upstream patches
+# still needed for 5.12.x ? -- rex
 Patch500: qtbase-everywhere-src-5.11.2-rendering-issue.patch
 Patch501: qtbase-everywhere-src-5.11.2-optimize-insertionPointsForLine.patch
 
@@ -372,10 +372,6 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 # FIXME/REBASE
 #patch67 -p1 -b .xcberror_filter
 %patch68 -p1
-# workaround for new glibc conflict
-%if 0%{?fedora} > 28
-%patch69 -p1 -b .glibc
-%endif
 
 ## upstream patches
 %patch500 -p1 -b .rendering-issue
@@ -988,6 +984,9 @@ fi
 
 
 %changelog
+* Fri Dec 07 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.11.3-1
+- 5.11.3
+
 * Thu Oct 25 2018 Than Ngo <than@redhat.com> - 5.11.2-3
 - backported patch to fix selection rendering issues if rounding leads to left-out pixels
 - backported patch to optimize insertionPointsForLine
