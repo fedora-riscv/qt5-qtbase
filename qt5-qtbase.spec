@@ -45,8 +45,8 @@ BuildRequires: pkgconfig(libsystemd)
 
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
-Version: 5.11.1
-Release: 7%{?dist}
+Version: 5.11.3
+Release: 1%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -116,9 +116,11 @@ Patch67: https://bugreports.qt.io/secure/attachment/66353/xcberror_filter.patch
 Patch68: qtbase-everywhere-src-5.11.1-python3.patch
 
 # glibc stat
-Patch69: qt5-qtbase-glibc.patch
 
 ## upstream patches
+# still needed for 5.12.x ? -- rex
+Patch500: qtbase-everywhere-src-5.11.2-rendering-issue.patch
+Patch501: qtbase-everywhere-src-5.11.2-optimize-insertionPointsForLine.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -229,11 +231,12 @@ Requires: %{name}-common = %{version}-%{release}
 %global tds -no-sql-tds
 %endif
 
-# workaround gold linker bug by not using it
+# workaround gold linker bug(s) by not using it
 # https://bugzilla.redhat.com/1458003
 # https://sourceware.org/bugzilla/show_bug.cgi?id=21074
 # reportedly fixed or worked-around, re-enable if there's evidence of problems -- rex
-#global use_gold_linker -no-use-gold-linker
+# https://bugzilla.redhat.com/show_bug.cgi?id=1635973
+%global use_gold_linker -no-use-gold-linker
 
 %description
 Qt is a software toolkit for developing applications.
@@ -317,7 +320,7 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 
 %package postgresql
 Summary: PostgreSQL driver for Qt5's SQL classes
-BuildRequires: postgresql-devel
+BuildRequires: libpq-devel
 Requires: %{name}%{?_isa} = %{version}-%{release}
 %description postgresql
 %{summary}.
@@ -369,12 +372,10 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 # FIXME/REBASE
 #patch67 -p1 -b .xcberror_filter
 %patch68 -p1
-# workaround for new glibc conflict
-%if 0%{?fedora} > 28
-%patch69 -p1 -b .glibc
-%endif
 
 ## upstream patches
+%patch500 -p1 -b .rendering-issue
+%patch501 -p1 -b .optimize-insertionPointsForLine
 
 # move some bundled libs to ensure they're not accidentally used
 pushd src/3rdparty
@@ -983,6 +984,20 @@ fi
 
 
 %changelog
+* Fri Dec 07 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.11.3-1
+- 5.11.3
+
+* Thu Oct 25 2018 Than Ngo <than@redhat.com> - 5.11.2-3
+- backported patch to fix selection rendering issues if rounding leads to left-out pixels
+- backported patch to optimize insertionPointsForLine
+
+* Thu Oct 11 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.11.2-2
+- -no-use-gold-linker (#1635973)
+
+
+* Fri Sep 21 2018 Jan Grulich <jgrulich@redhat.com> - 5.11.2-1
+- 5.11.2
+
 * Thu Jul 26 2018 Than Ngo <than@redhat.com> - 5.11.1-7
 - fixed FTBFS
 
