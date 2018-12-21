@@ -46,7 +46,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.11.1
-Release: 8%{?dist}
+Release: 7%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -229,12 +229,11 @@ Requires: %{name}-common = %{version}-%{release}
 %global tds -no-sql-tds
 %endif
 
-# workaround gold linker bug(s) by not using it
+# workaround gold linker bug by not using it
 # https://bugzilla.redhat.com/1458003
 # https://sourceware.org/bugzilla/show_bug.cgi?id=21074
 # reportedly fixed or worked-around, re-enable if there's evidence of problems -- rex
-# https://bugzilla.redhat.com/show_bug.cgi?id=1635973
-%global use_gold_linker -no-use-gold-linker
+#global use_gold_linker -no-use-gold-linker
 
 %description
 Qt is a software toolkit for developing applications.
@@ -984,9 +983,6 @@ fi
 
 
 %changelog
-* Wed Oct 24 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.11.1-8
-- (branch) -no-use-gold-linker (#1635973)
-
 * Thu Jul 26 2018 Than Ngo <than@redhat.com> - 5.11.1-7
 - fixed FTBFS
 
