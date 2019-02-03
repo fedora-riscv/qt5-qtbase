@@ -14,6 +14,13 @@
 %endif
 %endif
 
+# workaround https://bugzilla.redhat.com/show_bug.cgi?id=1668865
+# for current stable releases
+%if 0%{?fedora} && 0%{?fedora} < 30
+%global no_feature_statx -no-feature-statx
+%global no_feature_renameat2 -no-feature-renameat2
+%endif
+
 # support qtchooser (adds qtchooser .conf file)
 %global qtchooser 1
 %if 0%{?qtchooser}
@@ -46,7 +53,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.11.3
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -468,6 +475,8 @@ export MAKEFLAGS="%{?_smp_mflags}"
   -system-zlib \
   %{?use_gold_linker} \
   -no-directfb \
+  %{?no_feature_renameat2} \
+  %{?no_feature_statx} \
   QMAKE_CFLAGS_RELEASE="${CFLAGS:-$RPM_OPT_FLAGS}" \
   QMAKE_CXXFLAGS_RELEASE="${CXXFLAGS:-$RPM_OPT_FLAGS}" \
   QMAKE_LFLAGS_RELEASE="${LDFLAGS:-$RPM_LD_FLAGS}"
@@ -984,6 +993,9 @@ fi
 
 
 %changelog
+* Sun Feb 03 2019 Rex Dieter <rdieter@fedoraproject.org> - 5.11.3-3
+- disable renameat2/statx feature on < f30 (#1668865)
+
 * Sat Feb 02 2019 Fedora Release Engineering <releng@fedoraproject.org> - 5.11.3-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
 
