@@ -53,7 +53,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.11.3
-Release: 3%{?dist}
+Release: 4%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -121,6 +121,9 @@ Patch67: https://bugreports.qt.io/secure/attachment/66353/xcberror_filter.patch
 
 # python3
 Patch68: qtbase-everywhere-src-5.11.1-python3.patch
+
+# build issue with gcc9
+Patch69: qtbase-everywhere-src-5.11.3-gcc9.patch
 
 # glibc stat
 
@@ -379,6 +382,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 # FIXME/REBASE
 #patch67 -p1 -b .xcberror_filter
 %patch68 -p1
+%patch69 -p1
 
 ## upstream patches
 %patch500 -p1 -b .rendering-issue
@@ -993,6 +997,9 @@ fi
 
 
 %changelog
+* Wed Feb 13 2019 Than Ngo <than@redhat.com> - 5.11.3-4
+- fixed build issue with gcc9
+
 * Sun Feb 03 2019 Rex Dieter <rdieter@fedoraproject.org> - 5.11.3-3
 - disable renameat2/statx feature on < f30 (#1668865)
 
