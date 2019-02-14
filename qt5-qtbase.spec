@@ -52,8 +52,8 @@ BuildRequires: pkgconfig(libsystemd)
 
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
-Version: 5.11.3
-Release: 4%{?dist}
+Version: 5.12.1
+Release: 1%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -109,7 +109,7 @@ Patch54: qtbase-qmake_LFLAGS.patch
 Patch61: qt5-qtbase-cxxflag.patch
 
 # support firebird version 3.x
-Patch64: qt5-qtbase-5.9.1-firebird.patch
+Patch64: qt5-qtbase-5.12.1-firebird.patch
 
 # fix for new mariadb
 Patch65: qtbase-opensource-src-5.9.0-mysql.patch
@@ -122,15 +122,9 @@ Patch67: https://bugreports.qt.io/secure/attachment/66353/xcberror_filter.patch
 # python3
 Patch68: qtbase-everywhere-src-5.11.1-python3.patch
 
-# build issue with gcc9
-Patch69: qtbase-everywhere-src-5.11.3-gcc9.patch
-
 # glibc stat
 
 ## upstream patches
-# still needed for 5.12.x ? -- rex
-Patch500: qtbase-everywhere-src-5.11.2-rendering-issue.patch
-Patch501: qtbase-everywhere-src-5.11.2-optimize-insertionPointsForLine.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -177,7 +171,7 @@ BuildRequires: openssl-devel%{?openssl11: >= 1.1}
 %endif
 BuildRequires: pkgconfig(libpulse) pkgconfig(libpulse-mainloop-glib)
 %if 0%{?fedora}
-%global xkbcommon -system-xkbcommon
+#global xkbcommon -system-xkbcommon
 BuildRequires: pkgconfig(libinput)
 BuildRequires: pkgconfig(xcb-xkb) >= 1.10
 BuildRequires: pkgconfig(xkbcommon) >= 0.4.1
@@ -187,7 +181,7 @@ BuildRequires: pkgconfig(xkbcommon-x11) >= 0.4.1
 %if 0%{?rhel} == 6
 %global xcb -qt-xcb
 %endif
-%global xkbcommon -qt-xkbcommon
+#global xkbcommon -qt-xkbcommon
 Provides: bundled(libxkbcommon) = 0.4.1
 %endif
 BuildRequires: pkgconfig(xkeyboard-config)
@@ -214,6 +208,8 @@ BuildRequires: libicu-devel
 BuildRequires: pkgconfig(xcb) pkgconfig(xcb-glx) pkgconfig(xcb-icccm) pkgconfig(xcb-image) pkgconfig(xcb-keysyms) pkgconfig(xcb-renderutil)
 BuildRequires: pkgconfig(zlib)
 BuildRequires: perl-generators
+# see patch68
+BuildRequires: python3
 BuildRequires: qt5-rpm-macros
 
 %if 0%{?tests}
@@ -382,11 +378,8 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 # FIXME/REBASE
 #patch67 -p1 -b .xcberror_filter
 %patch68 -p1
-%patch69 -p1
 
 ## upstream patches
-%patch500 -p1 -b .rendering-issue
-%patch501 -p1 -b .optimize-insertionPointsForLine
 
 # move some bundled libs to ensure they're not accidentally used
 pushd src/3rdparty
@@ -673,7 +666,9 @@ fi
 %endif
 
 %files
-%license LICENSE.LGPL* LGPL_EXCEPTION.txt LICENSE.FDL
+%license LICENSE.FDL
+%license LICENSE.GPL*
+%license LICENSE.LGPL*
 %if 0%{?qtchooser}
 %dir %{_sysconfdir}/xdg/qtchooser
 # not editable config files, so not using %%config here
@@ -988,15 +983,18 @@ fi
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QXcbIntegrationPlugin.cmake
 %{_qt5_plugindir}/xcbglintegrations/libqxcb-glx-integration.so
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QXcbGlxIntegrationPlugin.cmake
-%{_qt5_plugindir}/platformthemes/libqflatpak.so
+%{_qt5_plugindir}/platformthemes/libqxdgdesktopportal.so
 %{_qt5_plugindir}/platformthemes/libqgtk3.so
-%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QFlatpakThemePlugin.cmake
+%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QXdgDesktopPortalThemePlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QGtk3ThemePlugin.cmake
 %{_qt5_plugindir}/printsupport/libcupsprintersupport.so
 %{_qt5_libdir}/cmake/Qt5PrintSupport/Qt5PrintSupport_QCupsPrinterSupportPlugin.cmake
 
 
 %changelog
+* Thu Feb 14 2019 Rex Dieter <rdieter@fedoraproject.org> - 5.12.1-1
+- 5.12.1
+
 * Wed Feb 13 2019 Than Ngo <than@redhat.com> - 5.11.3-4
 - fixed build issue with gcc9
 
