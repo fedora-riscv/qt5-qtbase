@@ -53,7 +53,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.12.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -273,6 +273,9 @@ Requires: qt5-rpm-macros
 %if 0%{?use_clang}
 Requires: clang >= 3.7.0
 %endif
+# QtPrintSupport/private requires cups/ppd.h
+# todo: spilt out private headers into separate pkg
+Requires: cups-devel
 %description devel
 %{summary}.
 
@@ -992,6 +995,9 @@ fi
 
 
 %changelog
+* Mon Mar 04 2019 Rex Dieter <rdieter@fedoraproject.org> - 5.12.1-2
+- -devel: Requires: cups-devel
+
 * Thu Feb 14 2019 Rex Dieter <rdieter@fedoraproject.org> - 5.12.1-1
 - 5.12.1
 
