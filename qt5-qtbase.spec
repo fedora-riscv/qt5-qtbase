@@ -53,7 +53,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.12.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -101,6 +101,10 @@ Patch51: qtbase-hidpi_scale_at_192.patch
 # https://bugreports.qt.io/browse/QTBUG-49972
 # 2. Workaround sysmacros.h (pre)defining major/minor a breaking stuff
 Patch52: qtbase-opensource-src-5.7.1-moc_macros.patch
+
+# CMake generates wrong -isystem /usr/include compilations flags with Qt5::Gui
+# https://bugzilla.redhat.com/1704474
+Patch53: qtbase-everywhere-src-5.12.1-qt5gui_cmake_isystem_includes.patch
 
 # respect QMAKE_LFLAGS_RELEASE when building qmake
 Patch54: qtbase-qmake_LFLAGS.patch
@@ -373,11 +377,13 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 
 
 %patch4 -p1 -b .QTBUG-35459
-%patch8 -p1 -b .tell-the-truth-about-private-api
+# omit '-b .tell-the-truth-about-private-api' so it doesn't end up in installed files -- rdieter
+%patch8 -p1
 
 %patch50 -p1 -b .QT_VERSION_CHECK
 %patch51 -p1 -b .hidpi_scale_at_192
 %patch52 -p1 -b .moc_macros
+%patch53 -p1 -b .qt5gui_cmake_isystem_includes
 %patch54 -p1 -b .qmake_LFLAGS
 %patch61 -p1 -b .qt5-qtbase-cxxflag
 %patch64 -p1 -b .firebird
@@ -1007,6 +1013,9 @@ fi
 
 
 %changelog
+* Tue Apr 30 2019 Rex Dieter <rdieter@fedoraproject.org> - 5.12.1-4
+- CMake generates wrong -isystem /usr/include compilations flags with Qt5::Gui (#1704474)
+
 * Tue Apr 30 2019 Rex Dieter <rdieter@fedoraproject.org> - 5.12.1-3
 - -private-devel subpkg, move Requires: cups-devel here
 
