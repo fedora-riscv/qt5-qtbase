@@ -1010,7 +1010,6 @@ fi
 * Tue Apr 30 2019 Rex Dieter <rdieter@fedoraproject.org> - 5.12.1-3
 - -private-devel subpkg, move Requires: cups-devel here
 
-
 * Mon Mar 04 2019 Rex Dieter <rdieter@fedoraproject.org> - 5.12.1-2
 - -devel: Requires: cups-devel
 
