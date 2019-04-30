@@ -53,7 +53,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.12.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -262,7 +262,6 @@ BuildArch: noarch
 
 %package devel
 Summary: Development files for %{name}
-Provides: %{name}-private-devel = %{version}-%{release}
 Requires: %{name}%{?_isa} = %{version}-%{release}
 Requires: %{name}-gui%{?_isa}
 %if 0%{?egl}
@@ -277,6 +276,14 @@ Requires: clang >= 3.7.0
 # todo: spilt out private headers into separate pkg
 Requires: cups-devel
 %description devel
+%{summary}.
+
+%package private-devel
+Summary: Development files for %{name} private APIs
+# upgrade path, when private-devel was introduced
+Obsoletes: %{name}-devel < 5.12.1-3
+Requires: %{name}-devel%{?_isa} = %{version}-%{release}
+%description private-devel
 %{summary}.
 
 %package examples
@@ -840,7 +847,13 @@ fi
 %{_qt5_libdir}/libQt5EglFsKmsSupport.prl
 %{_qt5_libdir}/libQt5EglFsKmsSupport.so
 %endif
+## private-devel globs
+%exclude %{_qt5_archdatadir}/mkspecs/modules/qt_lib_*_private.pri
+%exclude %{_qt5_headerdir}/*/%{version}/*/private/
 
+%files private-devel
+%{_qt5_headerdir}/*/%{version}/*/private/
+%{_qt5_archdatadir}/mkspecs/modules/qt_lib_*_private.pri
 
 %files static
 %{_qt5_libdir}/libQt5Bootstrap.*a
@@ -995,6 +1008,9 @@ fi
 
 
 %changelog
+* Tue Apr 30 2019 Rex Dieter <rdieter@fedoraproject.org> - 5.12.1-3
+- -private-devel subpkg
+
 * Mon Mar 04 2019 Rex Dieter <rdieter@fedoraproject.org> - 5.12.1-2
 - -devel: Requires: cups-devel
 
