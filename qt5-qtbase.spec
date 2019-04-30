@@ -272,9 +272,6 @@ Requires: qt5-rpm-macros
 %if 0%{?use_clang}
 Requires: clang >= 3.7.0
 %endif
-# QtPrintSupport/private requires cups/ppd.h
-# todo: spilt out private headers into separate pkg
-Requires: cups-devel
 %description devel
 %{summary}.
 
@@ -283,6 +280,8 @@ Summary: Development files for %{name} private APIs
 # upgrade path, when private-devel was introduced
 Obsoletes: %{name}-devel < 5.12.1-3
 Requires: %{name}-devel%{?_isa} = %{version}-%{release}
+# QtPrintSupport/private requires cups/ppd.h
+Requires: cups-devel
 %description private-devel
 %{summary}.
 
@@ -1009,7 +1008,8 @@ fi
 
 %changelog
 * Tue Apr 30 2019 Rex Dieter <rdieter@fedoraproject.org> - 5.12.1-3
-- -private-devel subpkg
+- -private-devel subpkg, move Requires: cups-devel here
+
 
 * Mon Mar 04 2019 Rex Dieter <rdieter@fedoraproject.org> - 5.12.1-2
 - -devel: Requires: cups-devel
