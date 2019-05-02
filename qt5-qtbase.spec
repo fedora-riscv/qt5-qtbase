@@ -53,7 +53,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.12.1
-Release: 4%{?dist}
+Release: 5%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -853,12 +853,13 @@ fi
 %{_qt5_libdir}/libQt5EglFsKmsSupport.so
 %endif
 ## private-devel globs
-%exclude %{_qt5_archdatadir}/mkspecs/modules/qt_lib_*_private.pri
+# keep mkspecs/modules stuff  in -devel for now, https://bugzilla.redhat.com/show_bug.cgi?id=1705280
+%{_qt5_archdatadir}/mkspecs/modules/qt_lib_*_private.pri
 %exclude %{_qt5_headerdir}/*/%{version}/*/private/
 
 %files private-devel
 %{_qt5_headerdir}/*/%{version}/*/private/
-%{_qt5_archdatadir}/mkspecs/modules/qt_lib_*_private.pri
+#{_qt5_archdatadir}/mkspecs/modules/qt_lib_*_private.pri
 
 %files static
 %{_qt5_libdir}/libQt5Bootstrap.*a
@@ -1013,6 +1014,9 @@ fi
 
 
 %changelog
+* Thu May 02 2019 Rex Dieter <rdieter@fedoraproject.org> - 5.12.1-5
+- keep mkspecs/modules/*_private.pri in -devel #1705280)
+
 * Tue Apr 30 2019 Rex Dieter <rdieter@fedoraproject.org> - 5.12.1-4
 - CMake generates wrong -isystem /usr/include compilations flags with Qt5::Gui (#1704474)
 
