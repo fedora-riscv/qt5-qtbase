@@ -53,7 +53,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.12.1
-Release: 5%{?dist}
+Release: 6%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -129,6 +129,7 @@ Patch68: qtbase-everywhere-src-5.11.1-python3.patch
 # glibc stat
 
 ## upstream patches
+Patch234: 0234-Blacklist-nouveau-and-llvmpipe-for-multithreading.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -373,8 +374,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %setup -q -n %{qt_module}-everywhere-src-%{version}
 
 ## upstream fixes
-
-
+%patch234 -p1 -b .0234
 
 %patch4 -p1 -b .QTBUG-35459
 # omit '-b .tell-the-truth-about-private-api' so it doesn't end up in installed files -- rdieter
@@ -1014,6 +1014,9 @@ fi
 
 
 %changelog
+* Wed May 08 2019 Rex Dieter <rdieter@fedoraproject.org> - 5.12.1-6
+- Blacklist nouveau and llvmpipe for multithreading (#1706420)
+
 * Thu May 02 2019 Rex Dieter <rdieter@fedoraproject.org> - 5.12.1-5
 - keep mkspecs/modules/*_private.pri in -devel #1705280)
 
