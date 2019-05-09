@@ -194,7 +194,11 @@ BuildRequires: pkgconfig(xkeyboard-config)
 %global egl 1
 BuildRequires: pkgconfig(egl)
 BuildRequires: pkgconfig(gbm)
+## TODO: apparently only needed if building opengl_es2 support, do we actually use it?  -- rex
+## this dep was removed in rawhide with introduction of mesa-19.1
+%if 0%{?fedora} < 30
 BuildRequires: pkgconfig(glesv2)
+%endif
 %global sqlite -system-sqlite
 BuildRequires: pkgconfig(sqlite3) >= 3.7
 %if 0%{?fedora} > 22
@@ -1016,6 +1020,7 @@ fi
 %changelog
 * Wed May 08 2019 Rex Dieter <rdieter@fedoraproject.org> - 5.12.1-6
 - Blacklist nouveau and llvmpipe for multithreading (#1706420)
+- drop BR: pkgconfig(glesv2) on f31+, no longer provided in mesa-19.1+
 
 * Thu May 02 2019 Rex Dieter <rdieter@fedoraproject.org> - 5.12.1-5
 - keep mkspecs/modules/*_private.pri in -devel #1705280)
