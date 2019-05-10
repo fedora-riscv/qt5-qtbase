@@ -1,0 +1,33 @@
+From 8e6231f4ebd0957920b740fb0cc96af0ac66e6cf Mon Sep 17 00:00:00 2001
+From: Joerg Bornemann <joerg.bornemann@qt.io>
+Date: Wed, 30 Jan 2019 16:16:58 +0100
+Subject: [PATCH 129/525] Fix install targets for generated private headers
+
+Header files of modules that specify generated_privates are usually
+not yet available at qmake-time. Thus, the installation rule must not
+check for the file's existence.
+
+Change-Id: Ifc7ff95422912d255744c9006382ff181176ae77
+Fixes: QTBUG-71340
+Reviewed-by: Oliver Wolff <oliver.wolff@qt.io>
+Reviewed-by: Edward Welbourne <edward.welbourne@qt.io>
+---
+ mkspecs/features/qt_installs.prf | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/mkspecs/features/qt_installs.prf b/mkspecs/features/qt_installs.prf
+index 8f98987b99..1ebca17366 100644
+--- a/mkspecs/features/qt_installs.prf
++++ b/mkspecs/features/qt_installs.prf
+@@ -38,6 +38,8 @@ qt_install_headers {
+ 
+     private_headers.files = $$SYNCQT.PRIVATE_HEADER_FILES $$SYNCQT.INJECTED_PRIVATE_HEADER_FILES
+     private_headers.path = $$[QT_INSTALL_HEADERS]/$$MODULE_INCNAME/$$VERSION/$$MODULE_INCNAME/private
++    generated_privates: \
++        private_headers.CONFIG += no_check_exist
+     INSTALLS += private_headers
+ 
+     qpa_headers.files = $$SYNCQT.QPA_HEADER_FILES
+-- 
+2.21.0
+

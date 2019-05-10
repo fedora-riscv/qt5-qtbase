@@ -53,7 +53,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.12.1
-Release: 6%{?dist}
+Release: 7%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -129,6 +129,7 @@ Patch68: qtbase-everywhere-src-5.11.1-python3.patch
 # glibc stat
 
 ## upstream patches
+Patch129: 0129-Fix-install-targets-for-generated-private-headers.patch
 Patch234: 0234-Blacklist-nouveau-and-llvmpipe-for-multithreading.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
@@ -378,6 +379,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %setup -q -n %{qt_module}-everywhere-src-%{version}
 
 ## upstream fixes
+%patch129 -p1 -b .0129
 %patch234 -p1 -b .0234
 
 %patch4 -p1 -b .QTBUG-35459
@@ -1018,6 +1020,9 @@ fi
 
 
 %changelog
+* Fri May 10 2019 Rex Dieter <rdieter@fedoraproject.org> - 5.12.1-7
+- Fix install targets for generated private headers (#1702858)
+
 * Wed May 08 2019 Rex Dieter <rdieter@fedoraproject.org> - 5.12.1-6
 - Blacklist nouveau and llvmpipe for multithreading (#1706420)
 - drop BR: pkgconfig(glesv2) on f31+, no longer provided in mesa-19.1+
