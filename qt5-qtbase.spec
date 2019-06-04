@@ -52,8 +52,8 @@ BuildRequires: pkgconfig(libsystemd)
 
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
-Version: 5.12.1
-Release: 7%{?dist}
+Version: 5.12.3
+Release: 1%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -129,8 +129,6 @@ Patch68: qtbase-everywhere-src-5.11.1-python3.patch
 # glibc stat
 
 ## upstream patches
-Patch129: 0129-Fix-install-targets-for-generated-private-headers.patch
-Patch234: 0234-Blacklist-nouveau-and-llvmpipe-for-multithreading.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -379,8 +377,6 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %setup -q -n %{qt_module}-everywhere-src-%{version}
 
 ## upstream fixes
-%patch129 -p1 -b .0129
-%patch234 -p1 -b .0234
 
 %patch4 -p1 -b .QTBUG-35459
 # omit '-b .tell-the-truth-about-private-api' so it doesn't end up in installed files -- rdieter
@@ -1020,6 +1016,9 @@ fi
 
 
 %changelog
+* Tue Jun 04 2019 Jan Grulich <jgrulich@redhat.com> - 5.12.3-1
+- 5.12.3
+
 * Fri May 10 2019 Rex Dieter <rdieter@fedoraproject.org> - 5.12.1-7
 - Fix install targets for generated private headers (#1702858)
 
