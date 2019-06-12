@@ -53,7 +53,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.12.3
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -129,6 +129,9 @@ Patch68: qtbase-everywhere-src-5.11.1-python3.patch
 # glibc stat
 
 ## upstream patches
+# https://bugs.kde.org/show_bug.cgi?id=406180
+# https://codereview.qt-project.org/c/qt/qtbase/+/264563
+Patch100: fbf3488.diff
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -397,6 +400,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %patch68 -p1
 
 ## upstream patches
+%patch100 -p1
 
 # move some bundled libs to ensure they're not accidentally used
 pushd src/3rdparty
@@ -1016,6 +1020,9 @@ fi
 
 
 %changelog
+* Wed Jun 12 2019 Rex Dieter <rdieter@fedoraproject.org> - 5.12.3-2
+- pull in candidate upstream nvidia/optima fix (kde#406180)
+
 * Tue Jun 04 2019 Jan Grulich <jgrulich@redhat.com> - 5.12.3-1
 - 5.12.3
 

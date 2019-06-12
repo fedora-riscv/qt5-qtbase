@@ -1,0 +1,53 @@
+From fbf34883dfc23c109aa03d0df04a07bfd3be59e6 Mon Sep 17 00:00:00 2001
+From: Erik Kurzinger <ekurzinger@nvidia.com>
+Date: Mon, 10 Jun 2019 14:50:40 -0700
+Subject: [PATCH] Remove m_swapInterval from QGLXContext
+
+As per GLX_EXT_swap_control, the GLX swap interval is specified on a
+per-drawable basis. However, QGLXContext only tracks it per-context
+using the m_swapInterval member. If a new drawable is made current to a
+context, it is still necessary to call glXSwapIntervalEXT to change the
+swap interval, even if it has been previously called for the same
+context with a different drawable.  However, currently,
+QGLXContext::makeCurrent doesn't do this if m_swapInterval matches the
+new swap interval. This change removes m_swapInterval, forcing the swap
+interval to be set every time and relying on the OpenGL implementation
+to optimize away unnecessary calls.
+
+Change-Id: Idc34101476c6af618059f6f3d8925dee743994a3
+---
+
+diff --git a/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qglxintegration.cpp b/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qglxintegration.cpp
+index 4adf662..01517eb 100644
+--- a/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qglxintegration.cpp
++++ b/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qglxintegration.cpp
+@@ -204,7 +204,6 @@
+     , m_shareContext(0)
+     , m_format(format)
+     , m_isPBufferCurrent(false)
+-    , m_swapInterval(-1)
+     , m_ownsContext(nativeHandle.isNull())
+     , m_getGraphicsResetStatus(0)
+     , m_lost(false)
+@@ -568,8 +567,7 @@
+     if (success && surfaceClass == QSurface::Window) {
+         int interval = surface->format().swapInterval();
+         QXcbScreen *screen = screenForPlatformSurface(surface);
+-        if (interval >= 0 && m_swapInterval != interval && screen) {
+-            m_swapInterval = interval;
++        if (interval >= 0 && screen) {
+             typedef void (*qt_glXSwapIntervalEXT)(Display *, GLXDrawable, int);
+             typedef void (*qt_glXSwapIntervalMESA)(unsigned int);
+             static qt_glXSwapIntervalEXT glXSwapIntervalEXT = 0;
+diff --git a/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qglxintegration.h b/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qglxintegration.h
+index be9d3f5..2a88fd6 100644
+--- a/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qglxintegration.h
++++ b/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qglxintegration.h
+@@ -87,7 +87,6 @@
+     GLXContext m_shareContext;
+     QSurfaceFormat m_format;
+     bool m_isPBufferCurrent;
+-    int m_swapInterval;
+     bool m_ownsContext;
+     GLenum (APIENTRY * m_getGraphicsResetStatus)();
+     bool m_lost;
