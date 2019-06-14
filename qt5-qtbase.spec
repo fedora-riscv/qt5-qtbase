@@ -1020,7 +1020,7 @@ fi
 
 
 %changelog
-* Tue Jun 11 2019 Jan Grulich <jgrulich@redhat.com> - 5.12.4-1
+* Thu Jun 14 2019 Jan Grulich <jgrulich@redhat.com> - 5.12.4-1
 - 5.12.4
 
 * Wed Jun 12 2019 Rex Dieter <rdieter@fedoraproject.org> - 5.12.3-2
