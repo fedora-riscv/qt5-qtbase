@@ -52,8 +52,8 @@ BuildRequires: pkgconfig(libsystemd)
 
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
-Version: 5.12.3
-Release: 2%{?dist}
+Version: 5.12.4
+Release: 1%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -1020,6 +1020,9 @@ fi
 
 
 %changelog
+* Tue Jun 11 2019 Jan Grulich <jgrulich@redhat.com> - 5.12.4-1
+- 5.12.4
+
 * Wed Jun 12 2019 Rex Dieter <rdieter@fedoraproject.org> - 5.12.3-2
 - pull in candidate upstream nvidia/optima fix (kde#406180)
 
