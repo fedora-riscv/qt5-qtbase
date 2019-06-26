@@ -53,7 +53,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.12.4
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -132,6 +132,11 @@ Patch68: qtbase-everywhere-src-5.11.1-python3.patch
 # https://bugs.kde.org/show_bug.cgi?id=406180
 # https://codereview.qt-project.org/c/qt/qtbase/+/264563
 Patch100: fbf3488.diff
+Patch110: 0010-Work-around-crash-where-a-destroyed-window-becomes-f.patch
+Patch154: 0054-Fix-crash-when-app-is-going-to-shutdown-but-conf-man.patch
+Patch156: 0056-QHighDpi-Replace-fromNative-toNative-with-scale.patch
+Patch166: 0066-High-DPI-Fix-crash-in-QWindow-mapFromGlobal.patch
+Patch200: 0100-QHighDpi-fromNativePixels-use-correct-screen.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -401,6 +406,11 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 
 ## upstream patches
 %patch100 -p1
+%patch110 -p1
+%patch154 -p1
+%patch156 -p1
+%patch166 -p1
+%patch200 -p1
 
 # move some bundled libs to ensure they're not accidentally used
 pushd src/3rdparty
@@ -1020,6 +1030,9 @@ fi
 
 
 %changelog
+* Wed Jun 26 2019 Rex Dieter <rdieter@fedoraproject.org> - 5.12.4-2
+- pull in some upstream crash fixes
+
 * Fri Jun 14 2019 Jan Grulich <jgrulich@redhat.com> - 5.12.4-1
 - 5.12.4
 

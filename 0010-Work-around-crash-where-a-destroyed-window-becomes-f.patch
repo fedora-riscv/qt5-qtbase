@@ -1,0 +1,40 @@
+From 1eac947ce2c1d63bd04a94939c4f04e9086913c7 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Morten=20Johan=20S=C3=B8rvig?= <morten.sorvig@qt.io>
+Date: Wed, 22 May 2019 14:01:41 +0200
+Subject: [PATCH 010/105] Work around crash where a destroyed window becomes
+ focus_window
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Clear QGuiApplication::focus_window (again) in the
+QWindow destructor.
+
+Task-number: QTBUG-75326
+Change-Id: Ief00b6adfb267fcc7e3881fd728e12df07fc1094
+Reviewed-by: Christian Andersen <csandersen3@gmail.com>
+Reviewed-by: Tor Arne Vestbø <tor.arne.vestbo@qt.io>
+---
+ src/gui/kernel/qwindow.cpp | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/src/gui/kernel/qwindow.cpp b/src/gui/kernel/qwindow.cpp
+index bcd8351619..a19df4da0f 100644
+--- a/src/gui/kernel/qwindow.cpp
++++ b/src/gui/kernel/qwindow.cpp
+@@ -218,6 +218,12 @@ QWindow::~QWindow()
+     QGuiApplicationPrivate::window_list.removeAll(this);
+     if (!QGuiApplicationPrivate::is_app_closing)
+         QGuiApplicationPrivate::instance()->modalWindowList.removeOne(this);
++
++    // focus_window is normally cleared in destroy(), but the window may in
++    // some cases end up becoming the focus window again. Clear it again
++    // here as a workaround. See QTBUG-75326.
++    if (QGuiApplicationPrivate::focus_window == this)
++        QGuiApplicationPrivate::focus_window = 0;
+ }
+ 
+ void QWindowPrivate::init(QScreen *targetScreen)
+-- 
+2.21.0
+
