@@ -53,7 +53,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.12.4
-Release: 4%{?dist}
+Release: 5%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -125,6 +125,10 @@ Patch67: https://bugreports.qt.io/secure/attachment/66353/xcberror_filter.patch
 
 # python3
 Patch68: qtbase-everywhere-src-5.11.1-python3.patch
+
+# https://fedoraproject.org/wiki/Changes/Qt_Wayland_By_Default_On_Gnome
+# https://bugzilla.redhat.com/show_bug.cgi?id=1732129
+Patch80: qtbase-use-wayland-on-gnome.patch
 
 # glibc stat
 
@@ -405,6 +409,10 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 # FIXME/REBASE
 #patch67 -p1 -b .xcberror_filter
 %patch68 -p1
+
+%if 0%{?fedora} > 30
+%patch80 -p1 -b .use-wayland-on-gnome.patch
+%endif
 
 ## upstream patches
 %patch100 -p1
@@ -1033,6 +1041,10 @@ fi
 
 
 %changelog
+* Tue Jul 23 2019 Jan Grulich <jgrulich@redhat.com> - 5.12.4-5
+- Use qtwayland by default on Gnome Wayland sessions
+  Resolves: bz#1732129
+
 * Mon Jul 15 2019 Jan Grulich <jgrulich@redhat.com> - 5.12.4-4
 - Revert "Reset QWidget's winId when backing window surface is destroyed"
 
