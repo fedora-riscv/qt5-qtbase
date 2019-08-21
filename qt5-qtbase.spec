@@ -53,7 +53,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.12.4
-Release: 6%{?dist}
+Release: 7%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -205,7 +205,7 @@ Provides: bundled(libxkbcommon) = 0.4.1
 BuildRequires: pkgconfig(xkeyboard-config)
 %if 0%{?fedora} || 0%{?rhel} > 6
 %global egl 1
-BuildRequires: pkgconfig(egl)
+BuildRequires: libEGL-devel
 BuildRequires: pkgconfig(gbm)
 ## TODO: apparently only needed if building opengl_es2 support, do we actually use it?  -- rex
 ## this dep was removed in rawhide with introduction of mesa-19.1
@@ -287,7 +287,7 @@ Summary: Development files for %{name}
 Requires: %{name}%{?_isa} = %{version}-%{release}
 Requires: %{name}-gui%{?_isa}
 %if 0%{?egl}
-Requires: pkgconfig(egl)
+Requires: libEGL-devel
 %endif
 Requires: pkgconfig(gl)
 Requires: qt5-rpm-macros
@@ -1041,6 +1041,9 @@ fi
 
 
 %changelog
+* Wed Aug 21 2019 Rex Dieter <rdieter@fedoraproject.org> - 5.12.4-7
+- s/pkgconfig(egl)/libEGL-devel/
+
 * Fri Jul 26 2019 Fedora Release Engineering <releng@fedoraproject.org> - 5.12.4-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
 
