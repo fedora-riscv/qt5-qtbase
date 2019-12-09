@@ -52,8 +52,8 @@ BuildRequires: pkgconfig(libsystemd)
 
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
-Version: 5.12.5
-Release: 2%{?dist}
+Version: 5.13.2
+Release: 1%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -542,7 +542,7 @@ translationdir=%{_qt5_translationdir}
 
 Name: Qt5
 Description: Qt5 Configuration
-Version: 5.12.5
+Version: 5.13.2
 EOF
 
 # rpm macros
@@ -725,6 +725,7 @@ fi
 %dir %{_qt5_libdir}/cmake/Qt5Xml/
 %dir %{_qt5_docdir}/
 %{_qt5_docdir}/global/
+%{_qt5_docdir}/config/
 %{_qt5_importdir}/
 %{_qt5_translationdir}/
 %if "%{_qt5_prefix}" != "%{_prefix}"
@@ -774,6 +775,7 @@ fi
 %{_bindir}/qlalr
 %{_bindir}/fixqt4headers.pl
 %{_bindir}/qvkgen
+%{_bindir}/tracegen
 %{_qt5_bindir}/moc*
 %{_qt5_bindir}/qdbuscpp2xml*
 %{_qt5_bindir}/qdbusxml2cpp*
@@ -803,6 +805,7 @@ fi
 %{_qt5_headerdir}/QtEglFSDeviceIntegration
 %{_qt5_headerdir}/QtInputSupport
 %{_qt5_headerdir}/QtEdidSupport
+%{_qt5_headerdir}/QtXkbCommonSupport
 %{_qt5_archdatadir}/mkspecs/
 %{_qt5_libdir}/libQt5Concurrent.prl
 %{_qt5_libdir}/libQt5Concurrent.so
@@ -847,6 +850,25 @@ fi
 %{_qt5_libdir}/cmake/Qt5Widgets/Qt5WidgetsMacros.cmake
 %{_qt5_libdir}/cmake/Qt5Xml/Qt5XmlConfig*.cmake
 %{_qt5_libdir}/cmake/Qt5/Qt5ModuleLocation.cmake
+%{_qt5_libdir}/cmake/Qt5AccessibilitySupport/Qt5AccessibilitySupportConfig*.cmake
+%{_qt5_libdir}/cmake/Qt5Bootstrap/Qt5BootstrapConfig*.cmake
+%{_qt5_libdir}/cmake/Qt5DeviceDiscoverySupport/Qt5DeviceDiscoverySupportConfig*.cmake
+%{_qt5_libdir}/cmake/Qt5EdidSupport/Qt5EdidSupportConfig*.cmake
+%{_qt5_libdir}/cmake/Qt5EglFSDeviceIntegration/Qt5EglFSDeviceIntegrationConfig*.cmake
+%{_qt5_libdir}/cmake/Qt5EglFsKmsSupport/Qt5EglFsKmsSupportConfig*.cmake
+%{_qt5_libdir}/cmake/Qt5EglSupport/Qt5EglSupportConfig*.cmake
+%{_qt5_libdir}/cmake/Qt5EventDispatcherSupport/Qt5EventDispatcherSupportConfig*.cmake
+%{_qt5_libdir}/cmake/Qt5FbSupport/Qt5FbSupportConfig*.cmake
+%{_qt5_libdir}/cmake/Qt5FontDatabaseSupport/Qt5FontDatabaseSupportConfig*.cmake
+%{_qt5_libdir}/cmake/Qt5GlxSupport/Qt5GlxSupportConfig*.cmake
+%{_qt5_libdir}/cmake/Qt5InputSupport/Qt5InputSupportConfig*.cmake
+%{_qt5_libdir}/cmake/Qt5KmsSupport/Qt5KmsSupportConfig*.cmake
+%{_qt5_libdir}/cmake/Qt5LinuxAccessibilitySupport/Qt5LinuxAccessibilitySupportConfig*.cmake
+%{_qt5_libdir}/cmake/Qt5PlatformCompositorSupport/Qt5PlatformCompositorSupportConfig*.cmake
+%{_qt5_libdir}/cmake/Qt5ServiceSupport/Qt5ServiceSupportConfig*.cmake
+%{_qt5_libdir}/cmake/Qt5ThemeSupport/Qt5ThemeSupportConfig*.cmake
+%{_qt5_libdir}/cmake/Qt5XcbQpa/Qt5XcbQpaConfig*.cmake
+%{_qt5_libdir}/cmake/Qt5XkbCommonSupport/Qt5XkbCommonSupportConfig*.cmake
 %{_qt5_libdir}/pkgconfig/Qt5.pc
 %{_qt5_libdir}/pkgconfig/Qt5Concurrent.pc
 %{_qt5_libdir}/pkgconfig/Qt5Core.pc
@@ -863,6 +885,7 @@ fi
 %{_qt5_libdir}/libQt5EglFsKmsSupport.prl
 %{_qt5_libdir}/libQt5EglFsKmsSupport.so
 %endif
+%{_qt5_libdir}/qt5/bin/tracegen
 ## private-devel globs
 # keep mkspecs/modules stuff  in -devel for now, https://bugzilla.redhat.com/show_bug.cgi?id=1705280
 %{_qt5_archdatadir}/mkspecs/modules/qt_lib_*_private.pri
@@ -920,6 +943,8 @@ fi
 %{_qt5_headerdir}/QtKmsSupport
 %{_qt5_libdir}/libQt5EdidSupport.*a
 %{_qt5_libdir}/libQt5EdidSupport.prl
+%{_qt5_libdir}/libQt5XkbCommonSupport.*a
+%{_qt5_libdir}/libQt5XkbCommonSupport.prl
 
 %if 0%{?examples}
 %files examples
@@ -1025,6 +1050,9 @@ fi
 
 
 %changelog
+* Mon Dec 09 2019 Jan Grulich <jgrulich@redhat.com> - 5.13.2-1
+- 5.13.2
+
 * Fri Nov 01 2019 Pete Walter <pwalter@fedoraproject.org> - 5.12.5-2
 - Rebuild for ICU 65
 
