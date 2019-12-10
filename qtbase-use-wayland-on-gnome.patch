@@ -1,20 +1,29 @@
 diff --git a/src/gui/kernel/qguiapplication.cpp b/src/gui/kernel/qguiapplication.cpp
-index b8bfad4f16..676fdfad5e 100644
+index 5014878bd2..91d0273b97 100644
 --- a/src/gui/kernel/qguiapplication.cpp
 +++ b/src/gui/kernel/qguiapplication.cpp
-@@ -1376,14 +1376,7 @@ void QGuiApplicationPrivate::createPlatformIntegration()
+@@ -1320,13 +1320,20 @@ void QGuiApplicationPrivate::createPlatformIntegration()
          if (sessionType == QByteArrayLiteral("x11") && !platformName.contains(QByteArrayLiteral("xcb"))) {
              platformName = QByteArrayLiteral("xcb");
          } else if (sessionType == QByteArrayLiteral("wayland") && !platformName.contains(QByteArrayLiteral("wayland"))) {
--            QByteArray currentDesktop = qgetenv("XDG_CURRENT_DESKTOP").toLower();
--            QByteArray sessionDesktop = qgetenv("XDG_SESSION_DESKTOP").toLower();
++            QStringList blacklistedApps;
+             QByteArray currentDesktop = qgetenv("XDG_CURRENT_DESKTOP").toLower();
+             QByteArray sessionDesktop = qgetenv("XDG_SESSION_DESKTOP").toLower();
 -            if (currentDesktop.contains("gnome") || sessionDesktop.contains("gnome")) {
 -                qInfo() << "Warning: Ignoring XDG_SESSION_TYPE=wayland on Gnome."
 -                        << "Use QT_QPA_PLATFORM=wayland to run on Wayland anyway.";
 -            } else {
--                platformName = QByteArrayLiteral("wayland");
--            }
-+            platformName = QByteArrayLiteral("wayland");
++            blacklistedApps << QStringLiteral("virtualbox") << QStringLiteral("obs") << QStringLiteral("kdenlive")
++                            << QStringLiteral("smplayer") << QStringLiteral("mixxx") << QStringLiteral("qtcreator");
++            if (!blacklistedApps.contains(QCoreApplicationPrivate::appName().toLower())) {
+                 platformName = QByteArrayLiteral("wayland");
++            } else {
++                // Fallback to xcb in GNOME
++                if (currentDesktop.contains("gnome") || sessionDesktop.contains("gnome"))
++                    platformName = QByteArrayLiteral("xcb");
++                // Otherwise use Wayland which was default even before
++                else
++                    platformName = QByteArrayLiteral("wayland");
+             }
          }
      }
- #ifdef QT_QPA_DEFAULT_PLATFORM_NAME

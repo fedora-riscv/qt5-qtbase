@@ -53,7 +53,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.12.5
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -133,6 +133,7 @@ Patch80: qtbase-use-wayland-on-gnome.patch
 # glibc stat
 
 ## upstream patches
+Patch100: qtbase-prefer-utf8-when-multiple-charsets-are-available.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -405,7 +406,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %endif
 
 ## upstream patches
-
+%patch100 -p1 -b .prefer-utf8-when-multiple-charsets-are-available
 
 # move some bundled libs to ensure they're not accidentally used
 pushd src/3rdparty
@@ -1025,6 +1026,10 @@ fi
 
 
 %changelog
+* Tue Dec 10 2019 Jan Grulich <jgrulich@redhat.com> - 5.12.5-2
+- Blacklist some applications from being used on Wayland
+- QMimeData: Prefer UTF-8 when multiple charsets are available
+
 * Tue Sep 24 2019 Jan Grulich <jgrulich@redhat.com> - 5.12.5-1
 - 5.12.5
 
