@@ -13,8 +13,8 @@ index 5014878bd2..91d0273b97 100644
 -                qInfo() << "Warning: Ignoring XDG_SESSION_TYPE=wayland on Gnome."
 -                        << "Use QT_QPA_PLATFORM=wayland to run on Wayland anyway.";
 -            } else {
-+            blacklistedApps << QStringLiteral("virtualbox") << QStringLiteral("obs") << QStringLiteral("kdenlive")
-+                            << QStringLiteral("smplayer") << QStringLiteral("mixxx") << QStringLiteral("qtcreator");
++            blacklistedApps << QStringLiteral("virtualbox") << QStringLiteral("obs") << QStringLiteral("kdenlive") << QStringLiteral("mythtv-setup")
++                            << QStringLiteral("mythfrontend") << QStringLiteral("smplayer") << QStringLiteral("mixxx") << QStringLiteral("qtcreator");
 +            if (!blacklistedApps.contains(QCoreApplicationPrivate::appName().toLower())) {
                  platformName = QByteArrayLiteral("wayland");
 +            } else {
