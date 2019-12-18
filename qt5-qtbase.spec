@@ -405,7 +405,6 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %endif
 
 ## upstream patches
-%patch100 -p1 -b .prefer-utf8-when-multiple-charsets-are-available
 
 # move some bundled libs to ensure they're not accidentally used
 pushd src/3rdparty
