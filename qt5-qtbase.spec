@@ -53,7 +53,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.13.2
-Release: 3%{?dist}
+Release: 4%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -135,6 +135,8 @@ Patch80: qtbase-use-wayland-on-gnome.patch
 ## upstream patches
 Patch100: 0001-Do-not-load-plugin-from-the-PWD.patch
 Patch101: 0001-QLibrary-Unix-do-not-attempt-to-load-a-library-relat.patch
+# Add support for PostgreSQL 12
+Patch102: https://code.qt.io/cgit/qt/qtbase.git/patch/?id=14b61d48#/0001-QPSQL-Add-support-for-PostgreSQL-12.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -409,6 +411,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 ## upstream patches
 %patch100 -p1 -b .Do-not-load-plugin-from-the-PWD.patch
 %patch101 -p1 -b .QLibrary-Unix-do-not-attempt-to-load-a-library-relat
+%patch102 -p1 -b .QPSQL-Add-support-for-PostgreSQL-12
 
 # move some bundled libs to ensure they're not accidentally used
 pushd src/3rdparty
@@ -1053,6 +1056,9 @@ fi
 
 
 %changelog
+* Sun Mar 22 2020 Robert-André Mauchin <zebob.m@gmail.com> - 5.13.2-4
+- Upstream patch to add support for PostgreSQL 12 (#1815921)
+
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 5.13.2-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
 
