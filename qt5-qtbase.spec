@@ -52,8 +52,8 @@ BuildRequires: pkgconfig(libsystemd)
 
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
-Version: 5.13.2
-Release: 4%{?dist}
+Version: 5.14.2
+Release: 1%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -77,9 +77,6 @@ Source10: macros.qt5-qtbase
 
 # support multilib optflags
 Patch2: qtbase-multilib_optflags.patch
-
-# fix QTBUG-35459 (too low entityCharacterLimit=1024 for CVE-2013-4549)
-Patch4: qtbase-opensource-src-5.3.2-QTBUG-35459.patch
 
 # borrowed from opensuse
 # track private api via properly versioned symbols
@@ -118,11 +115,6 @@ Patch64: qt5-qtbase-5.12.1-firebird.patch
 # fix for new mariadb
 Patch65: qtbase-opensource-src-5.9.0-mysql.patch
 
-# use categorized logging for xcb log entries
-# https://bugreports.qt.io/browse/QTBUG-55167
-# https://bugzilla.redhat.com/show_bug.cgi?id=1497564
-Patch67: https://bugreports.qt.io/secure/attachment/66353/xcberror_filter.patch
-
 # python3
 Patch68: qtbase-everywhere-src-5.11.1-python3.patch
 
@@ -133,10 +125,6 @@ Patch80: qtbase-use-wayland-on-gnome.patch
 # glibc stat
 
 ## upstream patches
-Patch100: 0001-Do-not-load-plugin-from-the-PWD.patch
-Patch101: 0001-QLibrary-Unix-do-not-attempt-to-load-a-library-relat.patch
-# Add support for PostgreSQL 12
-Patch102: https://code.qt.io/cgit/qt/qtbase.git/patch/?id=14b61d48#/0001-QPSQL-Add-support-for-PostgreSQL-12.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -386,12 +374,12 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 
 ## upstream fixes
 
-%patch4 -p1 -b .QTBUG-35459
 # omit '-b .tell-the-truth-about-private-api' so it doesn't end up in installed files -- rdieter
 %patch8 -p1
 
 %patch50 -p1 -b .QT_VERSION_CHECK
-%patch51 -p1 -b .hidpi_scale_at_192
+# FIXME/TODO : rebase or drop -- rdieter
+#patch51 -p1 -b .hidpi_scale_at_192
 %patch52 -p1 -b .moc_macros
 %patch53 -p1 -b .qt5gui_cmake_isystem_includes
 %patch54 -p1 -b .qmake_LFLAGS
@@ -400,8 +388,6 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %if 0%{?fedora} > 27
 %patch65 -p1 -b .mysql
 %endif
-# FIXME/REBASE
-#patch67 -p1 -b .xcberror_filter
 %patch68 -p1
 
 %if 0%{?fedora} > 30
@@ -409,9 +395,6 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %endif
 
 ## upstream patches
-%patch100 -p1 -b .Do-not-load-plugin-from-the-PWD.patch
-%patch101 -p1 -b .QLibrary-Unix-do-not-attempt-to-load-a-library-relat
-%patch102 -p1 -b .QPSQL-Add-support-for-PostgreSQL-12
 
 # move some bundled libs to ensure they're not accidentally used
 pushd src/3rdparty
@@ -548,7 +531,7 @@ translationdir=%{_qt5_translationdir}
 
 Name: Qt5
 Description: Qt5 Configuration
-Version: 5.13.2
+Version: %{version}
 EOF
 
 # rpm macros
@@ -1056,6 +1039,9 @@ fi
 
 
 %changelog
+* Sat Apr 04 2020 Rex Dieter <rdieter@fedoraproject.org> - 5.14.2-1
+- 5.14.2
+
 * Sun Mar 22 2020 Robert-André Mauchin <zebob.m@gmail.com> - 5.13.2-4
 - Upstream patch to add support for PostgreSQL 12 (#1815921)
 
