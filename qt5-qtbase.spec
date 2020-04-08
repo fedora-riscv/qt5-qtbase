@@ -53,7 +53,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.14.2
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -125,6 +125,7 @@ Patch80: qtbase-use-wayland-on-gnome.patch
 # glibc stat
 
 ## upstream patches
+Patch100: qt5-qtbase-CVE-2015-9541.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -395,6 +396,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %endif
 
 ## upstream patches
+%patch100 -p1 -b .CVE-2015-9541
 
 # move some bundled libs to ensure they're not accidentally used
 pushd src/3rdparty
@@ -1039,6 +1041,9 @@ fi
 
 
 %changelog
+* Wed Apr 08 2020 Than Ngo <than@redhat.com> - 5.14.2-2
+- Fixed bz#1801370 - CVE-2015-9541 XML entity expansion vulnerability via a crafted SVG document
+
 * Sat Apr 04 2020 Rex Dieter <rdieter@fedoraproject.org> - 5.14.2-1
 - 5.14.2
 
