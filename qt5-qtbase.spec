@@ -387,7 +387,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %patch52 -p1 -b .moc_macros
 %patch53 -p1 -b .qt5gui_cmake_isystem_includes
 %patch54 -p1 -b .qmake_LFLAGS
-%patch54 -p1 -b .no_relocatable
+%patch55 -p1 -b .no_relocatable
 %patch61 -p1 -b .qt5-qtbase-cxxflag
 %patch64 -p1 -b .firebird
 %if 0%{?fedora} > 27
