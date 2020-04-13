@@ -53,7 +53,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.14.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -474,6 +474,7 @@ export MAKEFLAGS="%{?_smp_mflags}"
   %{!?examples:-nomake examples} \
   %{!?tests:-nomake tests} \
   -no-pch \
+  -no-relocatable \
   -no-rpath \
   -no-separate-debug-info \
   %{?no_sse2} \
@@ -1041,6 +1042,9 @@ fi
 
 
 %changelog
+* Mon Apr 13 2020 Rex Dieter <rdieter@fedoraproject.org> - 5.14.2-3
+- %%build: -no-relocatable (#1823118)
+
 * Wed Apr 08 2020 Than Ngo <than@redhat.com> - 5.14.2-2
 - Fixed bz#1801370 - CVE-2015-9541 XML entity expansion vulnerability via a crafted SVG document
 
