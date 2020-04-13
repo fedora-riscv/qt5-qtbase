@@ -474,7 +474,6 @@ export MAKEFLAGS="%{?_smp_mflags}"
   %{!?examples:-nomake examples} \
   %{!?tests:-nomake tests} \
   -no-pch \
-  -no-relocatable \
   -no-rpath \
   -no-separate-debug-info \
   %{?no_sse2} \
@@ -490,6 +489,7 @@ export MAKEFLAGS="%{?_smp_mflags}"
   -system-zlib \
   %{?use_gold_linker} \
   -no-directfb \
+  -no-feature-relocatable \
   %{?no_feature_renameat2} \
   %{?no_feature_statx} \
   QMAKE_CFLAGS_RELEASE="${CFLAGS:-$RPM_OPT_FLAGS}" \
@@ -1043,7 +1043,7 @@ fi
 
 %changelog
 * Mon Apr 13 2020 Rex Dieter <rdieter@fedoraproject.org> - 5.14.2-3
-- %%build: -no-relocatable (#1823118)
+- %%build: -no-feature-relocatable (#1823118)
 
 * Wed Apr 08 2020 Than Ngo <than@redhat.com> - 5.14.2-2
 - Fixed bz#1801370 - CVE-2015-9541 XML entity expansion vulnerability via a crafted SVG document
