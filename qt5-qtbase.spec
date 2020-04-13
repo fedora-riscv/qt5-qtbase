@@ -106,6 +106,9 @@ Patch53: qtbase-everywhere-src-5.12.1-qt5gui_cmake_isystem_includes.patch
 # respect QMAKE_LFLAGS_RELEASE when building qmake
 Patch54: qtbase-qmake_LFLAGS.patch
 
+# don't use relocatable heuristics to guess prefix when using -no-feature-relocatable
+Patch55: qtbase-everywhere-src-5.14.2-no_relocatable.patch
+
 # drop -O3 and make -O2 by default
 Patch61: qt5-qtbase-cxxflag.patch
 
@@ -384,6 +387,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %patch52 -p1 -b .moc_macros
 %patch53 -p1 -b .qt5gui_cmake_isystem_includes
 %patch54 -p1 -b .qmake_LFLAGS
+%patch54 -p1 -b .no_relocatable
 %patch61 -p1 -b .qt5-qtbase-cxxflag
 %patch64 -p1 -b .firebird
 %if 0%{?fedora} > 27
@@ -1043,7 +1047,7 @@ fi
 
 %changelog
 * Mon Apr 13 2020 Rex Dieter <rdieter@fedoraproject.org> - 5.14.2-3
-- %%build: -no-feature-relocatable (#1823118)
+- %%build: -no-feature-relocatable + matching patch (#1823118)
 
 * Wed Apr 08 2020 Than Ngo <than@redhat.com> - 5.14.2-2
 - Fixed bz#1801370 - CVE-2015-9541 XML entity expansion vulnerability via a crafted SVG document
