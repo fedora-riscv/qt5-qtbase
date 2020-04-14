@@ -6,7 +6,7 @@ diff -up qtbase-everywhere-src-5.14.2/src/corelib/global/qlibraryinfo.cpp.no_rel
      if (group == QLibraryInfo::DevicePaths)
          return QString::fromLocal8Bit(QT_CONFIGURE_PREFIX_PATH);
 -#  endif
-+#  elif QT_CONFIG(relocatable)
++#  elif 0 //QT_CONFIG(relocatable)
      return getExtPrefixFromHostBinDir();
 +#  else
 +    return QString::fromLocal8Bit(QT_CONFIGURE_PREFIX_PATH);
