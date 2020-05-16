@@ -53,7 +53,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.14.2
-Release: 4%{?dist}
+Release: 5%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -1048,6 +1048,9 @@ fi
 
 
 %changelog
+* Sat May 16 2020 Pete Walter <pwalter@fedoraproject.org> - 5.14.2-5
+- Rebuild for ICU 67
+
 * Tue Apr 14 2020 Rex Dieter <rdieter@fedoraproject.org> - 5.14.2-4
 - backport "Mutex deadlock in QPluginLoader, Krita fails to start" (QTBUG-83207)
 
