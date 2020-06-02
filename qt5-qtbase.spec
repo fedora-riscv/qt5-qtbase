@@ -52,7 +52,7 @@ BuildRequires: pkgconfig(libsystemd)
 
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
-Version: 5.13.2
+Version: 5.14.2
 Release: 5%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
@@ -77,9 +77,6 @@ Source10: macros.qt5-qtbase
 
 # support multilib optflags
 Patch2: qtbase-multilib_optflags.patch
-
-# fix QTBUG-35459 (too low entityCharacterLimit=1024 for CVE-2013-4549)
-Patch4: qtbase-opensource-src-5.3.2-QTBUG-35459.patch
 
 # borrowed from opensuse
 # track private api via properly versioned symbols
@@ -109,6 +106,9 @@ Patch53: qtbase-everywhere-src-5.12.1-qt5gui_cmake_isystem_includes.patch
 # respect QMAKE_LFLAGS_RELEASE when building qmake
 Patch54: qtbase-qmake_LFLAGS.patch
 
+# don't use relocatable heuristics to guess prefix when using -no-feature-relocatable
+Patch55: qtbase-everywhere-src-5.14.2-no_relocatable.patch
+
 # drop -O3 and make -O2 by default
 Patch61: qt5-qtbase-cxxflag.patch
 
@@ -117,11 +117,6 @@ Patch64: qt5-qtbase-5.12.1-firebird.patch
 
 # fix for new mariadb
 Patch65: qtbase-opensource-src-5.9.0-mysql.patch
-
-# use categorized logging for xcb log entries
-# https://bugreports.qt.io/browse/QTBUG-55167
-# https://bugzilla.redhat.com/show_bug.cgi?id=1497564
-Patch67: https://bugreports.qt.io/secure/attachment/66353/xcberror_filter.patch
 
 # python3
 Patch68: qtbase-everywhere-src-5.11.1-python3.patch
@@ -133,11 +128,8 @@ Patch80: qtbase-use-wayland-on-gnome.patch
 # glibc stat
 
 ## upstream patches
-Patch100: 0001-Do-not-load-plugin-from-the-PWD.patch
-Patch101: 0001-QLibrary-Unix-do-not-attempt-to-load-a-library-relat.patch
-# Add support for PostgreSQL 12
-Patch102: https://code.qt.io/cgit/qt/qtbase.git/patch/?id=14b61d48#/0001-QPSQL-Add-support-for-PostgreSQL-12.patch
-Patch103: qt5-qtbase-CVE-2015-9541.patch
+Patch100: qt5-qtbase-CVE-2015-9541.patch
+Patch144: 0044-QLibrary-fix-deadlock-caused-by-fix-to-QTBUG-39642.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -387,22 +379,21 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 
 ## upstream fixes
 
-%patch4 -p1 -b .QTBUG-35459
 # omit '-b .tell-the-truth-about-private-api' so it doesn't end up in installed files -- rdieter
 %patch8 -p1
 
 %patch50 -p1 -b .QT_VERSION_CHECK
-%patch51 -p1 -b .hidpi_scale_at_192
+# FIXME/TODO : rebase or drop -- rdieter
+#patch51 -p1 -b .hidpi_scale_at_192
 %patch52 -p1 -b .moc_macros
 %patch53 -p1 -b .qt5gui_cmake_isystem_includes
 %patch54 -p1 -b .qmake_LFLAGS
+%patch55 -p1 -b .no_relocatable
 %patch61 -p1 -b .qt5-qtbase-cxxflag
 %patch64 -p1 -b .firebird
 %if 0%{?fedora} > 27
 %patch65 -p1 -b .mysql
 %endif
-# FIXME/REBASE
-#patch67 -p1 -b .xcberror_filter
 %patch68 -p1
 
 %if 0%{?fedora} > 30
@@ -410,10 +401,8 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %endif
 
 ## upstream patches
-%patch100 -p1 -b .Do-not-load-plugin-from-the-PWD.patch
-%patch101 -p1 -b .QLibrary-Unix-do-not-attempt-to-load-a-library-relat
-%patch102 -p1 -b .QPSQL-Add-support-for-PostgreSQL-12
-%patch103 -p1 -b .CVE-2015-9541
+%patch100 -p1 -b .CVE-2015-9541
+%patch144 -p1 -b .0044
 
 # move some bundled libs to ensure they're not accidentally used
 pushd src/3rdparty
@@ -506,6 +495,7 @@ export MAKEFLAGS="%{?_smp_mflags}"
   -system-zlib \
   %{?use_gold_linker} \
   -no-directfb \
+  -no-feature-relocatable \
   %{?no_feature_renameat2} \
   %{?no_feature_statx} \
   QMAKE_CFLAGS_RELEASE="${CFLAGS:-$RPM_OPT_FLAGS}" \
@@ -550,7 +540,7 @@ translationdir=%{_qt5_translationdir}
 
 Name: Qt5
 Description: Qt5 Configuration
-Version: 5.13.2
+Version: %{version}
 EOF
 
 # rpm macros
@@ -1058,8 +1048,20 @@ fi
 
 
 %changelog
-* Wed Apr 08 2020 Than Ngo <than@redhat.com> - 5.13.2-5
+* Sat May 16 2020 Pete Walter <pwalter@fedoraproject.org> - 5.14.2-5
+- Rebuild for ICU 67
+
+* Tue Apr 14 2020 Rex Dieter <rdieter@fedoraproject.org> - 5.14.2-4
+- backport "Mutex deadlock in QPluginLoader, Krita fails to start" (QTBUG-83207)
+
+* Mon Apr 13 2020 Rex Dieter <rdieter@fedoraproject.org> - 5.14.2-3
+- %%build: -no-feature-relocatable + matching patch (#1823118)
+
+* Wed Apr 08 2020 Than Ngo <than@redhat.com> - 5.14.2-2
 - Fixed bz#1801370 - CVE-2015-9541 XML entity expansion vulnerability via a crafted SVG document
+
+* Sat Apr 04 2020 Rex Dieter <rdieter@fedoraproject.org> - 5.14.2-1
+- 5.14.2
 
 * Sun Mar 22 2020 Robert-André Mauchin <zebob.m@gmail.com> - 5.13.2-4
 - Upstream patch to add support for PostgreSQL 12 (#1815921)
