@@ -53,7 +53,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.14.2
-Release: 5%{?dist}
+Release: 6%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -887,10 +887,10 @@ fi
 ## private-devel globs
 # keep mkspecs/modules stuff  in -devel for now, https://bugzilla.redhat.com/show_bug.cgi?id=1705280
 %{_qt5_archdatadir}/mkspecs/modules/qt_lib_*_private.pri
-%exclude %{_qt5_headerdir}/*/%{version}/*/private/
+%exclude %{_qt5_headerdir}/*/%{version}/
 
 %files private-devel
-%{_qt5_headerdir}/*/%{version}/*/private/
+%{_qt5_headerdir}/*/%{version}/
 #{_qt5_archdatadir}/mkspecs/modules/qt_lib_*_private.pri
 
 %files static
@@ -1048,6 +1048,9 @@ fi
 
 
 %changelog
+* Mon Jun 15 2020 Rex Dieter <rdieter@fedoraproject.org> - 5.14.2-6
+- Qt5 private header packaging breaks Qt5 Cmake files (#1846613)
+
 * Sat May 16 2020 Pete Walter <pwalter@fedoraproject.org> - 5.14.2-5
 - Rebuild for ICU 67
 
