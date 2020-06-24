@@ -8,7 +8,7 @@
 %endif
 %global openssl -openssl-linked
 
-%if 0%{?fedora} < 29
+%if 0%{?fedora} < 29 && 0%{?rhel} < 9
 %ifarch %{ix86}
 %global no_sse2  -no-sse2
 %endif
@@ -606,7 +606,7 @@ popd
 install -p -m755 -D %{SOURCE6} %{buildroot}%{_sysconfdir}/X11/xinit/xinitrc.d/10-qt5-check-opengl2.sh
 
 # f29+ enables sse2 unconditionally on ix86 -- rex
-%if 0%{?fedora} < 29
+%if 0%{?fedora} < 29 && 0%{?rhel} < 9
 # fix bz#1442553 multilib issue
 privat_header_file=%{buildroot}%{_qt5_headerdir}/QtCore/%{version}/QtCore/private/qconfig_p.h
 grep -v QT_FEATURE_sse2 $privat_header_file > ${privat_header_file}.me
