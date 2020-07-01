@@ -53,7 +53,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.14.2
-Release: 6%{?dist}
+Release: 7%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -429,6 +429,12 @@ sed -i -e "s|^#!/usr/bin/env perl$|#!%{__perl}|" \
 
 
 %build
+# QT is known not to work properly with LTO at this point.  Some of the issues
+# are being worked on upstream and disabling LTO should be re-evaluated as
+# we update this change.  Until such time...
+# Disable LTO
+%define _lto_cflags %{nil}
+
 ## FIXME/TODO:
 # * for %%ix86, add sse2 enabled builds for Qt5Gui, Qt5Core, QtNetwork, see also:
 #   http://anonscm.debian.org/cgit/pkg-kde/qt/qtbase.git/tree/debian/rules (234-249)
@@ -1048,6 +1054,9 @@ fi
 
 
 %changelog
+* Wed Jul 01 2020 Jeff Law <law@redhat.com> - 5.14.2-7
+- Disable LTO
+
 * Mon Jun 15 2020 Rex Dieter <rdieter@fedoraproject.org> - 5.14.2-6
 - Qt5 private header packaging breaks Qt5 Cmake files (#1846613)
 
