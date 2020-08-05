@@ -326,7 +326,7 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 
 %package mysql
 Summary: MySQL driver for Qt5's SQL classes
-%if 0%{?fedora} > 27
+%if 0%{?fedora} > 27 || 0%{?rhel} > 8
 BuildRequires: mariadb-connector-c-devel
 %else
 BuildRequires: mysql-devel
