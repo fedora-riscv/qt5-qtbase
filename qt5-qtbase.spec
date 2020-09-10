@@ -2,10 +2,6 @@
 %global multilib_archs x86_64 %{ix86} %{?mips} ppc64 ppc s390x s390 sparc64 sparcv9
 %global multilib_basearchs x86_64 %{?mips64} ppc64 s390x sparc64
 
-# support openssl-1.1
-%if 0%{?fedora} > 26
-%global openssl11 1
-%endif
 %global openssl -openssl-linked
 
 %if 0%{?fedora} < 29 && 0%{?rhel} < 9
@@ -53,7 +49,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.15.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -167,26 +163,13 @@ BuildRequires: pkgconfig(libproxy-1.0)
 BuildRequires: pkgconfig(ice) pkgconfig(sm)
 BuildRequires: pkgconfig(libpng)
 BuildRequires: pkgconfig(libudev)
-%if 0%{?fedora} == 26
-BuildRequires: compat-openssl10-devel
-%else
-BuildRequires: openssl-devel%{?openssl11: >= 1.1}
-%endif
+BuildRequires: openssl-devel
 BuildRequires: pkgconfig(libpulse) pkgconfig(libpulse-mainloop-glib)
-%if 0%{?fedora}
-#global xkbcommon -system-xkbcommon
 BuildRequires: pkgconfig(libinput)
 BuildRequires: pkgconfig(xcb-xkb) >= 1.10
 BuildRequires: pkgconfig(xkbcommon) >= 0.4.1
 BuildRequires: pkgconfig(xkbcommon-x11) >= 0.4.1
-%else
-# not Fedora
-%if 0%{?rhel} == 6
-%global xcb -qt-xcb
-%endif
-#global xkbcommon -qt-xkbcommon
-Provides: bundled(libxkbcommon) = 0.4.1
-%endif
+
 BuildRequires: pkgconfig(xkeyboard-config)
 %if 0%{?fedora} || 0%{?rhel} > 6
 %global egl 1
@@ -1053,6 +1036,9 @@ fi
 
 
 %changelog
+* Thu Sep 10 2020 Rex Dieter <rdieter@fedoraproject.org> - 5.15.1-2
+- CentOS8 - numpad do not work in KDE Plasma (#1868371)
+
 * Thu Sep 10 2020 Jan Grulich <jgrulich@redhat.com> - 5.15.1-1
 - 5.15.1
 
