@@ -287,10 +287,8 @@ Summary: Static library files for %{name}
 Requires: %{name}-devel%{?_isa} = %{version}-%{release}
 Requires: pkgconfig(fontconfig)
 Requires: pkgconfig(glib-2.0)
-%if 0%{?fedora}
 Requires: pkgconfig(libinput)
 Requires: pkgconfig(xkbcommon)
-%endif
 Requires: pkgconfig(zlib)
 
 %description static
