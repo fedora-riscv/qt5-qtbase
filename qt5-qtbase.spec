@@ -410,6 +410,7 @@ sed -i -e "s|^#!/usr/bin/env perl$|#!%{__perl}|" \
 # are being worked on upstream and disabling LTO should be re-evaluated as
 # we update this change.  Until such time...
 # Disable LTO
+## TODO: please document this in a bug -- Rex
 %define _lto_cflags %{nil}
 
 ## FIXME/TODO:
