@@ -49,7 +49,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.15.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -171,6 +171,7 @@ BuildRequires: pkgconfig(xkbcommon) >= 0.4.1
 BuildRequires: pkgconfig(xkbcommon-x11) >= 0.4.1
 
 BuildRequires: pkgconfig(xkeyboard-config)
+BuildRequires: pkgconfig(vulkan)
 %if 0%{?fedora} || 0%{?rhel} > 6
 %global egl 1
 BuildRequires: libEGL-devel
@@ -1033,6 +1034,9 @@ fi
 
 
 %changelog
+* Thu Sep 17 2020 Rex Dieter <rdieter@fedoraproject.org> - 5.15.1-3
+- enable vulkan support (#1794969)
+
 * Thu Sep 10 2020 Rex Dieter <rdieter@fedoraproject.org> - 5.15.1-2
 - CentOS8 - numpad do not work in KDE Plasma (#1868371)
 
