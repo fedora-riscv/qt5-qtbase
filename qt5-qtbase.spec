@@ -49,7 +49,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.15.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -259,6 +259,7 @@ Requires: %{name}-gui%{?_isa}
 Requires: libEGL-devel
 %endif
 Requires: pkgconfig(gl)
+Requires: pkgconfig(vulkan)
 Requires: qt5-rpm-macros
 %if 0%{?use_clang}
 Requires: clang >= 3.7.0
@@ -1038,6 +1039,9 @@ fi
 
 
 %changelog
+* Tue Sep 29 2020 Yaroslav Fedevych <yaroslav@fedevych.name> - 5.15.1-4
+- qt5-qtbase-devel requires vulkan headers
+
 * Thu Sep 17 2020 Rex Dieter <rdieter@fedoraproject.org> - 5.15.1-3
 - enable vulkan support (#1794969)
 
