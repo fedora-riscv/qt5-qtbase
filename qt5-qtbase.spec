@@ -49,7 +49,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.15.1
-Release: 4%{?dist}
+Release: 5%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -124,6 +124,7 @@ Patch80: qtbase-use-wayland-on-gnome.patch
 # glibc stat
 
 ## upstream patches
+Patch100: qtbase-emit-qscreen-geometry-changed-when-logical-dpi-changes.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -382,6 +383,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %endif
 
 ## upstream patches
+%patch100 -p1 -b .emit-qscreen-geometry-changed-when-logical-dpi-changes
 
 # move some bundled libs to ensure they're not accidentally used
 pushd src/3rdparty
@@ -1039,6 +1041,9 @@ fi
 
 
 %changelog
+* Wed Sep 30 2020 Jan Grulich <jgrulich@redhat.com> - 5.15.1-5
+- Upstream fix: Emit QScreen::geometryChanged when the logical DPI changes
+
 * Tue Sep 29 2020 Yaroslav Fedevych <yaroslav@fedevych.name> - 5.15.1-4
 - qt5-qtbase-devel requires vulkan headers
 
