@@ -49,7 +49,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.15.1
-Release: 5%{?dist}
+Release: 6%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -120,6 +120,9 @@ Patch68: qtbase-everywhere-src-5.11.1-python3.patch
 # https://fedoraproject.org/wiki/Changes/Qt_Wayland_By_Default_On_Gnome
 # https://bugzilla.redhat.com/show_bug.cgi?id=1732129
 Patch80: qtbase-use-wayland-on-gnome.patch
+
+# gcc-11
+Patch90: %{name}-gcc11.patch
 
 # glibc stat
 
@@ -381,6 +384,8 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %if 0%{?fedora} > 30
 %patch80 -p1 -b .use-wayland-on-gnome.patch
 %endif
+
+%patch90 -p1 -b .gcc11
 
 ## upstream patches
 %patch100 -p1 -b .emit-qscreen-geometry-changed-when-logical-dpi-changes
@@ -1041,6 +1046,9 @@ fi
 
 
 %changelog
+* Sun Oct 18 2020 Jeff Law <law@redhat.com> - 5.15.1-6
+- Fix missing #includes for gcc-11
+
 * Wed Sep 30 2020 Jan Grulich <jgrulich@redhat.com> - 5.15.1-5
 - Upstream fix: Emit QScreen::geometryChanged when the logical DPI changes
 
