@@ -49,7 +49,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.15.1
-Release: 6%{?dist}
+Release: 7%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -128,6 +128,8 @@ Patch90: %{name}-gcc11.patch
 
 ## upstream patches
 Patch100: qtbase-emit-qscreen-geometry-changed-when-logical-dpi-changes.patch
+
+Patch101: qtbase-QTBUG-86319.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -389,6 +391,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 
 ## upstream patches
 %patch100 -p1 -b .emit-qscreen-geometry-changed-when-logical-dpi-changes
+%patch101 -p1
 
 # move some bundled libs to ensure they're not accidentally used
 pushd src/3rdparty
@@ -1046,6 +1049,9 @@ fi
 
 
 %changelog
+* Tue Nov 03 2020 Sandro Mani <manisandro@gmail.com> - 5.15.1-7
+- Backport upstream fix for QTBUG-86319
+
 * Sun Oct 18 2020 Jeff Law <law@redhat.com> - 5.15.1-6
 - Fix missing #includes for gcc-11
 
