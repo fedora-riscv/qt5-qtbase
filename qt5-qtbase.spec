@@ -127,7 +127,6 @@ Patch90: %{name}-gcc11.patch
 # glibc stat
 
 ## upstream patches
-Patch100: qtbase-emit-qscreen-geometry-changed-when-logical-dpi-changes.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -171,9 +170,9 @@ BuildRequires: openssl-devel
 BuildRequires: pkgconfig(libpulse) pkgconfig(libpulse-mainloop-glib)
 BuildRequires: pkgconfig(libinput)
 BuildRequires: pkgconfig(xcb-xkb) >= 1.10
+BuildRequires: pkgconfig(xcb-util)
 BuildRequires: pkgconfig(xkbcommon) >= 0.4.1
 BuildRequires: pkgconfig(xkbcommon-x11) >= 0.4.1
-
 BuildRequires: pkgconfig(xkeyboard-config)
 BuildRequires: pkgconfig(vulkan)
 %if 0%{?fedora} || 0%{?rhel} > 6
@@ -388,7 +387,6 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %patch90 -p1 -b .gcc11
 
 ## upstream patches
-%patch100 -p1 -b .emit-qscreen-geometry-changed-when-logical-dpi-changes
 
 # move some bundled libs to ensure they're not accidentally used
 pushd src/3rdparty
@@ -842,7 +840,6 @@ fi
 %{_qt5_libdir}/cmake/Qt5Xml/Qt5XmlConfig*.cmake
 %{_qt5_libdir}/cmake/Qt5/Qt5ModuleLocation.cmake
 %{_qt5_libdir}/cmake/Qt5AccessibilitySupport/Qt5AccessibilitySupportConfig*.cmake
-%{_qt5_libdir}/cmake/Qt5Bootstrap/Qt5BootstrapConfig*.cmake
 %{_qt5_libdir}/cmake/Qt5DeviceDiscoverySupport/Qt5DeviceDiscoverySupportConfig*.cmake
 %{_qt5_libdir}/cmake/Qt5EdidSupport/Qt5EdidSupportConfig*.cmake
 %{_qt5_libdir}/cmake/Qt5EglFSDeviceIntegration/Qt5EglFSDeviceIntegrationConfig*.cmake
