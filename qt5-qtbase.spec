@@ -49,7 +49,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.15.2
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -471,6 +471,7 @@ export MAKEFLAGS="%{?_smp_mflags}"
   %{!?examples:-nomake examples} \
   %{!?tests:-nomake tests} \
   -no-pch \
+  -no-reduce-relocations \
   -no-rpath \
   -no-separate-debug-info \
   %{?no_sse2} \
@@ -1043,6 +1044,9 @@ fi
 
 
 %changelog
+* Mon Nov 23 2020 Rex Dieter <rdieter@fedoraproject.org> - 5.15.2-2
+- -no-reduce-relocations (#1900527)
+
 * Fri Nov 20 09:27:41 CET 2020 Jan Grulich <jgrulich@redhat.com> - 5.15.2-1
 - 5.15.2
 
