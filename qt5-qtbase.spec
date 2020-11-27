@@ -37,7 +37,9 @@
 %global rpm_macros_dir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
 # use external qt_settings pkg
+%if 0%{?fedora}
 %global qt_settings 1
+%endif
 
 %global journald -journald
 BuildRequires: pkgconfig(libsystemd)
@@ -49,7 +51,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.15.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -1044,6 +1046,9 @@ fi
 
 
 %changelog
+* Fri Nov 27 2020 Jan Grulich <jgrulich@redhat.com> - 5.15.2-3
+- Require qt-settings only in Fedora builds
+
 * Mon Nov 23 2020 Rex Dieter <rdieter@fedoraproject.org> - 5.15.2-2
 - -no-reduce-relocations (#1900527)
 
