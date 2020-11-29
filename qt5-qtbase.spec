@@ -51,7 +51,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.15.2
-Release: 3%{?dist}
+Release: 4%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -176,7 +176,10 @@ BuildRequires: pkgconfig(xcb-util)
 BuildRequires: pkgconfig(xkbcommon) >= 0.4.1
 BuildRequires: pkgconfig(xkbcommon-x11) >= 0.4.1
 BuildRequires: pkgconfig(xkeyboard-config)
+%ifnarch s390x
+%global vulkan 1
 BuildRequires: pkgconfig(vulkan)
+%endif
 %if 0%{?fedora} || 0%{?rhel} > 6
 %global egl 1
 BuildRequires: libEGL-devel
@@ -264,7 +267,9 @@ Requires: %{name}-gui%{?_isa}
 Requires: libEGL-devel
 %endif
 Requires: pkgconfig(gl)
+%if 0%{?vulkan}
 Requires: pkgconfig(vulkan)
+%endif
 Requires: qt5-rpm-macros
 %if 0%{?use_clang}
 Requires: clang >= 3.7.0
@@ -1046,6 +1051,9 @@ fi
 
 
 %changelog
+* Sun Nov 29 2020 Rex Dieter <rdieter@fedoraproject.org> - 5.15.2-4
+- drop vulkan support on s390x (#1902449)
+
 * Fri Nov 27 2020 Jan Grulich <jgrulich@redhat.com> - 5.15.2-3
 - Require qt-settings only in Fedora builds
 
