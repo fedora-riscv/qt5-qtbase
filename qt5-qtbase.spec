@@ -944,10 +944,12 @@ fi
 %{_qt5_libdir}/libQt5EdidSupport.prl
 %{_qt5_libdir}/libQt5XkbCommonSupport.*a
 %{_qt5_libdir}/libQt5XkbCommonSupport.prl
+%if 0%{?vulkan}
 %{_qt5_headerdir}/QtVulkanSupport/
 %{_qt5_libdir}/cmake/Qt5VulkanSupport/
 %{_qt5_libdir}/libQt5VulkanSupport.*a
 %{_qt5_libdir}/libQt5VulkanSupport.prl
+%endif
 
 %if 0%{?examples}
 %files examples
