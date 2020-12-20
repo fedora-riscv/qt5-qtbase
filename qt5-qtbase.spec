@@ -51,7 +51,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.15.2
-Release: 5%{?dist}
+Release: 6%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -1051,6 +1051,9 @@ fi
 
 
 %changelog
+* Sat Dec 19 2020 Rex Dieter <rdieter@fedoraproject.org> - 5.15.2-6
+- rebuild (gcc11)
+
 * Mon Nov 30 2020 Rex Dieter <rdieter@fedoraproject.org> - 5.15.2-5
 - re-enable vulkan support on s390x, root cause fixed
 
