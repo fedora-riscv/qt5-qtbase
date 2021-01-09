@@ -42,6 +42,7 @@
 %endif
 
 %global journald -journald
+BuildRequires: make
 BuildRequires: pkgconfig(libsystemd)
 
 %global examples 1
