@@ -53,7 +53,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.14.2
-Release: 5%{?dist}
+Release: 6%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -130,6 +130,9 @@ Patch80: qtbase-use-wayland-on-gnome.patch
 ## upstream patches
 Patch100: qt5-qtbase-CVE-2015-9541.patch
 Patch144: 0044-QLibrary-fix-deadlock-caused-by-fix-to-QTBUG-39642.patch
+# Do not fully initialize QIconLoader when setting the fallback theme
+# (QTBUG-74252, kde#402172, backported from 5.15)
+Patch145: qtbase-everywhere-src-5.14.2-QTBUG-74252.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -403,6 +406,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 ## upstream patches
 %patch100 -p1 -b .CVE-2015-9541
 %patch144 -p1 -b .0044
+%patch145 -p1 -b .QTBUG-74252
 
 # move some bundled libs to ensure they're not accidentally used
 pushd src/3rdparty
@@ -1048,6 +1052,10 @@ fi
 
 
 %changelog
+* Mon Jan 25 2021 Kevin Kofler <Kevin@tigcc.ticalc.org> - 5.14.2-6
+- Do not fully initialize QIconLoader when setting the fallback theme
+  (QTBUG-74252, kde#402172, backported from 5.15)
+
 * Sat May 16 2020 Pete Walter <pwalter@fedoraproject.org> - 5.14.2-5
 - Rebuild for ICU 67
 
