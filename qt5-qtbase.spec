@@ -12,7 +12,7 @@
 
 # workaround https://bugzilla.redhat.com/show_bug.cgi?id=1668865
 # for current stable releases
-%if 0%{?fedora} && 0%{?fedora} < 30
+%if 0%{?fedora} < 30  || 0%{?rhel} > 6
 %global no_feature_statx -no-feature-statx
 %global no_feature_renameat2 -no-feature-renameat2
 %endif
@@ -52,7 +52,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.15.2
-Release: 7%{?dist}
+Release: 8%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -1052,6 +1052,9 @@ fi
 
 
 %changelog
+* Fri Jan 29 2021 Jan Grulich <jgrulich@redhat.com> - 5.15.2-8
+- Disable statx and renameat2 on RHEL
+
 * Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 5.15.2-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
