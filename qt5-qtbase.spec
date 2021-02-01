@@ -16,6 +16,9 @@
 %global no_feature_statx -no-feature-statx
 %global no_feature_renameat2 -no-feature-renameat2
 %endif
+%if 0%{?rhel} && 0%{?rhel} > 6
+%global no_feature_getentropy -no-feature-getentropy
+%endif
 
 # support qtchooser (adds qtchooser .conf file)
 %global qtchooser 1
@@ -52,7 +55,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.15.2
-Release: 8%{?dist}
+Release: 9%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -496,6 +499,7 @@ export MAKEFLAGS="%{?_smp_mflags}"
   -no-feature-relocatable \
   %{?no_feature_renameat2} \
   %{?no_feature_statx} \
+  %{?no_feature_getentropy} \
   QMAKE_CFLAGS_RELEASE="${CFLAGS:-$RPM_OPT_FLAGS}" \
   QMAKE_CXXFLAGS_RELEASE="${CXXFLAGS:-$RPM_OPT_FLAGS}" \
   QMAKE_LFLAGS_RELEASE="${LDFLAGS:-$RPM_LD_FLAGS}"
@@ -1052,6 +1056,9 @@ fi
 
 
 %changelog
+* Mon Feb 01 2021 Jan Grulich <jgrulich@redhat.com> - 5.15.2-9
+- Disable getentropy on RHEL
+
 * Fri Jan 29 2021 Jan Grulich <jgrulich@redhat.com> - 5.15.2-8
 - Disable statx and renameat2 on RHEL
 
