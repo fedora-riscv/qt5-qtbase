@@ -55,7 +55,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.15.2
-Release: 11%{?dist}
+Release: 12%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -393,7 +393,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %endif
 %patch68 -p1
 
-%if 0%{?fedora} > 30
+%if 0%{?fedora} > 30 || 0%{?rhel} > 8
 %patch80 -p1 -b .use-wayland-on-gnome.patch
 %endif
 
@@ -1062,6 +1062,9 @@ fi
 
 
 %changelog
+* Mon Feb 08 2021 Jan Grulich <jgrulich@redhat.com> - 5.15.2-12
+- Use Wayland platform on GNOME for RHEL 9
+
 * Mon Feb 08 2021 Pavel Raiskup <praiskup@redhat.com> - 5.15.2-11
 - rebuild for libpq ABI fix rhbz#1908268
 
