@@ -55,7 +55,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.15.2
-Release: 10%{?dist}
+Release: 11%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -1062,6 +1062,9 @@ fi
 
 
 %changelog
+* Mon Feb 08 2021 Pavel Raiskup <praiskup@redhat.com> - 5.15.2-11
+- rebuild for libpq ABI fix rhbz#1908268
+
 * Sat Feb 06 2021 Rex Dieter <rdieter@fedoraproject.org> - 5.15.2-10
 - FTBFS: qendian.h (and qfloat16.h) missing <limits> include (QTBUG-90395)
 - Qt build on GCC 11 (QTBUG-89977)
