@@ -55,7 +55,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.15.2
-Release: 12%{?dist}
+Release: 13%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -1062,6 +1062,9 @@ fi
 
 
 %changelog
+* Tue Feb 09 2021 Pavel Raiskup <praiskup@redhat.com> - 5.15.2-13
+- rebuild all postgresql deps once more, for libpq ABI fix rhbz#1908268
+
 * Mon Feb 08 2021 Jan Grulich <jgrulich@redhat.com> - 5.15.2-12
 - Use Wayland platform on GNOME for RHEL 9
 
