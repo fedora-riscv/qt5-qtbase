@@ -55,7 +55,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.15.2
-Release: 13%{?dist}
+Release: 14%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -191,10 +191,7 @@ BuildRequires: pkgconfig(vulkan)
 BuildRequires: libEGL-devel
 BuildRequires: pkgconfig(gbm)
 ## TODO: apparently only needed if building opengl_es2 support, do we actually use it?  -- rex
-## this dep was removed in rawhide with introduction of mesa-19.1
-%if 0%{?fedora} < 30
 BuildRequires: pkgconfig(glesv2)
-%endif
 %global sqlite -system-sqlite
 BuildRequires: pkgconfig(sqlite3) >= 3.7
 %if 0%{?fedora} > 22
@@ -475,6 +472,7 @@ export MAKEFLAGS="%{?_smp_mflags}"
   -shared \
   -accessibility \
   %{?dbus}%{!?dbus:-dbus-runtime} \
+  %{?egl:-egl} \
   -fontconfig \
   -glib \
   -gtk \
@@ -1062,6 +1060,10 @@ fi
 
 
 %changelog
+* Fri Feb 19 2021 Rex Dieter <rdieter@fedoraproject.org> - 5.15.2-14
+- %%build: explicitly pass -egl build option
+- unconditional BR: pkgconfig(glesv2) again
+
 * Tue Feb 09 2021 Pavel Raiskup <praiskup@redhat.com> - 5.15.2-13
 - rebuild all postgresql deps once more, for libpq ABI fix rhbz#1908268
 
