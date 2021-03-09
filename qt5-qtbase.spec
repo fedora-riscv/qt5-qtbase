@@ -55,7 +55,8 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.15.2
-Release: 14%{?dist}
+Release: 15%{?dist}
+
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -136,7 +137,7 @@ Patch90: %{name}-gcc11.patch
 # see also patch90
 Patch200: qtbase-QTBUG-90395.patch
 Patch201: qtbase-QTBUG-89977.patch
-
+Patch202: qtbase-filechooser-portal-send-window-id-in-hex.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -1060,6 +1061,9 @@ fi
 
 
 %changelog
+* Tue Mar 09 2021 Jan Grulich <jgrulich@redhat.com> - 5.15.2-15
+- FileChooser portal: send window id in hex
+
 * Fri Feb 19 2021 Rex Dieter <rdieter@fedoraproject.org> - 5.15.2-14
 - %%build: explicitly pass -egl build option
 - unconditional BR: pkgconfig(glesv2) again
