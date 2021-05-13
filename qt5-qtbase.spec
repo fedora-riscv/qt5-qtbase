@@ -55,7 +55,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.15.2
-Release: 16%{?dist}
+Release: 17%{?dist}
 
 
 # See LGPL_EXCEPTIONS.txt, for exception details
@@ -857,24 +857,24 @@ fi
 %{_qt5_libdir}/cmake/Qt5Widgets/Qt5WidgetsMacros.cmake
 %{_qt5_libdir}/cmake/Qt5Xml/Qt5XmlConfig*.cmake
 %{_qt5_libdir}/cmake/Qt5/Qt5ModuleLocation.cmake
-%{_qt5_libdir}/cmake/Qt5AccessibilitySupport/Qt5AccessibilitySupportConfig*.cmake
-%{_qt5_libdir}/cmake/Qt5DeviceDiscoverySupport/Qt5DeviceDiscoverySupportConfig*.cmake
-%{_qt5_libdir}/cmake/Qt5EdidSupport/Qt5EdidSupportConfig*.cmake
-%{_qt5_libdir}/cmake/Qt5EglFSDeviceIntegration/Qt5EglFSDeviceIntegrationConfig*.cmake
-%{_qt5_libdir}/cmake/Qt5EglFsKmsSupport/Qt5EglFsKmsSupportConfig*.cmake
-%{_qt5_libdir}/cmake/Qt5EglSupport/Qt5EglSupportConfig*.cmake
-%{_qt5_libdir}/cmake/Qt5EventDispatcherSupport/Qt5EventDispatcherSupportConfig*.cmake
-%{_qt5_libdir}/cmake/Qt5FbSupport/Qt5FbSupportConfig*.cmake
-%{_qt5_libdir}/cmake/Qt5FontDatabaseSupport/Qt5FontDatabaseSupportConfig*.cmake
-%{_qt5_libdir}/cmake/Qt5GlxSupport/Qt5GlxSupportConfig*.cmake
-%{_qt5_libdir}/cmake/Qt5InputSupport/Qt5InputSupportConfig*.cmake
-%{_qt5_libdir}/cmake/Qt5KmsSupport/Qt5KmsSupportConfig*.cmake
-%{_qt5_libdir}/cmake/Qt5LinuxAccessibilitySupport/Qt5LinuxAccessibilitySupportConfig*.cmake
-%{_qt5_libdir}/cmake/Qt5PlatformCompositorSupport/Qt5PlatformCompositorSupportConfig*.cmake
-%{_qt5_libdir}/cmake/Qt5ServiceSupport/Qt5ServiceSupportConfig*.cmake
-%{_qt5_libdir}/cmake/Qt5ThemeSupport/Qt5ThemeSupportConfig*.cmake
-%{_qt5_libdir}/cmake/Qt5XcbQpa/Qt5XcbQpaConfig*.cmake
-%{_qt5_libdir}/cmake/Qt5XkbCommonSupport/Qt5XkbCommonSupportConfig*.cmake
+%{_qt5_libdir}/cmake/Qt5AccessibilitySupport/
+%{_qt5_libdir}/cmake/Qt5DeviceDiscoverySupport/
+%{_qt5_libdir}/cmake/Qt5EdidSupport/
+%{_qt5_libdir}/cmake/Qt5EglFSDeviceIntegration/
+%{_qt5_libdir}/cmake/Qt5EglFsKmsSupport/
+%{_qt5_libdir}/cmake/Qt5EglSupport/
+%{_qt5_libdir}/cmake/Qt5EventDispatcherSupport/
+%{_qt5_libdir}/cmake/Qt5FbSupport/
+%{_qt5_libdir}/cmake/Qt5FontDatabaseSupport/
+%{_qt5_libdir}/cmake/Qt5GlxSupport/
+%{_qt5_libdir}/cmake/Qt5InputSupport/
+%{_qt5_libdir}/cmake/Qt5KmsSupport/
+%{_qt5_libdir}/cmake/Qt5LinuxAccessibilitySupport/
+%{_qt5_libdir}/cmake/Qt5PlatformCompositorSupport/
+%{_qt5_libdir}/cmake/Qt5ServiceSupport/
+%{_qt5_libdir}/cmake/Qt5ThemeSupport/
+%{_qt5_libdir}/cmake/Qt5XcbQpa/
+%{_qt5_libdir}/cmake/Qt5XkbCommonSupport/
 %{_qt5_libdir}/metatypes/qt5core_metatypes.json
 %{_qt5_libdir}/metatypes/qt5gui_metatypes.json
 %{_qt5_libdir}/metatypes/qt5widgets_metatypes.json
@@ -1063,6 +1063,9 @@ fi
 
 
 %changelog
+* Thu May 13 2021 Rex Dieter <rdieter@fedoraproject.org> - 5.15.2-17
+- -devel: fix some cmake-related dir ownership
+
 * Sat May 01 2021 Alessandro Astone <ales.astone@gmail.com> - 5.15.2-16
 - Backport upstream fix for QTBUG-91909
 
