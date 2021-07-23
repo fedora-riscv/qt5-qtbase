@@ -55,7 +55,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.15.2
-Release: 18%{?dist}
+Release: 19%{?dist}
 
 
 # See LGPL_EXCEPTIONS.txt, for exception details
@@ -1063,6 +1063,9 @@ fi
 
 
 %changelog
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 5.15.2-19
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
 * Thu May 20 2021 Pete Walter <pwalter@fedoraproject.org> - 5.15.2-18
 - Rebuild for ICU 69
 
