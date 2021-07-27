@@ -55,7 +55,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.15.2
-Release: 19%{?dist}
+Release: 20%{?dist}
 
 
 # See LGPL_EXCEPTIONS.txt, for exception details
@@ -240,6 +240,9 @@ Requires: %{name}-common = %{version}-%{release}
 %global ibase -no-sql-ibase
 %global tds -no-sql-tds
 %endif
+
+# disable sql-ibase temporary (firebird build failed on s390x, bz#1969393)
+%global ibase -no-sql-ibase
 
 # workaround gold linker bug(s) by not using it
 # https://bugzilla.redhat.com/1458003
@@ -1063,6 +1066,9 @@ fi
 
 
 %changelog
+* Tue Jul 27 2021 Than Ngo <than@redhat.com> - 5.15.2-20
+- Disable sql-ibase temporary (firebird build failed on s390x, bz#1969393)
+
 * Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 5.15.2-19
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
 
