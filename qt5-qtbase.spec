@@ -55,7 +55,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.15.2
-Release: 20%{?dist}
+Release: 21%{?dist}
 
 
 # See LGPL_EXCEPTIONS.txt, for exception details
@@ -116,7 +116,10 @@ Patch55: qtbase-everywhere-src-5.14.2-no_relocatable.patch
 Patch61: qt5-qtbase-cxxflag.patch
 
 # support firebird version 3.x
-Patch64: qt5-qtbase-5.12.1-firebird.patch
+Patch63: qt5-qtbase-5.12.1-firebird.patch
+
+# support firebird version 4.x
+Patch64: qt5-qtbase-5.12.1-firebird-4.0.0.patch
 
 # fix for new mariadb
 Patch65: qtbase-opensource-src-5.9.0-mysql.patch
@@ -389,7 +392,11 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %patch54 -p1 -b .qmake_LFLAGS
 %patch55 -p1 -b .no_relocatable
 %patch61 -p1 -b .qt5-qtbase-cxxflag
+%if 0%{?fedora} < 35
+%patch63 -p1 -b .firebird
+%else
 %patch64 -p1 -b .firebird
+%endif
 %if 0%{?fedora} > 27
 %patch65 -p1 -b .mysql
 %endif
@@ -1066,6 +1073,9 @@ fi
 
 
 %changelog
+* Thu Jul 29 2021 Than Ngo <than@redhat.com> - 5.15.2-21
+- Fixed FTBFS against firebird-4.0.0
+
 * Tue Jul 27 2021 Than Ngo <than@redhat.com> - 5.15.2-20
 - Disable sql-ibase temporary (firebird build failed on s390x, bz#1969393)
 
