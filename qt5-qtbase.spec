@@ -55,7 +55,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.15.2
-Release: 21%{?dist}
+Release: 22%{?dist}
 
 
 # See LGPL_EXCEPTIONS.txt, for exception details
@@ -134,14 +134,12 @@ Patch80: qtbase-use-wayland-on-gnome.patch
 # gcc-11
 Patch90: %{name}-gcc11.patch
 
-# glibc stat
-
 ## upstream patches
-# see also patch90
-Patch200: qtbase-QTBUG-90395.patch
-Patch201: qtbase-QTBUG-89977.patch
-Patch202: qtbase-filechooser-portal-send-window-id-in-hex.patch
-Patch203: qtbase-QTBUG-91909.patch
+# https://invent.kde.org/qt/qt/qtbase, kde/5.15 branch
+# git diff v5.15.2..HEAD | gzip > kde-5.15-rollup-(date).patch.gz
+# patch100 in lookaside cache due to large'ish size -- rdieter
+Patch100: kde-5.15-rollup-20210823.patch.gz
+Patch101: 0068-Bump-version.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -409,9 +407,9 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %patch90 -p1 -b .gcc11
 
 ## upstream patches
-%patch200 -p1 -b .QTBUG-90395
-%patch201 -p1 -b .QTBUG-89977
-%patch203 -p1 -b .QTBUG-91909
+%patch100 -p1
+# revert version bump
+%patch101 -p1 -R
 
 # move some bundled libs to ensure they're not accidentally used
 pushd src/3rdparty
@@ -1073,6 +1071,9 @@ fi
 
 
 %changelog
+* Mon Aug 23 2021 Rex Dieter <rdieter@fedoraproject.org> - 5.15.2-22
+- sync kde/5.15 branch patches
+
 * Thu Jul 29 2021 Than Ngo <than@redhat.com> - 5.15.2-21
 - Fixed FTBFS against firebird-4.0.0
 
