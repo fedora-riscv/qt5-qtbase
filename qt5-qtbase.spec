@@ -55,7 +55,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.15.2
-Release: 23%{?dist}
+Release: 24%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -135,9 +135,9 @@ Patch90: %{name}-gcc11.patch
 
 ## upstream patches
 # https://invent.kde.org/qt/qt/qtbase, kde/5.15 branch
-# git diff v5.15.2..HEAD | gzip > kde-5.15-rollup-(date).patch.gz
+# git diff v5.15.2..HEAD | gzip > kde-5.15-rollup-$(date +%Y%m%d).patch.gz
 # patch100 in lookaside cache due to large'ish size -- rdieter
-Patch100: kde-5.15-rollup-20210823.patch.gz
+Patch100: kde-5.15-rollup-20210907.patch.gz
 Patch101: 0068-Bump-version.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
@@ -1074,6 +1074,9 @@ fi
 
 
 %changelog
+* Tue Sep 07 2021 Rex Dieter <rdieter@fedoraproject.org> - 5.15.2-24
+- refresh kde-5.15-rollup patch
+
 * Tue Sep 07 2021 Rex Dieter <rdieter@fedoraproject.org> - 5.15.2-23
 - (re)enable ibase
 - handle upgrade path when/if some db drivers are ever disabled (ibase,tds)
