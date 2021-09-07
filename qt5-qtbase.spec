@@ -55,8 +55,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.15.2
-Release: 22%{?dist}
-
+Release: 23%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -242,9 +241,6 @@ Requires: %{name}-common = %{version}-%{release}
 %global tds -no-sql-tds
 %endif
 
-# disable sql-ibase temporary (firebird build failed on s390x, bz#1969393)
-%global ibase -no-sql-ibase
-
 # workaround gold linker bug(s) by not using it
 # https://bugzilla.redhat.com/1458003
 # https://sourceware.org/bugzilla/show_bug.cgi?id=21074
@@ -263,6 +259,12 @@ Summary: Common files for Qt5
 # offer upgrade path for qtquick1 somewhere... may as well be here -- rex
 Obsoletes: qt5-qtquick1 < 5.9.0
 Obsoletes: qt5-qtquick1-devel < 5.9.0
+%if "%{?ibase}" == "-no-sql-ibase"
+Obsoletes: qt5-qtbase-ibase < %{version}-%{release}
+%endif
+%if "%{?tds}" == "-no-sql-tds"
+Obsoletes: qt5-qtbase-tds < %{version}-%{release}
+%endif
 Requires: %{name} = %{version}-%{release}
 BuildArch: noarch
 %description common
@@ -326,10 +328,10 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 
 %package mysql
 Summary: MySQL driver for Qt5's SQL classes
-%if 0%{?fedora} > 27 || 0%{?rhel} > 8
-BuildRequires: mariadb-connector-c-devel
-%else
+%if 0%{?rhel} && 0%{?rhel} < 9
 BuildRequires: mysql-devel
+%else
+BuildRequires: mariadb-connector-c-devel
 %endif
 Requires: %{name}%{?_isa} = %{version}-%{release}
 %description mysql
@@ -362,7 +364,8 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %package gui
 Summary: Qt5 GUI-related libraries
 Requires: %{name}%{?_isa} = %{version}-%{release}
-%if 0%{?fedora} > 20
+# where Recommends are supported
+%if ! 0%{?rhel} < 8 
 Recommends: mesa-dri-drivers
 %endif
 Obsoletes: qt5-qtbase-x11 < 5.2.0
@@ -1071,6 +1074,11 @@ fi
 
 
 %changelog
+* Tue Sep 07 2021 Rex Dieter <rdieter@fedoraproject.org> - 5.15.2-23
+- (re)enable ibase
+- handle upgrade path when/if some db drivers are ever disabled (ibase,tds)
+- -gui: add mesa-dri-drivers soft dep for rhel8+ too
+
 * Mon Aug 23 2021 Rex Dieter <rdieter@fedoraproject.org> - 5.15.2-22
 - sync kde/5.15 branch patches
 
