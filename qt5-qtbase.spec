@@ -111,6 +111,9 @@ Patch54: qtbase-qmake_LFLAGS.patch
 # don't use relocatable heuristics to guess prefix when using -no-feature-relocatable
 Patch55: qtbase-everywhere-src-5.14.2-no_relocatable.patch
 
+# fix FTBFS against libglvnd-1.3.4+
+Patch56: qtbase-everywhere-src-5.15.2-libglvnd.patch
+
 # drop -O3 and make -O2 by default
 Patch61: qt5-qtbase-cxxflag.patch
 
@@ -392,6 +395,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %patch53 -p1 -b .qt5gui_cmake_isystem_includes
 %patch54 -p1 -b .qmake_LFLAGS
 %patch55 -p1 -b .no_relocatable
+%patch56 -p1 -b .libglvnd
 %patch61 -p1 -b .qt5-qtbase-cxxflag
 %if 0%{?fedora} < 35
 %patch63 -p1 -b .firebird
@@ -486,7 +490,7 @@ export MAKEFLAGS="%{?_smp_mflags}"
   -shared \
   -accessibility \
   %{?dbus}%{!?dbus:-dbus-runtime} \
-  %{?egl:-egl} \
+  %{?egl:-egl -eglfs} \
   -fontconfig \
   -glib \
   -gtk \
@@ -521,6 +525,16 @@ export MAKEFLAGS="%{?_smp_mflags}"
   QMAKE_CFLAGS_RELEASE="${CFLAGS:-$RPM_OPT_FLAGS}" \
   QMAKE_CXXFLAGS_RELEASE="${CXXFLAGS:-$RPM_OPT_FLAGS}" \
   QMAKE_LFLAGS_RELEASE="${LDFLAGS:-$RPM_LD_FLAGS}"
+
+# Validate config results
+for config_test in egl-x11 ibase ; do
+config_result="$(grep ^cache.${config_test}.result config.cache | cut -d= -f2 | tr -d ' ')"
+if [ "${config_result}" != "true" ]; then
+  echo "${config_test} detection failed"
+  config_failed=1
+fi
+done
+if [ ${config_failed} -eq 1 ]; then exit 1; fi
 
 # ensure qmake build using optflags (which can happen if not munging qmake.conf defaults)
 make clean -C qmake
@@ -1076,6 +1090,8 @@ fi
 %changelog
 * Tue Sep 07 2021 Rex Dieter <rdieter@fedoraproject.org> - 5.15.2-24
 - refresh kde-5.15-rollup patch
+- validate configure results (base, egl-x11)
+- fix libglvnd-1.3.4 FTBFS (#2002416)
 
 * Tue Sep 07 2021 Rex Dieter <rdieter@fedoraproject.org> - 5.15.2-23
 - (re)enable ibase
