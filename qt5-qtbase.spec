@@ -55,7 +55,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.15.2
-Release: 24%{?dist}
+Release: 25%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -1088,6 +1088,9 @@ fi
 
 
 %changelog
+* Tue Sep 14 2021 Sahana Prasad <sahana@redhat.com> - 5.15.2-25
+- Rebuilt with OpenSSL 3.0.0
+
 * Tue Sep 07 2021 Rex Dieter <rdieter@fedoraproject.org> - 5.15.2-24
 - refresh kde-5.15-rollup patch
 - validate configure results (base, egl-x11)
