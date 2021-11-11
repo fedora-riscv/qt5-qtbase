@@ -55,7 +55,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.15.2
-Release: 27%{?dist}
+Release: 28%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -660,6 +660,10 @@ EOF
 mkdir -p %{buildroot}%{_qt5_headerdir}/QtXcb
 install -m 644 src/plugins/platforms/xcb/*.h %{buildroot}%{_qt5_headerdir}/QtXcb/
 
+# drop Qt5Bootstrap from -static (#2017661)
+rm -f %{buildroot}%{_qt5_libdir}/libQt5Bootstrap.*a
+rm -f %{buildroot}%{_qt5_libdir}/libQt5Bootstrap.prl
+
 
 %check
 # verify Qt5.pc
@@ -932,8 +936,6 @@ fi
 #{_qt5_archdatadir}/mkspecs/modules/qt_lib_*_private.pri
 
 %files static
-%{_qt5_libdir}/libQt5Bootstrap.*a
-%{_qt5_libdir}/libQt5Bootstrap.prl
 %{_qt5_headerdir}/QtOpenGLExtensions/
 %{_qt5_libdir}/libQt5OpenGLExtensions.*a
 %{_qt5_libdir}/libQt5OpenGLExtensions.prl
@@ -1090,6 +1092,9 @@ fi
 
 
 %changelog
+* Thu Nov 11 2021 Sandro Mani <manisandro@gmail.com> - 5.15.2-28
+- Drop Qt5Bootstrap files from -static (#2017661)
+
 * Tue Oct 26 2021 Rex Dieter <rdieter@fedoraproject.org> - 5.15.2-27
 - refresh kde-5.15-rollup patch
 
