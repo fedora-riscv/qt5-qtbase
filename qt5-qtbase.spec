@@ -55,7 +55,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.15.2
-Release: 28%{?dist}
+Release: 29%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -140,9 +140,9 @@ Patch90: %{name}-gcc11.patch
 # https://invent.kde.org/qt/qt/qtbase, kde/5.15 branch
 # git diff v5.15.2..HEAD | gzip > kde-5.15-rollup-$(date +%Y%m%d).patch.gz
 # patch100 in lookaside cache due to large'ish size -- rdieter
-Patch100: kde-5.15-rollup-20211026.patch.gz
+Patch100: kde-5.15-rollup-20211124.patch.gz
 # HACK to make 'fedpkg sources' consider it 'used"
-Source100: kde-5.15-rollup-20211026.patch.gz
+Source100: kde-5.15-rollup-20211124.patch.gz
 Patch101: 0068-Bump-version.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
@@ -1092,6 +1092,9 @@ fi
 
 
 %changelog
+* Wed Nov 24 2021 Rex Dieter <rdieter@fedoraproject.org> - 5.15.2-29
+- refresh kde-5.15-rollup patch
+
 * Thu Nov 11 2021 Sandro Mani <manisandro@gmail.com> - 5.15.2-28
 - Drop Qt5Bootstrap files from -static (#2017661)
 
