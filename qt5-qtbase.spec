@@ -29,6 +29,9 @@
 %endif
 %endif
 
+# Disable automatic .la file removal
+%global __brp_remove_la_files %nil
+
 %global platform linux-g++
 
 %if 0%{?use_clang}
@@ -55,7 +58,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.15.2
-Release: 32%{?dist}
+Release: 33%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -1092,6 +1095,10 @@ fi
 
 
 %changelog
+* Mon Jan 24 2022 Timm Bäder <tbaeder@redhat.com> - 5.15.2-33
+- Disable automatic .la file removal
+- https://fedoraproject.org/wiki/Changes/RemoveLaFiles
+
 * Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 5.15.2-32
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
 
