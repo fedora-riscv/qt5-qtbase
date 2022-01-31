@@ -58,7 +58,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.15.2
-Release: 33%{?dist}
+Release: 34%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -143,9 +143,9 @@ Patch90: %{name}-gcc11.patch
 # https://invent.kde.org/qt/qt/qtbase, kde/5.15 branch
 # git diff v5.15.2..HEAD | gzip > kde-5.15-rollup-$(date +%Y%m%d).patch.gz
 # patch100 in lookaside cache due to large'ish size -- rdieter
-Patch100: kde-5.15-rollup-20220107.patch.gz
+Patch100: kde-5.15-rollup-20220131.patch.gz
 # HACK to make 'fedpkg sources' consider it 'used"
-Source100: kde-5.15-rollup-20220107.patch.gz
+Source100: kde-5.15-rollup-20220131.patch.gz
 Patch101: 0068-Bump-version.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
@@ -1095,6 +1095,9 @@ fi
 
 
 %changelog
+* Mon Jan 31 2022 Jan Grulich <jgrulich@redhat.com> - 5.15.2-34
+- refresh kde-5.15-rollup patch
+
 * Mon Jan 24 2022 Timm Bäder <tbaeder@redhat.com> - 5.15.2-33
 - Disable automatic .la file removal
 - https://fedoraproject.org/wiki/Changes/RemoveLaFiles
