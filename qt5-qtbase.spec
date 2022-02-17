@@ -58,7 +58,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.15.2
-Release: 34%{?dist}
+Release: 35%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -147,6 +147,7 @@ Patch100: kde-5.15-rollup-20220131.patch.gz
 # HACK to make 'fedpkg sources' consider it 'used"
 Source100: kde-5.15-rollup-20220131.patch.gz
 Patch101: 0068-Bump-version.patch
+Patch102: qtbase-everywhere-src-5.15.2-CVE-2022-2525.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -422,6 +423,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %patch100 -p1
 # revert version bump
 %patch101 -p1 -R
+%patch102 -p1
 
 # move some bundled libs to ensure they're not accidentally used
 pushd src/3rdparty
@@ -1095,6 +1097,9 @@ fi
 
 
 %changelog
+* Thu Feb 17 2022 Than Ngo <than@redhat.com> - 5.15.2-35
+- Fixed CVE-2022-25255
+
 * Mon Jan 31 2022 Jan Grulich <jgrulich@redhat.com> - 5.15.2-34
 - refresh kde-5.15-rollup patch
 
