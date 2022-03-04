@@ -57,14 +57,14 @@ BuildRequires: pkgconfig(libsystemd)
 
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
-Version: 5.15.2
-Release: 35%{?dist}
+Version: 5.15.3
+Release: 1%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
 Url:     http://qt-project.org/
 %global  majmin %(echo %{version} | cut -d. -f1-2)
-Source0: https://download.qt.io/official_releases/qt/%{majmin}/%{version}/submodules/%{qt_module}-everywhere-src-%{version}.tar.xz
+Source0: https://download.qt.io/official_releases/qt/%{majmin}/%{version}/submodules/%{qt_module}-everywhere-opensource-src-%{version}.tar.xz
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1227295
 Source1: qtlogging.ini
@@ -141,12 +141,11 @@ Patch90: %{name}-gcc11.patch
 
 ## upstream patches
 # https://invent.kde.org/qt/qt/qtbase, kde/5.15 branch
-# git diff v5.15.2..HEAD | gzip > kde-5.15-rollup-$(date +%Y%m%d).patch.gz
+# git diff v5.15.3-lts-lgpl..HEAD | gzip > kde-5.15-rollup-$(date +%Y%m%d).patch.gz
 # patch100 in lookaside cache due to large'ish size -- rdieter
-Patch100: kde-5.15-rollup-20220131.patch.gz
+Patch100: kde-5.15-rollup-20220304.patch.gz
 # HACK to make 'fedpkg sources' consider it 'used"
-Source100: kde-5.15-rollup-20220131.patch.gz
-Patch101: 0068-Bump-version.patch
+Source100: kde-5.15-rollup-20220304.patch.gz
 Patch102: qtbase-everywhere-src-5.15.2-CVE-2022-2525.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
@@ -421,8 +420,6 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 
 ## upstream patches
 %patch100 -p1
-# revert version bump
-%patch101 -p1 -R
 %patch102 -p1
 
 # move some bundled libs to ensure they're not accidentally used
@@ -581,7 +578,7 @@ translationdir=%{_qt5_translationdir}
 
 Name: Qt5
 Description: Qt5 Configuration
-Version: 5.15.2
+Version: 5.15.3
 EOF
 
 # rpm macros
@@ -1097,6 +1094,9 @@ fi
 
 
 %changelog
+* Fri Mar 04 2022 Jan Grulich <jgrulich@redhat.com> - 5.15.3-1
+- 5.15.3 + kde-5.15 fixes
+
 * Thu Feb 17 2022 Than Ngo <than@redhat.com> - 5.15.2-35
 - Fixed CVE-2022-25255
 
