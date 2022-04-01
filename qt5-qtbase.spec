@@ -10,6 +10,9 @@
 %endif
 %endif
 
+# zstd support
+%global zstd 1
+
 # workaround https://bugzilla.redhat.com/show_bug.cgi?id=1668865
 # for current stable releases
 %if 0%{?fedora} < 30  || 0%{?rhel} > 6
@@ -58,7 +61,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.15.3
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -229,6 +232,10 @@ BuildRequires: dbus-x11
 BuildRequires: mesa-dri-drivers
 BuildRequires: time
 BuildRequires: xorg-x11-server-Xvfb
+%endif
+
+%if 0%{?zstd}
+BuildRequires: pkgconfig(libzstd)
 %endif
 
 %if 0%{?qtchooser}
@@ -1094,6 +1101,9 @@ fi
 
 
 %changelog
+* Fri Apr 01 2022 Than Ngo <than@redhat.com> - 5.15.3-2
+- bz#2070958, enable zstd
+
 * Fri Mar 04 2022 Jan Grulich <jgrulich@redhat.com> - 5.15.3-1
 - 5.15.3 + kde-5.15 fixes
 
