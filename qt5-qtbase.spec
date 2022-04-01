@@ -57,7 +57,7 @@
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.15.9
-Release: 1%{?dist}
+Release: 1.rv64%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPL-3.0-only OR GPL-3.0-only WITH Qt-GPL-exception-1.0
@@ -437,6 +437,12 @@ mv sqlite UNUSED/
 mv xcb UNUSED/
 %endif
 popd
+
+# fix -pthread issue with RISC-V build
+%ifarch riscv64
+sed -i -e 's/-lpthread/-pthread/g'  \
+        src/corelib/configure.json
+%endif
 
 # builds failing mysteriously on f20
 # ./configure: Permission denied
@@ -1104,6 +1110,9 @@ fi
 
 
 %changelog
+* Thu Apr 27 2023 Liu Yang <Yang.Liu.sn@gmail.com> - 5.15.9-1.rv64
+- Fix build on riscv64.
+
 * Tue Apr 11 2023 Jan Grulich <jgrulich@redhat.com> - 5.15.9-1
 - 5.15.9
 
