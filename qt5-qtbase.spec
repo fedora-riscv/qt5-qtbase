@@ -61,7 +61,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.15.8
-Release: 2%{?dist}
+Release: 2.rv64%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -438,6 +438,12 @@ mv sqlite UNUSED/
 mv xcb UNUSED/
 %endif
 popd
+
+# fix -pthread issue with RISC-V build
+%ifarch riscv64
+sed -i -e 's/-lpthread/-pthread/g'  \
+        src/corelib/configure.json
+%endif
 
 # builds failing mysteriously on f20
 # ./configure: Permission denied
@@ -1103,6 +1109,9 @@ fi
 
 
 %changelog
+* Thu Jan 27 2023 Liu Yang <Yang.Liu.sn@gmail.com> - 5.15.8-2.rv64
+- Fix build on riscv64
+
 * Thu Jan 05 2023 Jan Grulich <jgrulich@redhat.com> - 5.15.8-2
 - Correctly install qtsan header file
 
