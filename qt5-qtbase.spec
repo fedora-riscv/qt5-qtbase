@@ -538,7 +538,11 @@ export MAKEFLAGS="%{?_smp_mflags}"
   QMAKE_LFLAGS_RELEASE="${LDFLAGS:-$RPM_LD_FLAGS}"
 
 # Validate config results
+%if "%{?ibase}" != "-no-sql-ibase"
 for config_test in egl-x11 ibase ; do
+%else
+for config_test in egl-x11 ; do
+%endif
 config_result="$(grep ^cache.${config_test}.result config.cache | cut -d= -f2 | tr -d ' ')"
 if [ "${config_result}" != "true" ]; then
   echo "${config_test} detection failed"
