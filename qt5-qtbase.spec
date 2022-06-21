@@ -148,6 +148,7 @@ Patch100: kde-5.15-rollup-20220304.patch.gz
 Source100: kde-5.15-rollup-20220304.patch.gz
 Patch101: qtbase-everywhere-src-5.15.4-cve-2021-38593.patch
 Patch102: qtbase-everywhere-src-5.15.2-CVE-2022-2525.patch
+Patch103: qt5-qtbase-fix-invalid-number-of-concurrent-stream.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -423,6 +424,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %patch100 -p1
 %patch101 -p1
 %patch102 -p1
+%patch103 -p1
 
 # move some bundled libs to ensure they're not accidentally used
 pushd src/3rdparty
@@ -1096,6 +1098,9 @@ fi
 
 
 %changelog
+* Tue Jun 21 2022 Than Ngo <than@redhat.com> - 5.15.3-3
+- bz#2099267, backport patch to fix download problem from Settings
+
 * Mon May 30 2022 Than Ngo <than@redhat.com> - 5.15.3-2
 - Fixed bz#1994724, CVE-2021-38593
 
