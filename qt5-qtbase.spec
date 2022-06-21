@@ -61,7 +61,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.15.4
-Release: 3%{?dist}
+Release: 4%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -151,6 +151,7 @@ Patch100: kde-5.15-rollup-20220516.patch.gz
 Source100: kde-5.15-rollup-20220516.patch.gz
 # CVS-2021-38593
 Patch101: qtbase-everywhere-src-5.15.4-cve-2021-38593.patch
+Patch102: qt5-qtbase-fix-invalid-number-of-concurrent-stream.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -429,6 +430,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 ## upstream patches
 %patch100 -p1
 %patch101 -p1
+%patch102 -p1
 
 # move some bundled libs to ensure they're not accidentally used
 pushd src/3rdparty
@@ -1106,6 +1108,9 @@ fi
 
 
 %changelog
+* Tue Jun 21 2022 Than Ngo <than@redhat.com> - 5.15.4-4
+- bz#2099267, backport patch to fix download problem from Settings 
+
 * Mon May 30 2022 Than Ngo <than@redhat.com> - 5.15.4-3
 - bz#1994719, CVE-2021-38593
 
