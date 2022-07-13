@@ -60,8 +60,8 @@ BuildRequires: pkgconfig(libsystemd)
 
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
-Version: 5.15.4
-Release: 4%{?dist}
+Version: 5.15.5
+Release: 1%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -144,14 +144,13 @@ Patch90: %{name}-gcc11.patch
 
 ## upstream patches
 # https://invent.kde.org/qt/qt/qtbase, kde/5.15 branch
-# git diff v5.15.4-lts-lgpl..HEAD | gzip > kde-5.15-rollup-$(date +%Y%m%d).patch.gz
+# git diff v5.15.5-lts-lgpl..HEAD | gzip > kde-5.15-rollup-$(date +%Y%m%d).patch.gz
 # patch100 in lookaside cache due to large'ish size -- rdieter
-Patch100: kde-5.15-rollup-20220516.patch.gz
+Patch100: kde-5.15-rollup-20220713.patch.gz
 # HACK to make 'fedpkg sources' consider it 'used"
-Source100: kde-5.15-rollup-20220516.patch.gz
+Source100: kde-5.15-rollup-20220713.patch.gz
 # CVS-2021-38593
 Patch101: qtbase-everywhere-src-5.15.4-cve-2021-38593.patch
-Patch102: qt5-qtbase-fix-invalid-number-of-concurrent-stream.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -430,7 +429,6 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 ## upstream patches
 %patch100 -p1
 %patch101 -p1
-%patch102 -p1
 
 # move some bundled libs to ensure they're not accidentally used
 pushd src/3rdparty
@@ -592,7 +590,7 @@ translationdir=%{_qt5_translationdir}
 
 Name: Qt5
 Description: Qt5 Configuration
-Version: 5.15.4
+Version: 5.15.5
 EOF
 
 # rpm macros
@@ -1108,6 +1106,9 @@ fi
 
 
 %changelog
+* Wed Jul 13 2022 Jan Grulich <jgrulich@redhat.com> - 5.15.5-1
+- 5.15.5
+
 * Tue Jun 21 2022 Than Ngo <than@redhat.com> - 5.15.4-4
 - bz#2099267, backport patch to fix download problem from Settings 
 
