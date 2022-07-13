@@ -86,12 +86,6 @@ Source10: macros.qt5-qtbase
 # support multilib optflags
 Patch2: qtbase-multilib_optflags.patch
 
-# borrowed from opensuse
-# track private api via properly versioned symbols
-# downside: binaries produced with these differently-versioned symbols are no longer
-# compatible with qt-project.org's Qt binary releases.
-Patch8: tell-the-truth-about-private-api.patch
-
 # upstreamable patches
 # namespace QT_VERSION_CHECK to workaround major/minor being pre-defined (#1396755)
 Patch50: qtbase-opensource-src-5.8.0-QT_VERSION_CHECK.patch
@@ -397,9 +391,6 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %setup -q -n %{qt_module}-everywhere-src-%{version}
 
 ## upstream fixes
-
-# omit '-b .tell-the-truth-about-private-api' so it doesn't end up in installed files -- rdieter
-%patch8 -p1
 
 %patch50 -p1 -b .QT_VERSION_CHECK
 # FIXME/TODO : rebase or drop -- rdieter
