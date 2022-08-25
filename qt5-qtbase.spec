@@ -61,7 +61,7 @@ BuildRequires: pkgconfig(libsystemd)
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.15.5
-Release: 2%{?dist}
+Release: 4%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -140,9 +140,9 @@ Patch90: %{name}-gcc11.patch
 # https://invent.kde.org/qt/qt/qtbase, kde/5.15 branch
 # git diff v5.15.5-lts-lgpl..HEAD | gzip > kde-5.15-rollup-$(date +%Y%m%d).patch.gz
 # patch100 in lookaside cache due to large'ish size -- rdieter
-Patch100: kde-5.15-rollup-20220713.patch.gz
+Patch100: kde-5.15-rollup-20220824.patch.gz
 # HACK to make 'fedpkg sources' consider it 'used"
-Source100: kde-5.15-rollup-20220713.patch.gz
+Source100: kde-5.15-rollup-20220824.patch.gz
 # CVS-2021-38593
 Patch101: qtbase-everywhere-src-5.15.4-cve-2021-38593.patch
 
@@ -1097,6 +1097,15 @@ fi
 
 
 %changelog
+* Wed Aug 24 2022 Jan Grulich <jgrulich@redhat.com> - 5.15.5-4
+- Update to latest changes from Qt patch collection
+
+* Mon Aug 01 2022 Frantisek Zatloukal <fzatlouk@redhat.com> - 5.15.5-3
+- Rebuilt for ICU 71.1
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 5.15.5-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
 * Wed Jul 13 2022 Jan Grulich <jgrulich@redhat.com> - 5.15.5-1
 - 5.15.5
 
@@ -1120,7 +1129,6 @@ fi
 
 * Fri Apr 01 2022 Than Ngo <than@redhat.com> - 5.15.3-2
 - bz#2070958, enable zstd
->>>>>>> rawhide
 
 * Fri Mar 04 2022 Jan Grulich <jgrulich@redhat.com> - 5.15.3-1
 - 5.15.3 + kde-5.15 fixes
