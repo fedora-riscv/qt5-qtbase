@@ -60,8 +60,8 @@ BuildRequires: pkgconfig(libsystemd)
 
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
-Version: 5.15.5
-Release: 4%{?dist}
+Version: 5.15.6
+Release: 1%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -140,9 +140,9 @@ Patch90: %{name}-gcc11.patch
 # https://invent.kde.org/qt/qt/qtbase, kde/5.15 branch
 # git diff v5.15.5-lts-lgpl..HEAD | gzip > kde-5.15-rollup-$(date +%Y%m%d).patch.gz
 # patch100 in lookaside cache due to large'ish size -- rdieter
-Patch100: kde-5.15-rollup-20220824.patch.gz
+Patch100: kde-5.15-rollup-20220920.patch.gz
 # HACK to make 'fedpkg sources' consider it 'used"
-Source100: kde-5.15-rollup-20220824.patch.gz
+Source100: kde-5.15-rollup-20220920.patch.gz
 # CVS-2021-38593
 Patch101: qtbase-everywhere-src-5.15.4-cve-2021-38593.patch
 
@@ -581,7 +581,7 @@ translationdir=%{_qt5_translationdir}
 
 Name: Qt5
 Description: Qt5 Configuration
-Version: 5.15.5
+Version: 5.15.6
 EOF
 
 # rpm macros
@@ -1097,6 +1097,9 @@ fi
 
 
 %changelog
+* Tue Sep 20 2022 Jan Grulich <jgrulich@redhat.com> - 5.15.6-1
+- 5.15.6
+
 * Wed Aug 24 2022 Jan Grulich <jgrulich@redhat.com> - 5.15.5-4
 - Update to latest changes from Qt patch collection
 
