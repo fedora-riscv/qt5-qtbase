@@ -1,0 +1,13 @@
+From 1876069485bb9b6f1b7dab205460d77894ac0391 Mon Sep 17 00:00:00 2001
+From: Jan Grulich <jgrulich@redhat.com>
+Date: Thu, 5 Jan 2023 08:42:57 +0100
+Subject: Fix missing qtsan_impl include
+
+
+diff --git a/include/QtCore/qtsan_impl.h b/include/QtCore/qtsan_impl.h
+new file mode 100644
+index 00000000..e9209cbc
+--- /dev/null
++++ b/include/QtCore/qtsan_impl.h
+@@ -0,0 +1 @@
++#include "../../src/corelib/thread/qtsan_impl.h"
