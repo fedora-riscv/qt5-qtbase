@@ -2,16 +2,12 @@
 %global multilib_archs x86_64 %{ix86} %{?mips} ppc64 ppc s390x s390 sparc64 sparcv9
 %global multilib_basearchs x86_64 %{?mips64} ppc64 s390x sparc64
 
-%global openssl -openssl-linked
-
 %if 0%{?fedora} < 29 && 0%{?rhel} < 9
 %ifarch %{ix86}
 %global no_sse2  -no-sse2
 %endif
 %endif
 
-# zstd support
-%global zstd 1
 
 # workaround https://bugzilla.redhat.com/show_bug.cgi?id=1668865
 # for current stable releases
@@ -49,10 +45,6 @@
 %if 0%{?fedora}
 %global qt_settings 1
 %endif
-
-%global journald -journald
-BuildRequires: make
-BuildRequires: pkgconfig(libsystemd)
 
 %global examples 1
 ## skip for now, until we're better at it --rex
@@ -158,6 +150,12 @@ Patch101: qtbase-5.15.8-fix-missing-qtsan-include.patch
 # filter plugin provides
 %global __provides_exclude_from ^%{_qt5_plugindir}/.*\\.so$
 
+%if 0%{?use_clang}
+BuildRequires: clang >= 3.7.0
+%else
+BuildRequires: gcc-c++
+%endif
+BuildRequires: make
 BuildRequires: cups-devel
 BuildRequires: desktop-file-utils
 BuildRequires: double-conversion-devel
@@ -168,16 +166,7 @@ BuildRequires: libtiff-devel
 BuildRequires: pkgconfig(alsa)
 # required for -accessibility
 BuildRequires: pkgconfig(atspi-2)
-%if 0%{?use_clang}
-BuildRequires: clang >= 3.7.0
-%else
-BuildRequires: gcc-c++
-%endif
-# http://bugzilla.redhat.com/1196359
-%if 0%{?fedora} || 0%{?rhel} > 6
-%global dbus -dbus-linked
 BuildRequires: pkgconfig(dbus-1)
-%endif
 BuildRequires: pkgconfig(libdrm)
 BuildRequires: pkgconfig(fontconfig)
 BuildRequires: pkgconfig(gl)
@@ -192,6 +181,7 @@ BuildRequires: pkgconfig(libudev)
 BuildRequires: openssl-devel
 BuildRequires: pkgconfig(libpulse) pkgconfig(libpulse-mainloop-glib)
 BuildRequires: pkgconfig(libinput)
+BuildRequires: pkgconfig(libsystemd)
 BuildRequires: pkgconfig(xcb-xkb) >= 1.10
 BuildRequires: pkgconfig(xcb-util)
 BuildRequires: pkgconfig(xkbcommon) >= 0.4.1
@@ -222,6 +212,7 @@ BuildRequires: libicu-devel
 %endif
 BuildRequires: pkgconfig(xcb) pkgconfig(xcb-glx) pkgconfig(xcb-icccm) pkgconfig(xcb-image) pkgconfig(xcb-keysyms) pkgconfig(xcb-renderutil)
 BuildRequires: pkgconfig(zlib)
+BuildRequires: pkgconfig(libzstd)
 BuildRequires: perl-generators
 # see patch68
 BuildRequires: python3
@@ -234,9 +225,6 @@ BuildRequires: time
 BuildRequires: xorg-x11-server-Xvfb
 %endif
 
-%if 0%{?zstd}
-BuildRequires: pkgconfig(libzstd)
-%endif
 
 %if 0%{?qtchooser}
 %if 0%{?fedora}
@@ -500,16 +488,16 @@ export MAKEFLAGS="%{?_smp_mflags}"
   -release \
   -shared \
   -accessibility \
-  %{?dbus}%{!?dbus:-dbus-runtime} \
+  -dbus-linked \
   %{?egl:-egl -eglfs} \
   -fontconfig \
   -glib \
   -gtk \
   %{?ibase} \
   -icu \
-  %{?journald} \
+  -journald \
   -optimized-qmake \
-  %{?openssl} \
+  -openssl-linked \
   -libproxy \
   -sctp \
   %{!?examples:-nomake examples} \
