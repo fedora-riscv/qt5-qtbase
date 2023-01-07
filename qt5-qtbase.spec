@@ -160,6 +160,7 @@ Patch101: qtbase-5.15.8-fix-missing-qtsan-include.patch
 
 BuildRequires: cups-devel
 BuildRequires: desktop-file-utils
+BuildRequires: double-conversion-devel
 BuildRequires: findutils
 BuildRequires: libjpeg-devel
 BuildRequires: libmng-devel
@@ -183,6 +184,7 @@ BuildRequires: pkgconfig(gl)
 BuildRequires: pkgconfig(glib-2.0)
 BuildRequires: pkgconfig(gtk+-3.0)
 BuildRequires: pkgconfig(libproxy-1.0)
+BuildRequires: pkgconfig(libsctp)
 # xcb-sm
 BuildRequires: pkgconfig(ice) pkgconfig(sm)
 BuildRequires: pkgconfig(libpng)
@@ -508,6 +510,8 @@ export MAKEFLAGS="%{?_smp_mflags}"
   %{?journald} \
   -optimized-qmake \
   %{?openssl} \
+  -libproxy \
+  -sctp \
   %{!?examples:-nomake examples} \
   %{!?tests:-nomake tests} \
   -no-pch \
