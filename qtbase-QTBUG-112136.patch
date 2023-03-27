@@ -1,0 +1,113 @@
+diff -pruN qtbase-everywhere-src-5.15.8.orig/src/platformsupport/fontdatabases/fontconfig/qfontconfigdatabase.cpp qtbase-everywhere-src-5.15.8/src/platformsupport/fontdatabases/fontconfig/qfontconfigdatabase.cpp
+--- qtbase-everywhere-src-5.15.8.orig/src/platformsupport/fontdatabases/fontconfig/qfontconfigdatabase.cpp	2023-03-24 14:40:24.844713011 +0900
++++ qtbase-everywhere-src-5.15.8/src/platformsupport/fontdatabases/fontconfig/qfontconfigdatabase.cpp	2023-03-24 21:22:35.466115667 +0900
+@@ -954,6 +954,7 @@ void QFontconfigDatabase::setupFontEngin
+     QFontEngine::GlyphFormat format;
+     // try and get the pattern
+     FcPattern *pattern = FcPatternCreate();
++    FcPattern *match = NULL;
+ 
+     FcValue value;
+     value.type = FcTypeString;
+@@ -980,7 +981,41 @@ void QFontconfigDatabase::setupFontEngin
+     FcConfigSubstitute(nullptr, pattern, FcMatchPattern);
+     FcDefaultSubstitute(pattern);
+ 
+-    FcPattern *match = FcFontMatch(nullptr, pattern, &result);
++    if (!fid.filename.isEmpty()) {
++        // FC_INDEX is ignored during processing in FcFontMatch.
++        // So iterate FcPatterns directly and find it out.
++        FcFontSet *fcsets[2], *fcfs;
++
++        fcsets[0] = FcConfigGetFonts(nullptr, FcSetSystem);
++        fcsets[1] = FcConfigGetFonts(nullptr, FcSetApplication);
++        for (int nset = 0; nset < 2; nset++) {
++            fcfs = fcsets[nset];
++            for (int fnum = 0; fnum < fcfs->nfont; fnum++) {
++                FcPattern *fcpat = fcfs->fonts[fnum];
++                FcChar8 *fcfile;
++                FcBool variable;
++                int fcindex;
++
++                // FIXME: Ignore a FcPattern which has variable=true at this point.
++                if (FcPatternGetBool(fcpat, FC_VARIABLE, 0, &variable) == FcResultMatch &&
++                    variable == FcTrue)
++                    continue;
++                if (FcPatternGetString(fcpat, FC_FILE, 0, &fcfile) == FcResultMatch &&
++                    FcPatternGetInteger(fcpat, FC_INDEX, 0, &fcindex) == FcResultMatch) {
++                    QByteArray f = QByteArray::fromRawData((const char *)fcfile,
++                                                           strlen((const char *)fcfile));
++                    if (f == fid.filename && fcindex == fid.index) {
++                        // We found it.
++                        match = FcFontRenderPrepare(nullptr, pattern, fcpat);
++                        goto bail;
++                    }
++                }
++            }
++        }
++    }
++bail:
++    if (!match)
++        match = FcFontMatch(nullptr, pattern, &result);
+     if (match) {
+         engine->setDefaultHintStyle(defaultHintStyleFromMatch((QFont::HintingPreference)fontDef.hintingPreference, match, useXftConf));
+ 
+diff -pruN qtbase-everywhere-src-5.15.8.orig/src/platformsupport/fontdatabases/freetype/qfontengine_ft.cpp qtbase-everywhere-src-5.15.8/src/platformsupport/fontdatabases/freetype/qfontengine_ft.cpp
+--- qtbase-everywhere-src-5.15.8.orig/src/platformsupport/fontdatabases/freetype/qfontengine_ft.cpp	2022-11-11 16:29:17.000000000 +0900
++++ qtbase-everywhere-src-5.15.8/src/platformsupport/fontdatabases/freetype/qfontengine_ft.cpp	2023-03-24 23:03:02.165756803 +0900
+@@ -68,6 +68,7 @@
+ #include FT_GLYPH_H
+ #include FT_MODULE_H
+ #include FT_LCD_FILTER_H
++#include FT_MULTIPLE_MASTERS_H
+ 
+ #if defined(FT_CONFIG_OPTIONS_H)
+ #include FT_CONFIG_OPTIONS_H
+@@ -740,6 +741,29 @@ bool QFontEngineFT::init(FaceId faceId,
+     freetype->computeSize(fontDef, &xsize, &ysize, &defaultGlyphSet.outline_drawing, &scalableBitmapScaleFactor);
+ 
+     FT_Face face = lockFace();
++    FT_MM_Var *master = nullptr;
++    FT_Error ftresult;
++    double weight_mult = 1.0;
++
++    ftresult = FT_Get_MM_Var(face, &master);
++    if (face_id.index >> 16 && ftresult == FT_Err_Ok) {
++        if ((face_id.index >> 16) - 1 < master->num_namedstyles) {
++            // Pull out weight and width from named-instance.
++            FT_Var_Named_Style *instance = &master->namedstyle[(face_id.index >> 16) - 1];
++
++            for (unsigned int i = 0; i < master->num_axis; i++) {
++                double value = instance->coords[i] / (double) (1U << 16);
++                double default_value = master->axis[i].def / (double) (1U << 16);
++                double mult = default_value ? value / default_value : 1;
++
++                switch (master->axis[i].tag) {
++                case FT_MAKE_TAG('w', 'g', 'h', 't'):
++                    weight_mult = mult;
++                    break;
++                }
++            }
++        }
++    }
+ 
+     if (FT_IS_SCALABLE(face)) {
+         bool fake_oblique = (fontDef.style != QFont::StyleNormal) && !(face->style_flags & FT_STYLE_FLAG_ITALIC) && !qEnvironmentVariableIsSet("QT_NO_SYNTHESIZED_ITALIC");
+@@ -750,7 +774,7 @@ bool QFontEngineFT::init(FaceId faceId,
+         // fake bold
+         if ((fontDef.weight >= QFont::Bold) && !(face->style_flags & FT_STYLE_FLAG_BOLD) && !FT_IS_FIXED_WIDTH(face) && !qEnvironmentVariableIsSet("QT_NO_SYNTHESIZED_BOLD")) {
+             if (const TT_OS2 *os2 = reinterpret_cast<const TT_OS2 *>(FT_Get_Sfnt_Table(face, ft_sfnt_os2))) {
+-                if (os2->usWeightClass < 700 && fontDef.pixelSize < 64)
++                if (os2->usWeightClass * weight_mult < 700 && fontDef.pixelSize < 64)
+                     embolden = true;
+             }
+         }
+@@ -829,6 +853,8 @@ bool QFontEngineFT::init(FaceId faceId,
+     } else {
+         Q_ASSERT(!face_);
+     }
++    if (master && face->glyph)
++        FT_Done_MM_Var(face->glyph->library, master);
+     // we share the HB face in QFreeTypeFace, so do not let ~QFontEngine() destroy it
+     face_ = Holder(freetype->hbFace.get(), dont_delete);
+ 
