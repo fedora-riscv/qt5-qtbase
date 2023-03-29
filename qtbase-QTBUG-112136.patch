@@ -1,6 +1,6 @@
 diff -pruN qtbase-everywhere-src-5.15.8.orig/src/platformsupport/fontdatabases/fontconfig/qfontconfigdatabase.cpp qtbase-everywhere-src-5.15.8/src/platformsupport/fontdatabases/fontconfig/qfontconfigdatabase.cpp
 --- qtbase-everywhere-src-5.15.8.orig/src/platformsupport/fontdatabases/fontconfig/qfontconfigdatabase.cpp	2023-03-24 14:40:24.844713011 +0900
-+++ qtbase-everywhere-src-5.15.8/src/platformsupport/fontdatabases/fontconfig/qfontconfigdatabase.cpp	2023-03-24 21:22:35.466115667 +0900
++++ qtbase-everywhere-src-5.15.8/src/platformsupport/fontdatabases/fontconfig/qfontconfigdatabase.cpp	2023-03-29 19:50:13.097003358 +0900
 @@ -954,6 +954,7 @@ void QFontconfigDatabase::setupFontEngin
      QFontEngine::GlyphFormat format;
      // try and get the pattern
@@ -52,62 +52,54 @@ diff -pruN qtbase-everywhere-src-5.15.8.orig/src/platformsupport/fontdatabases/f
      if (match) {
          engine->setDefaultHintStyle(defaultHintStyleFromMatch((QFont::HintingPreference)fontDef.hintingPreference, match, useXftConf));
  
+@@ -1000,6 +1035,11 @@ void QFontconfigDatabase::setupFontEngin
+                 antialias = fc_antialias;
+         }
+ 
++        FcBool embolden;
++        engine->auto_embolden = true;
++        if (FcPatternGetBool(match, FC_EMBOLDEN, 0, &embolden) == FcResultMatch)
++            engine->embolden = embolden;
++
+         if (antialias) {
+             QFontEngine::SubpixelAntialiasingType subpixelType = QFontEngine::Subpixel_None;
+             if (!(fontDef.styleStrategy & QFont::NoSubpixelAntialias))
 diff -pruN qtbase-everywhere-src-5.15.8.orig/src/platformsupport/fontdatabases/freetype/qfontengine_ft.cpp qtbase-everywhere-src-5.15.8/src/platformsupport/fontdatabases/freetype/qfontengine_ft.cpp
 --- qtbase-everywhere-src-5.15.8.orig/src/platformsupport/fontdatabases/freetype/qfontengine_ft.cpp	2022-11-11 16:29:17.000000000 +0900
-+++ qtbase-everywhere-src-5.15.8/src/platformsupport/fontdatabases/freetype/qfontengine_ft.cpp	2023-03-24 23:03:02.165756803 +0900
-@@ -68,6 +68,7 @@
- #include FT_GLYPH_H
- #include FT_MODULE_H
- #include FT_LCD_FILTER_H
-+#include FT_MULTIPLE_MASTERS_H
- 
- #if defined(FT_CONFIG_OPTIONS_H)
- #include FT_CONFIG_OPTIONS_H
-@@ -740,6 +741,29 @@ bool QFontEngineFT::init(FaceId faceId,
-     freetype->computeSize(fontDef, &xsize, &ysize, &defaultGlyphSet.outline_drawing, &scalableBitmapScaleFactor);
- 
-     FT_Face face = lockFace();
-+    FT_MM_Var *master = nullptr;
-+    FT_Error ftresult;
-+    double weight_mult = 1.0;
-+
-+    ftresult = FT_Get_MM_Var(face, &master);
-+    if (face_id.index >> 16 && ftresult == FT_Err_Ok) {
-+        if ((face_id.index >> 16) - 1 < master->num_namedstyles) {
-+            // Pull out weight and width from named-instance.
-+            FT_Var_Named_Style *instance = &master->namedstyle[(face_id.index >> 16) - 1];
-+
-+            for (unsigned int i = 0; i < master->num_axis; i++) {
-+                double value = instance->coords[i] / (double) (1U << 16);
-+                double default_value = master->axis[i].def / (double) (1U << 16);
-+                double mult = default_value ? value / default_value : 1;
-+
-+                switch (master->axis[i].tag) {
-+                case FT_MAKE_TAG('w', 'g', 'h', 't'):
-+                    weight_mult = mult;
-+                    break;
-+                }
-+            }
-+        }
-+    }
- 
-     if (FT_IS_SCALABLE(face)) {
-         bool fake_oblique = (fontDef.style != QFont::StyleNormal) && !(face->style_flags & FT_STYLE_FLAG_ITALIC) && !qEnvironmentVariableIsSet("QT_NO_SYNTHESIZED_ITALIC");
-@@ -750,7 +774,7 @@ bool QFontEngineFT::init(FaceId faceId,
++++ qtbase-everywhere-src-5.15.8/src/platformsupport/fontdatabases/freetype/qfontengine_ft.cpp	2023-03-29 17:06:11.368989032 +0900
+@@ -681,6 +681,7 @@ QFontEngineFT::QFontEngineFT(const QFont
+     kerning_pairs_loaded = false;
+     transform = false;
+     embolden = false;
++    auto_embolden = false;
+     obliquen = false;
+     antialias = true;
+     freetype = nullptr;
+@@ -748,7 +749,7 @@ bool QFontEngineFT::init(FaceId faceId,
+         FT_Set_Transform(face, &matrix, nullptr);
+         freetype->matrix = matrix;
          // fake bold
-         if ((fontDef.weight >= QFont::Bold) && !(face->style_flags & FT_STYLE_FLAG_BOLD) && !FT_IS_FIXED_WIDTH(face) && !qEnvironmentVariableIsSet("QT_NO_SYNTHESIZED_BOLD")) {
+-        if ((fontDef.weight >= QFont::Bold) && !(face->style_flags & FT_STYLE_FLAG_BOLD) && !FT_IS_FIXED_WIDTH(face) && !qEnvironmentVariableIsSet("QT_NO_SYNTHESIZED_BOLD")) {
++        if (!auto_embolden && (fontDef.weight >= QFont::Bold) && !(face->style_flags & FT_STYLE_FLAG_BOLD) && !FT_IS_FIXED_WIDTH(face) && !qEnvironmentVariableIsSet("QT_NO_SYNTHESIZED_BOLD")) {
              if (const TT_OS2 *os2 = reinterpret_cast<const TT_OS2 *>(FT_Get_Sfnt_Table(face, ft_sfnt_os2))) {
--                if (os2->usWeightClass < 700 && fontDef.pixelSize < 64)
-+                if (os2->usWeightClass * weight_mult < 700 && fontDef.pixelSize < 64)
+                 if (os2->usWeightClass < 700 && fontDef.pixelSize < 64)
                      embolden = true;
-             }
-         }
-@@ -829,6 +853,8 @@ bool QFontEngineFT::init(FaceId faceId,
-     } else {
-         Q_ASSERT(!face_);
-     }
-+    if (master && face->glyph)
-+        FT_Done_MM_Var(face->glyph->library, master);
-     // we share the HB face in QFreeTypeFace, so do not let ~QFontEngine() destroy it
-     face_ = Holder(freetype->hbFace.get(), dont_delete);
+@@ -2102,6 +2103,7 @@ bool QFontEngineFT::initFromFontEngine(c
+     antialias = fe->antialias;
+     transform = fe->transform;
+     embolden = fe->embolden;
++    auto_embolden = fe->auto_embolden;
+     obliquen = fe->obliquen;
+     subpixelType = fe->subpixelType;
+     lcdFilterType = fe->lcdFilterType;
+diff -pruN qtbase-everywhere-src-5.15.8.orig/src/platformsupport/fontdatabases/freetype/qfontengine_ft_p.h qtbase-everywhere-src-5.15.8/src/platformsupport/fontdatabases/freetype/qfontengine_ft_p.h
+--- qtbase-everywhere-src-5.15.8.orig/src/platformsupport/fontdatabases/freetype/qfontengine_ft_p.h	2022-11-11 16:29:17.000000000 +0900
++++ qtbase-everywhere-src-5.15.8/src/platformsupport/fontdatabases/freetype/qfontengine_ft_p.h	2023-03-29 13:11:31.687717653 +0900
+@@ -295,6 +295,7 @@ protected:
+     bool cacheEnabled;
+     bool forceAutoHint;
+     bool stemDarkeningDriver;
++    bool auto_embolden;        // a flag to decide if embolden is set by fontconfig
  
+ private:
+     friend class QFontEngineFTRawFont;
