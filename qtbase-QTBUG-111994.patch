@@ -1,7 +1,8 @@
-diff -pruN qtbase-everywhere-src-5.15.8.orig/src/platformsupport/fontdatabases/fontconfig/qfontconfigdatabase.cpp qtbase-everywhere-src-5.15.8/src/platformsupport/fontdatabases/fontconfig/qfontconfigdatabase.cpp
---- qtbase-everywhere-src-5.15.8.orig/src/platformsupport/fontdatabases/fontconfig/qfontconfigdatabase.cpp	2023-03-16 16:21:48.574489839 +0900
-+++ qtbase-everywhere-src-5.15.8/src/platformsupport/fontdatabases/fontconfig/qfontconfigdatabase.cpp	2023-03-17 15:58:39.312498612 +0900
-@@ -564,6 +564,7 @@ void QFontconfigDatabase::populateFontDa
+diff --git a/src/platformsupport/fontdatabases/fontconfig/qfontconfigdatabase.cpp b/src/platformsupport/fontdatabases/fontconfig/qfontconfigdatabase.cpp
+index 00aa80cd..dd715b73 100644
+--- a/src/platformsupport/fontdatabases/fontconfig/qfontconfigdatabase.cpp
++++ b/src/platformsupport/fontdatabases/fontconfig/qfontconfigdatabase.cpp
+@@ -564,6 +564,7 @@ void QFontconfigDatabase::populateFontDatabase()
              FcObjectSetAdd(os, *p);
              ++p;
          }
