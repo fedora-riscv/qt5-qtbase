@@ -1,0 +1,102 @@
+From df8ef75321929d429c1f912453b63e85e98455c5 Mon Sep 17 00:00:00 2001
+From: Jan Grulich <jgrulich@redhat.com>
+Date: Wed, 26 Jul 2023 13:30:15 +0200
+Subject: [PATCH 10/25] Send ThemeChange event to all windows when system theme
+ changes
+
+The QWSI event for theme change has an optional window parameter to
+specify the window affected, but most platform react to global theme
+changes, and end up passing nullptr into the event.
+
+The reasonable thing to do in QGuiApplication in that case is send
+a theme change event to every QWindow, so that they are all notified
+about the situation.
+
+This approach is what the Windows platform plugin was doing already,
+but did so by iterating manually over the windows, resulting in multiple
+calls to QGuiApplicationPrivate::handleThemeChanged -- one for each QWSI
+event.
+---
+ src/gui/kernel/qguiapplication.cpp                | 9 +++++----
+ src/gui/kernel/qwindowsysteminterface.h           | 2 +-
+ src/plugins/platforms/cocoa/qcocoatheme.mm        | 2 +-
+ src/plugins/platforms/ios/qiosscreen.mm           | 2 +-
+ src/plugins/platforms/windows/qwindowscontext.cpp | 3 +--
+ 5 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/src/gui/kernel/qguiapplication.cpp b/src/gui/kernel/qguiapplication.cpp
+index ddde913064..64e44406fb 100644
+--- a/src/gui/kernel/qguiapplication.cpp
++++ b/src/gui/kernel/qguiapplication.cpp
+@@ -2564,10 +2564,11 @@ void QGuiApplicationPrivate::processThemeChanged(QWindowSystemInterfacePrivate::
+ {
+     if (self)
+         self->handleThemeChanged();
+-    if (QWindow *window  = tce->window.data()) {
+-        QEvent e(QEvent::ThemeChange);
+-        QGuiApplication::sendSpontaneousEvent(window, &e);
+-    }
++
++    QEvent themeChangeEvent(QEvent::ThemeChange);
++    const QWindowList windows = tce->window ? QWindowList{tce->window} : window_list;
++    for (auto *window : windows)
++        QGuiApplication::sendSpontaneousEvent(window, &themeChangeEvent);
+ }
+ 
+ void QGuiApplicationPrivate::handleThemeChanged()
+diff --git a/src/gui/kernel/qwindowsysteminterface.h b/src/gui/kernel/qwindowsysteminterface.h
+index 20baef12c1..5967c8f580 100644
+--- a/src/gui/kernel/qwindowsysteminterface.h
++++ b/src/gui/kernel/qwindowsysteminterface.h
+@@ -250,7 +250,7 @@ public:
+     static void handleScreenRefreshRateChange(QScreen *screen, qreal newRefreshRate);
+ 
+     template<typename Delivery = QWindowSystemInterface::DefaultDelivery>
+-    static void handleThemeChange(QWindow *window);
++    static void handleThemeChange(QWindow *window = nullptr);
+ 
+     static void handleFileOpenEvent(const QString& fileName);
+     static void handleFileOpenEvent(const QUrl &url);
+diff --git a/src/plugins/platforms/cocoa/qcocoatheme.mm b/src/plugins/platforms/cocoa/qcocoatheme.mm
+index cd2e7ef90a..269b580361 100644
+--- a/src/plugins/platforms/cocoa/qcocoatheme.mm
++++ b/src/plugins/platforms/cocoa/qcocoatheme.mm
+@@ -322,7 +322,7 @@ void QCocoaTheme::handleSystemThemeChange()
+         QFontCache::instance()->clear();
+     }
+ 
+-    QWindowSystemInterface::handleThemeChange<QWindowSystemInterface::SynchronousDelivery>(nullptr);
++    QWindowSystemInterface::handleThemeChange<QWindowSystemInterface::SynchronousDelivery>();
+ }
+ 
+ bool QCocoaTheme::usePlatformNativeDialog(DialogType dialogType) const
+diff --git a/src/plugins/platforms/ios/qiosscreen.mm b/src/plugins/platforms/ios/qiosscreen.mm
+index a83d495043..6f0858a4a0 100644
+--- a/src/plugins/platforms/ios/qiosscreen.mm
++++ b/src/plugins/platforms/ios/qiosscreen.mm
+@@ -216,7 +216,7 @@ static QIOSScreen* qtPlatformScreenFor(UIScreen *uiScreen)
+         if (self.screen == UIScreen.mainScreen) {
+             if (previousTraitCollection.userInterfaceStyle != self.traitCollection.userInterfaceStyle) {
+                 QIOSTheme::initializeSystemPalette();
+-                QWindowSystemInterface::handleThemeChange<QWindowSystemInterface::SynchronousDelivery>(nullptr);
++                QWindowSystemInterface::handleThemeChange<QWindowSystemInterface::SynchronousDelivery>();
+             }
+         }
+     }
+diff --git a/src/plugins/platforms/windows/qwindowscontext.cpp b/src/plugins/platforms/windows/qwindowscontext.cpp
+index d5c3022080..cc9857673b 100644
+--- a/src/plugins/platforms/windows/qwindowscontext.cpp
++++ b/src/plugins/platforms/windows/qwindowscontext.cpp
+@@ -1237,8 +1237,7 @@ bool QWindowsContext::windowsProc(HWND hwnd, UINT message,
+             }
+             if ((options & QWindowsIntegration::DarkModeStyle) != 0) {
+                 QWindowsTheme::instance()->refresh();
+-                for (QWindowsWindow *w : d->m_windows)
+-                    QWindowSystemInterface::handleThemeChange(w->window());
++                QWindowSystemInterface::handleThemeChange();
+             }
+         }
+         return d->m_screenManager.handleScreenChanges();
+-- 
+2.41.0
+

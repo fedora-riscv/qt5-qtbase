@@ -1,0 +1,119 @@
+From 488d73ca92deb669abc724c82dbd3206597107fd Mon Sep 17 00:00:00 2001
+From: Jan Grulich <jgrulich@redhat.com>
+Date: Wed, 26 Jul 2023 12:04:21 +0200
+Subject: [PATCH 02/25] Add QPlatformTheme::Appearance for detecting light/dark
+ modes
+
+And implement it on Windows and macOS.
+---
+ src/gui/kernel/qplatformtheme.cpp               | 5 +++++
+ src/gui/kernel/qplatformtheme.h                 | 8 ++++++++
+ src/plugins/platforms/cocoa/qcocoatheme.h       | 1 +
+ src/plugins/platforms/cocoa/qcocoatheme.mm      | 5 +++++
+ src/plugins/platforms/windows/qwindowstheme.cpp | 5 +++++
+ src/plugins/platforms/windows/qwindowstheme.h   | 3 +++
+ 6 files changed, 27 insertions(+)
+
+diff --git a/src/gui/kernel/qplatformtheme.cpp b/src/gui/kernel/qplatformtheme.cpp
+index 2325873245..662fef1426 100644
+--- a/src/gui/kernel/qplatformtheme.cpp
++++ b/src/gui/kernel/qplatformtheme.cpp
+@@ -399,6 +399,11 @@ QPlatformDialogHelper *QPlatformTheme::createPlatformDialogHelper(DialogType typ
+     return nullptr;
+ }
+ 
++QPlatformTheme::Appearance QPlatformTheme::appearance() const
++{
++    return Appearance::Unknown;
++}
++
+ const QPalette *QPlatformTheme::palette(Palette type) const
+ {
+     Q_D(const QPlatformTheme);
+diff --git a/src/gui/kernel/qplatformtheme.h b/src/gui/kernel/qplatformtheme.h
+index 7e6c9d5740..c0dee4c581 100644
+--- a/src/gui/kernel/qplatformtheme.h
++++ b/src/gui/kernel/qplatformtheme.h
+@@ -131,6 +131,12 @@ public:
+         MessageDialog
+     };
+ 
++    enum class Appearance {
++        Unknown = 0x0000,
++        Light = 0x0001,
++        Dark = 0x0002
++    };
++
+     enum Palette {
+         SystemPalette,
+         ToolTipPalette,
+@@ -320,6 +326,8 @@ public:
+     virtual QString standardButtonText(int button) const;
+     virtual QKeySequence standardButtonShortcut(int button) const;
+ 
++    virtual Appearance appearance() const;
++
+     static QVariant defaultThemeHint(ThemeHint hint);
+     static QString defaultStandardButtonText(int button);
+     static QString removeMnemonics(const QString &original);
+diff --git a/src/plugins/platforms/cocoa/qcocoatheme.h b/src/plugins/platforms/cocoa/qcocoatheme.h
+index 50e56ef1bf..f719fd943b 100644
+--- a/src/plugins/platforms/cocoa/qcocoatheme.h
++++ b/src/plugins/platforms/cocoa/qcocoatheme.h
+@@ -73,6 +73,7 @@ public:
+     QIcon fileIcon(const QFileInfo &fileInfo, QPlatformTheme::IconOptions options = {}) const override;
+ 
+     QVariant themeHint(ThemeHint hint) const override;
++    Appearance appearance() const override;
+     QString standardButtonText(int button) const override;
+     QKeySequence standardButtonShortcut(int button) const override;
+ 
+diff --git a/src/plugins/platforms/cocoa/qcocoatheme.mm b/src/plugins/platforms/cocoa/qcocoatheme.mm
+index d73b028afb..a79fa4e4b9 100644
+--- a/src/plugins/platforms/cocoa/qcocoatheme.mm
++++ b/src/plugins/platforms/cocoa/qcocoatheme.mm
+@@ -544,6 +544,11 @@ QVariant QCocoaTheme::themeHint(ThemeHint hint) const
+     return QPlatformTheme::themeHint(hint);
+ }
+ 
++QPlatformTheme::Appearance QCocoaTheme::appearance() const
++{
++    return qt_mac_applicationIsInDarkMode() ? Appearance::Dark : Appearance::Light;
++}
++
+ QString QCocoaTheme::standardButtonText(int button) const
+ {
+     return button == QPlatformDialogHelper::Discard ?
+diff --git a/src/plugins/platforms/windows/qwindowstheme.cpp b/src/plugins/platforms/windows/qwindowstheme.cpp
+index 25e083fd5c..510b8746da 100644
+--- a/src/plugins/platforms/windows/qwindowstheme.cpp
++++ b/src/plugins/platforms/windows/qwindowstheme.cpp
+@@ -520,6 +520,11 @@ QVariant QWindowsTheme::themeHint(ThemeHint hint) const
+     return QPlatformTheme::themeHint(hint);
+ }
+ 
++QPlatformTheme::Appearance QWindowsTheme::appearance() const
++{
++    return QWindowsContext::isDarkMode() ? Appearance::Dark : Appearance::Light;
++}
++
+ void QWindowsTheme::clearPalettes()
+ {
+     qDeleteAll(m_palettes, m_palettes + NPalettes);
+diff --git a/src/plugins/platforms/windows/qwindowstheme.h b/src/plugins/platforms/windows/qwindowstheme.h
+index af28f2878c..9d5fcc92fe 100644
+--- a/src/plugins/platforms/windows/qwindowstheme.h
++++ b/src/plugins/platforms/windows/qwindowstheme.h
+@@ -64,6 +64,9 @@ public:
+     QPlatformSystemTrayIcon *createPlatformSystemTrayIcon() const override;
+ #endif
+     QVariant themeHint(ThemeHint) const override;
++
++    Appearance appearance() const override;
++
+     const QPalette *palette(Palette type = SystemPalette) const override
+         { return m_palettes[type]; }
+     const QFont *font(Font type = SystemFont) const override
+-- 
+2.41.0
+

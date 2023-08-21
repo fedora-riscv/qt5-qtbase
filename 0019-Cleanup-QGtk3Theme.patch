@@ -1,0 +1,108 @@
+From e35349100e0f8fc21643c0fa514af5f6f8950097 Mon Sep 17 00:00:00 2001
+From: Jan Grulich <jgrulich@redhat.com>
+Date: Thu, 27 Jul 2023 12:38:53 +0200
+Subject: [PATCH 19/25] Cleanup QGtk3Theme
+
+1. Remove unused include.
+2. Replace unnecessary null checks with asserts.
+3. Remove dead code after the cleanup.
+---
+ .../platformthemes/gtk3/qgtk3theme.cpp        | 55 ++++---------------
+ 1 file changed, 10 insertions(+), 45 deletions(-)
+
+diff --git a/src/plugins/platformthemes/gtk3/qgtk3theme.cpp b/src/plugins/platformthemes/gtk3/qgtk3theme.cpp
+index fcd466f768..d3383097fc 100644
+--- a/src/plugins/platformthemes/gtk3/qgtk3theme.cpp
++++ b/src/plugins/platformthemes/gtk3/qgtk3theme.cpp
+@@ -43,7 +43,6 @@
+ #include "qpa/qwindowsysteminterface.h"
+ #include <QGuiApplication>
+ #include <QVariant>
+-#include <QtCore/qregularexpression.h>
+ 
+ #undef signals
+ #include <gtk/gtk.h>
+@@ -187,46 +186,8 @@ QString QGtk3Theme::gtkFontName() const
+ 
+ Qt::Appearance QGtk3Theme::appearance() const
+ {
+-    if (m_storage)
+-        return m_storage->appearance();
+-    /*
+-        https://docs.gtk.org/gtk3/running.html
+-
+-        It's possible to set a theme variant after the theme name when using GTK_THEME:
+-
+-            GTK_THEME=Adwaita:dark
+-
+-        Some themes also have "-dark" as part of their name.
+-
+-        We test this environment variable first because the documentation says
+-        it's mainly used for easy debugging, so it should be possible to use it
+-        to override any other settings.
+-    */
+-    QString themeName = qEnvironmentVariable("GTK_THEME");
+-    if (!themeName.isEmpty())
+-        return themeName.contains("dark", Qt::CaseInsensitive)
+-                ? Qt::Appearance::Dark : Qt::Appearance::Light;
+-
+-    /*
+-        https://docs.gtk.org/gtk3/property.Settings.gtk-application-prefer-dark-theme.html
+-
+-        This setting controls which theme is used when the theme specified by
+-        gtk-theme-name provides both light and dark variants. We can save a
+-        regex check by testing this property first.
+-    */
+-    const auto preferDark = gtkSetting<gboolean>("gtk-application-prefer-dark-theme");
+-    if (preferDark)
+-        return Qt::Appearance::Dark;
+-
+-    /*
+-        https://docs.gtk.org/gtk3/property.Settings.gtk-theme-name.html
+-    */
+-    themeName = gtkSetting("gtk-theme-name");
+-    if (!themeName.isEmpty())
+-        return themeName.contains("dark", Qt::CaseInsensitive)
+-                ? Qt::Appearance::Dark : Qt::Appearance::Light;
+-
+-    return Qt::Appearance::Unknown;
++    Q_ASSERT(m_storage);
++    return m_storage->appearance();
+ }
+ 
+ bool QGtk3Theme::usePlatformNativeDialog(DialogType type) const
+@@ -284,23 +245,27 @@ bool QGtk3Theme::useNativeFileDialog()
+ 
+ const QPalette *QGtk3Theme::palette(Palette type) const
+ {
+-    return m_storage ? m_storage->palette(type) : QPlatformTheme::palette(type);
++    Q_ASSERT(m_storage);
++    return m_storage->palette(type);
+ }
+ 
+ QPixmap QGtk3Theme::standardPixmap(StandardPixmap sp, const QSizeF &size) const
+ {
+-    return m_storage ? m_storage->standardPixmap(sp, size) : QPlatformTheme::standardPixmap(sp, size);
++    Q_ASSERT(m_storage);
++    return m_storage->standardPixmap(sp, size);
+ }
+ 
+ const QFont *QGtk3Theme::font(Font type) const
+ {
+-    return m_storage ? m_storage->font(type) : QGnomeTheme::font(type);
++    Q_ASSERT(m_storage);
++    return m_storage->font(type);
+ }
+ 
+ QIcon QGtk3Theme::fileIcon(const QFileInfo &fileInfo,
+                            QPlatformTheme::IconOptions iconOptions) const
+ {
+-    return m_storage ? m_storage->fileIcon(fileInfo) : QGnomeTheme::fileIcon(fileInfo, iconOptions);
++    Q_ASSERT(m_storage);
++    return m_storage->fileIcon(fileInfo);
+ }
+ 
+ QT_END_NAMESPACE
+-- 
+2.41.0
+

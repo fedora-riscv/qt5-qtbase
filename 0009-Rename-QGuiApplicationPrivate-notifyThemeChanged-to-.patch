@@ -1,0 +1,110 @@
+From 168ca696f509e0437550cddb80ea61a5d9ee0f1b Mon Sep 17 00:00:00 2001
+From: Jan Grulich <jgrulich@redhat.com>
+Date: Wed, 26 Jul 2023 13:04:13 +0200
+Subject: [PATCH 09/25] Rename QGuiApplicationPrivate::notifyThemeChanged to
+ handleThemeChanged
+
+The work done by QGuiApplicationPrivate in response to a theme change
+goes beyond notifying.
+---
+ src/gui/kernel/qguiapplication.cpp  | 26 +++++++++++++-------------
+ src/gui/kernel/qguiapplication_p.h  |  2 +-
+ src/widgets/kernel/qapplication.cpp |  4 ++--
+ src/widgets/kernel/qapplication_p.h |  2 +-
+ 4 files changed, 17 insertions(+), 17 deletions(-)
+
+diff --git a/src/gui/kernel/qguiapplication.cpp b/src/gui/kernel/qguiapplication.cpp
+index a217719ea8..ddde913064 100644
+--- a/src/gui/kernel/qguiapplication.cpp
++++ b/src/gui/kernel/qguiapplication.cpp
+@@ -2563,13 +2563,25 @@ void QGuiApplicationPrivate::processSafeAreaMarginsChangedEvent(QWindowSystemInt
+ void QGuiApplicationPrivate::processThemeChanged(QWindowSystemInterfacePrivate::ThemeChangeEvent *tce)
+ {
+     if (self)
+-        self->notifyThemeChanged();
++        self->handleThemeChanged();
+     if (QWindow *window  = tce->window.data()) {
+         QEvent e(QEvent::ThemeChange);
+         QGuiApplication::sendSpontaneousEvent(window, &e);
+     }
+ }
+ 
++void QGuiApplicationPrivate::handleThemeChanged()
++{
++    updatePalette();
++
++    if (!(applicationResourceFlags & ApplicationFontExplicitlySet)) {
++        const auto locker = qt_scoped_lock(applicationFontMutex);
++        clearFontUnlocked();
++        initFontUnlocked();
++    }
++    initThemeHints();
++}
++
+ void QGuiApplicationPrivate::processGeometryChangeEvent(QWindowSystemInterfacePrivate::GeometryChangeEvent *e)
+ {
+     if (e->window.isNull())
+@@ -4249,18 +4261,6 @@ QPixmap QGuiApplicationPrivate::getPixmapCursor(Qt::CursorShape cshape)
+     return QPixmap();
+ }
+ 
+-void QGuiApplicationPrivate::notifyThemeChanged()
+-{
+-    updatePalette();
+-
+-    if (!(applicationResourceFlags & ApplicationFontExplicitlySet)) {
+-        const auto locker = qt_scoped_lock(applicationFontMutex);
+-        clearFontUnlocked();
+-        initFontUnlocked();
+-    }
+-    initThemeHints();
+-}
+-
+ #if QT_CONFIG(draganddrop)
+ void QGuiApplicationPrivate::notifyDragStarted(const QDrag *drag)
+ {
+diff --git a/src/gui/kernel/qguiapplication_p.h b/src/gui/kernel/qguiapplication_p.h
+index 261add1ba4..a13a797ec3 100644
+--- a/src/gui/kernel/qguiapplication_p.h
++++ b/src/gui/kernel/qguiapplication_p.h
+@@ -327,7 +327,7 @@ public:
+     static void updatePalette();
+ 
+ protected:
+-    virtual void notifyThemeChanged();
++    virtual void handleThemeChanged();
+ 
+     static bool setPalette(const QPalette &palette);
+     virtual QPalette basePalette() const;
+diff --git a/src/widgets/kernel/qapplication.cpp b/src/widgets/kernel/qapplication.cpp
+index 1a0ac0cc3c..2d3ed99a83 100644
+--- a/src/widgets/kernel/qapplication.cpp
++++ b/src/widgets/kernel/qapplication.cpp
+@@ -4371,9 +4371,9 @@ void QApplicationPrivate::translateTouchCancel(QTouchDevice *device, ulong times
+     }
+ }
+ 
+-void QApplicationPrivate::notifyThemeChanged()
++void QApplicationPrivate::handleThemeChanged()
+ {
+-    QGuiApplicationPrivate::notifyThemeChanged();
++    QGuiApplicationPrivate::handleThemeChanged();
+ 
+     qt_init_tooltip_palette();
+ }
+diff --git a/src/widgets/kernel/qapplication_p.h b/src/widgets/kernel/qapplication_p.h
+index ab6d85aeb9..3a7214d01e 100644
+--- a/src/widgets/kernel/qapplication_p.h
++++ b/src/widgets/kernel/qapplication_p.h
+@@ -160,7 +160,7 @@ public:
+     static QStyle *app_style;
+ 
+ protected:
+-    void notifyThemeChanged() override;
++    void handleThemeChanged() override;
+ 
+     QPalette basePalette() const override;
+     void handlePaletteChanged(const char *className = nullptr) override;
+-- 
+2.41.0
+

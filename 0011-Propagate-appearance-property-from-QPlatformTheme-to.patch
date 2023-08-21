@@ -1,0 +1,261 @@
+From dc53c50184021944e26a3986236f37a7868951ad Mon Sep 17 00:00:00 2001
+From: Jan Grulich <jgrulich@redhat.com>
+Date: Wed, 26 Jul 2023 13:38:50 +0200
+Subject: [PATCH 11/25] Propagate appearance property from QPlatformTheme to
+ QStyleHints
+
+Implement appearance property, getter and notifier in QStyleHints.
+
+Update appearance property in QStyleHints when handling theme
+change in QGuiApplicationPrivate.
+---
+ .../5.15.10/QtGui/private/qstylehints_p.h     |  1 +
+ src/gui/kernel/kernel.pri                     |  1 +
+ src/gui/kernel/qguiapplication.cpp            | 16 ++++++
+ src/gui/kernel/qguiapplication_p.h            |  2 +
+ src/gui/kernel/qstylehints.cpp                | 51 +++++++++++-------
+ src/gui/kernel/qstylehints.h                  |  3 ++
+ src/gui/kernel/qstylehints_p.h                | 53 +++++++++++++++++++
+ 7 files changed, 108 insertions(+), 19 deletions(-)
+ create mode 100644 include/QtGui/5.15.10/QtGui/private/qstylehints_p.h
+ create mode 100644 src/gui/kernel/qstylehints_p.h
+
+diff --git a/include/QtGui/5.15.10/QtGui/private/qstylehints_p.h b/include/QtGui/5.15.10/QtGui/private/qstylehints_p.h
+new file mode 100644
+index 0000000000..fa8b8505a6
+--- /dev/null
++++ b/include/QtGui/5.15.10/QtGui/private/qstylehints_p.h
+@@ -0,0 +1 @@
++#include "../../../../../src/gui/kernel/qstylehints_p.h"
+diff --git a/src/gui/kernel/kernel.pri b/src/gui/kernel/kernel.pri
+index 9c80f1e2cc..af9385b120 100644
+--- a/src/gui/kernel/kernel.pri
++++ b/src/gui/kernel/kernel.pri
+@@ -59,6 +59,7 @@ HEADERS += \
+         kernel/qscreen.h \
+         kernel/qscreen_p.h \
+         kernel/qstylehints.h \
++        kernel/qstylehints_p.h \
+         kernel/qtouchdevice.h \
+         kernel/qtouchdevice_p.h \
+         kernel/qplatformsharedgraphicscache.h \
+diff --git a/src/gui/kernel/qguiapplication.cpp b/src/gui/kernel/qguiapplication.cpp
+index 64e44406fb..7c942dc233 100644
+--- a/src/gui/kernel/qguiapplication.cpp
++++ b/src/gui/kernel/qguiapplication.cpp
+@@ -74,6 +74,7 @@
+ 
+ #include <QtGui/qgenericpluginfactory.h>
+ #include <QtGui/qstylehints.h>
++#include <QtGui/private/qstylehints_p.h>
+ #include <QtGui/qinputmethod.h>
+ #include <QtGui/qpixmapcache.h>
+ #include <qpa/qplatforminputcontext.h>
+@@ -2569,6 +2570,21 @@ void QGuiApplicationPrivate::processThemeChanged(QWindowSystemInterfacePrivate::
+     const QWindowList windows = tce->window ? QWindowList{tce->window} : window_list;
+     for (auto *window : windows)
+         QGuiApplication::sendSpontaneousEvent(window, &themeChangeEvent);
++
++    QStyleHintsPrivate::get(QGuiApplication::styleHints())->setAppearance(appearance());
++}
++
++/*!
++   \internal
++   \brief QGuiApplicationPrivate::appearance
++   \return the platform theme's appearance
++   or Qt::Appearance::Unknown if a platform theme cannot be established
++   Qt::Appearance.
++ */
++Qt::Appearance QGuiApplicationPrivate::appearance()
++{
++    return platformTheme() ? platformTheme()->appearance()
++                           : Qt::Appearance::Unknown;
+ }
+ 
+ void QGuiApplicationPrivate::handleThemeChanged()
+diff --git a/src/gui/kernel/qguiapplication_p.h b/src/gui/kernel/qguiapplication_p.h
+index a13a797ec3..1e7f826c5b 100644
+--- a/src/gui/kernel/qguiapplication_p.h
++++ b/src/gui/kernel/qguiapplication_p.h
+@@ -343,6 +343,8 @@ private:
+ 
+     friend class QDragManager;
+ 
++    static Qt::Appearance appearance();
++
+     static QGuiApplicationPrivate *self;
+     static QTouchDevice *m_fakeTouchDevice;
+     static int m_fakeMouseSourcePointId;
+diff --git a/src/gui/kernel/qstylehints.cpp b/src/gui/kernel/qstylehints.cpp
+index 288bdf1b3c..d4766227ef 100644
+--- a/src/gui/kernel/qstylehints.cpp
++++ b/src/gui/kernel/qstylehints.cpp
+@@ -38,6 +38,7 @@
+ ****************************************************************************/
+ 
+ #include <qstylehints.h>
++#include "qstylehints_p.h"
+ #include <qpa/qplatformintegration.h>
+ #include <qpa/qplatformtheme.h>
+ #include <private/qguiapplication_p.h>
+@@ -79,25 +80,6 @@ static inline QVariant themeableHint(QPlatformTheme::ThemeHint th)
+     return QPlatformTheme::defaultThemeHint(th);
+ }
+ 
+-class QStyleHintsPrivate : public QObjectPrivate
+-{
+-    Q_DECLARE_PUBLIC(QStyleHints)
+-public:
+-    int m_mouseDoubleClickInterval = -1;
+-    int m_mousePressAndHoldInterval = -1;
+-    int m_startDragDistance = -1;
+-    int m_startDragTime = -1;
+-    int m_keyboardInputInterval = -1;
+-    int m_cursorFlashTime = -1;
+-    int m_tabFocusBehavior = -1;
+-    int m_uiEffects = -1;
+-    int m_showShortcutsInContextMenus = -1;
+-    int m_wheelScrollLines = -1;
+-    int m_mouseQuickSelectionThreshold = -1;
+-    int m_mouseDoubleClickDistance = -1;
+-    int m_touchDoubleTapDistance = -1;
+-};
+-
+ /*!
+     \class QStyleHints
+     \since 5.0
+@@ -176,6 +158,17 @@ int QStyleHints::touchDoubleTapDistance() const
+                 themeableHint(QPlatformTheme::TouchDoubleTapDistance).toInt();
+ }
+ 
++/*!
++    \property QStyleHints::appearance
++    \brief the appearance of the platform theme
++    \sa Qt::Appearance
++    \since 6.5
++*/
++Qt::Appearance QStyleHints::appearance() const
++{
++    return d_func()->appearance();
++}
++
+ /*!
+     Sets the \a mousePressAndHoldInterval.
+     \internal
+@@ -620,6 +613,26 @@ int QStyleHints::mouseQuickSelectionThreshold() const
+     return themeableHint(QPlatformTheme::MouseQuickSelectionThreshold, QPlatformIntegration::MouseQuickSelectionThreshold).toInt();
+ }
+ 
++/*!
++   \internal
++   QStyleHintsPrivate::setAppearance - set a new appearance.
++   Set \a appearance as the new appearance of the QStyleHints.
++   The appearanceChanged signal will be emitted if present and new appearance differ.
++ */
++void QStyleHintsPrivate::setAppearance(Qt::Appearance appearance)
++{
++    if (m_appearance != appearance) {
++        m_appearance = appearance;
++        emit q_func()->appearanceChanged(appearance);
++    }
++}
++
++QStyleHintsPrivate *QStyleHintsPrivate::get(QStyleHints *q)
++{
++    Q_ASSERT(q);
++    return q->d_func();
++}
++
+ QT_END_NAMESPACE
+ 
+ #include "moc_qstylehints.cpp"
+diff --git a/src/gui/kernel/qstylehints.h b/src/gui/kernel/qstylehints.h
+index 30d8fdc64d..3cd540b27a 100644
+--- a/src/gui/kernel/qstylehints.h
++++ b/src/gui/kernel/qstylehints.h
+@@ -76,6 +76,7 @@ class Q_GUI_EXPORT QStyleHints : public QObject
+     Q_PROPERTY(int mouseQuickSelectionThreshold READ mouseQuickSelectionThreshold WRITE setMouseQuickSelectionThreshold NOTIFY mouseQuickSelectionThresholdChanged FINAL)
+     Q_PROPERTY(int mouseDoubleClickDistance READ mouseDoubleClickDistance STORED false CONSTANT FINAL)
+     Q_PROPERTY(int touchDoubleTapDistance READ touchDoubleTapDistance STORED false CONSTANT FINAL)
++    Q_PROPERTY(Qt::Appearance appearance READ appearance NOTIFY appearanceChanged FINAL)
+ 
+ public:
+     void setMouseDoubleClickInterval(int mouseDoubleClickInterval);
+@@ -112,6 +113,7 @@ public:
+     void setWheelScrollLines(int scrollLines);
+     void setMouseQuickSelectionThreshold(int threshold);
+     int mouseQuickSelectionThreshold() const;
++    Qt::Appearance appearance() const;
+ 
+ Q_SIGNALS:
+     void cursorFlashTimeChanged(int cursorFlashTime);
+@@ -125,6 +127,7 @@ Q_SIGNALS:
+     void showShortcutsInContextMenusChanged(bool);
+     void wheelScrollLinesChanged(int scrollLines);
+     void mouseQuickSelectionThresholdChanged(int threshold);
++    void appearanceChanged(Qt::Appearance appearance);
+ 
+ private:
+     friend class QGuiApplication;
+diff --git a/src/gui/kernel/qstylehints_p.h b/src/gui/kernel/qstylehints_p.h
+new file mode 100644
+index 0000000000..4a16fbef01
+--- /dev/null
++++ b/src/gui/kernel/qstylehints_p.h
+@@ -0,0 +1,53 @@
++// Copyright (C) 2022 The Qt Company Ltd.
++// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++
++#ifndef QSTYLEHINTS_P_H
++#define QSTYLEHINTS_P_H
++
++//
++//  W A R N I N G
++//  -------------
++//
++// This file is not part of the Qt API.  It exists purely as an
++// implementation detail.  This header file may change from version to
++// version without notice, or even be removed.
++//
++// We mean it.
++//
++
++#include <qpa/qplatformintegration.h>
++#include <QPalette>
++#include <private/qguiapplication_p.h>
++#include "qstylehints.h"
++
++QT_BEGIN_NAMESPACE
++
++class QStyleHintsPrivate : public QObjectPrivate
++{
++    Q_DECLARE_PUBLIC(QStyleHints)
++public:
++    int m_mouseDoubleClickInterval = -1;
++    int m_mousePressAndHoldInterval = -1;
++    int m_startDragDistance = -1;
++    int m_startDragTime = -1;
++    int m_keyboardInputInterval = -1;
++    int m_cursorFlashTime = -1;
++    int m_tabFocusBehavior = -1;
++    int m_uiEffects = -1;
++    int m_showShortcutsInContextMenus = -1;
++    int m_wheelScrollLines = -1;
++    int m_mouseQuickSelectionThreshold = -1;
++    int m_mouseDoubleClickDistance = -1;
++    int m_touchDoubleTapDistance = -1;
++
++    Qt::Appearance appearance() const { return m_appearance; };
++    void setAppearance(Qt::Appearance appearance);
++    static QStyleHintsPrivate *get(QStyleHints *q);
++
++private:
++    Qt::Appearance m_appearance = Qt::Appearance::Unknown;
++};
++
++QT_END_NAMESPACE
++
++#endif
+-- 
+2.41.0
+

@@ -1,0 +1,49 @@
+From 84b0d114d98c58ecf00e20987321182e8e2ba4c1 Mon Sep 17 00:00:00 2001
+From: Jan Grulich <jgrulich@redhat.com>
+Date: Wed, 26 Jul 2023 12:44:00 +0200
+Subject: [PATCH 06/25] qt_fusionPalette: make links more legible on dark
+ backgrounds
+
+QPalette's default for Link is Qt::blue, which is difficult to read
+on dark backgrounds.
+
+Use the same blue that is already used for Highlight, as it is
+consistent and easy to read.
+---
+ src/gui/kernel/qplatformtheme.cpp | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/src/gui/kernel/qplatformtheme.cpp b/src/gui/kernel/qplatformtheme.cpp
+index 62f569bbef..14fdf94755 100644
+--- a/src/gui/kernel/qplatformtheme.cpp
++++ b/src/gui/kernel/qplatformtheme.cpp
+@@ -378,6 +378,7 @@ Q_GUI_EXPORT QPalette qt_fusionPalette()
+     const QColor dark = backGround.darker(150);
+     const QColor darkDisabled = QColor(209, 209, 209).darker(110);
+     const QColor text = darkAppearance ? windowText : Qt::black;
++    const QColor highlight = QColor(48, 140, 198);
+     const QColor hightlightedText = darkAppearance ? windowText : Qt::white;
+     const QColor disabledText = darkAppearance ? QColor(130, 130, 130) : QColor(190, 190, 190);
+     const QColor button = backGround;
+@@ -399,12 +400,16 @@ Q_GUI_EXPORT QPalette qt_fusionPalette()
+     fusionPalette.setBrush(QPalette::Disabled, QPalette::Dark, darkDisabled);
+     fusionPalette.setBrush(QPalette::Disabled, QPalette::Shadow, disabledShadow);
+ 
+-    fusionPalette.setBrush(QPalette::Active, QPalette::Highlight, QColor(48, 140, 198));
+-    fusionPalette.setBrush(QPalette::Inactive, QPalette::Highlight, QColor(48, 140, 198));
++    fusionPalette.setBrush(QPalette::Active, QPalette::Highlight, highlight);
++    fusionPalette.setBrush(QPalette::Inactive, QPalette::Highlight, highlight);
+     fusionPalette.setBrush(QPalette::Disabled, QPalette::Highlight, QColor(145, 145, 145));
+ 
+     fusionPalette.setBrush(QPalette::PlaceholderText, placeholder);
+ 
++    // Use a more legible light blue on dark backgrounds than the default Qt::blue.
++    if (darkAppearance)
++        fusionPalette.setBrush(QPalette::Link, highlight);
++
+     return fusionPalette;
+ }
+ 
+-- 
+2.41.0
+

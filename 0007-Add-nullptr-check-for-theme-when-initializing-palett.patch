@@ -1,0 +1,29 @@
+From dff40b9fed2b91244d6664342daf859b3aa0375f Mon Sep 17 00:00:00 2001
+From: Jan Grulich <jgrulich@redhat.com>
+Date: Wed, 26 Jul 2023 12:44:37 +0200
+Subject: [PATCH 07/25] Add nullptr check for theme when initializing palette
+
+---
+ src/gui/kernel/qplatformtheme.cpp | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/src/gui/kernel/qplatformtheme.cpp b/src/gui/kernel/qplatformtheme.cpp
+index 14fdf94755..827829c4a5 100644
+--- a/src/gui/kernel/qplatformtheme.cpp
++++ b/src/gui/kernel/qplatformtheme.cpp
+@@ -366,8 +366,10 @@ QPlatformThemePrivate::~QPlatformThemePrivate()
+ 
+ Q_GUI_EXPORT QPalette qt_fusionPalette()
+ {
+-    const bool darkAppearance = QGuiApplicationPrivate::platformTheme()->appearance()
+-        == QPlatformTheme::Appearance::Dark;
++    auto theme = QGuiApplicationPrivate::platformTheme();
++    const bool darkAppearance = theme
++                              ? theme->appearance() == QPlatformTheme::Appearance::Dark
++                              : false;
+     const QColor windowText = darkAppearance ? QColor(240, 240, 240) : Qt::black;
+     const QColor backGround = darkAppearance ? QColor(50, 50, 50) : QColor(239, 239, 239);
+     const QColor light = backGround.lighter(150);
+-- 
+2.41.0
+
