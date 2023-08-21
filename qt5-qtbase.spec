@@ -57,7 +57,7 @@
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.15.10
-Release: 6%{?dist}
+Release: 7%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPL-3.0-only OR GPL-3.0-only WITH Qt-GPL-exception-1.0
@@ -1170,6 +1170,9 @@ fi
 
 
 %changelog
+* Mon Aug 21 2023 Jan Grulich <jgrulich@redhat.com> - 5.15.10-7
+- Drop unnecessary backports
+
 * Mon Aug 21 2023 Jan Grulich <jgrulich@redhat.com> - 5.15.10-6
 - Backport Qt 6 improvements to QGtkStyle for better Gtk/GNOME integration
 - Use QGnomePlatform by default on F38 and older
