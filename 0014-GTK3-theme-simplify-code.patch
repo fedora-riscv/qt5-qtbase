@@ -1,7 +1,7 @@
-From 01ae45ce9cca19e96875eda74bf6b9168f90e464 Mon Sep 17 00:00:00 2001
+From 376815da4038c757a42f316c4cb7e2a6793fec00 Mon Sep 17 00:00:00 2001
 From: Jan Grulich <jgrulich@redhat.com>
 Date: Thu, 27 Jul 2023 12:35:44 +0200
-Subject: [PATCH 17/25] GTK3 theme: simplify code
+Subject: [PATCH 14/22] GTK3 theme: simplify code
 
 There's no need to first convert to QString and then convert back to
 QByteArray.

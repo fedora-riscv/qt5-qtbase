@@ -1,7 +1,7 @@
-From 45a629fb6495c2469c89e1bf797ee84214e7e661 Mon Sep 17 00:00:00 2001
+From 8f256a33fa60b249ee6fc7347f917f29a11c1e32 Mon Sep 17 00:00:00 2001
 From: Jan Grulich <jgrulich@redhat.com>
 Date: Thu, 27 Jul 2023 12:40:32 +0200
-Subject: [PATCH 20/25] Detect appearance by colors unless GTK theme name
+Subject: [PATCH 17/22] Detect appearance by colors unless GTK theme name
  contains "dark"
 
 QGtk3Theme detects the appearance property by theme name: If the name
@@ -68,7 +68,7 @@ index 8997a64e76..e04025923d 100644
      static int toGtkState(const QString &state);
      static const QLatin1String fromGtkState(GtkStateFlags state);
 diff --git a/src/plugins/platformthemes/gtk3/qgtk3storage.cpp b/src/plugins/platformthemes/gtk3/qgtk3storage.cpp
-index 1a9f88f6df..c206b4d3b5 100644
+index d5d0e2c8e6..0b6b8e8523 100644
 --- a/src/plugins/platformthemes/gtk3/qgtk3storage.cpp
 +++ b/src/plugins/platformthemes/gtk3/qgtk3storage.cpp
 @@ -222,7 +222,7 @@ void QGtk3Storage::populateMap()

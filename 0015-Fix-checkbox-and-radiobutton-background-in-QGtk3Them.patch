@@ -1,7 +1,7 @@
-From f44986a54facefafeed851a7db902867f701208b Mon Sep 17 00:00:00 2001
+From 40d1e750fd1b0f646724b383928b8f70a7a3abe8 Mon Sep 17 00:00:00 2001
 From: Jan Grulich <jgrulich@redhat.com>
 Date: Thu, 27 Jul 2023 12:36:14 +0200
-Subject: [PATCH 18/25] Fix checkbox and radiobutton background in QGtk3Theme
+Subject: [PATCH 15/22] Fix checkbox and radiobutton background in QGtk3Theme
 
 The background color for radio buttons and checkboxes was not
 correctly read from the current GTK3 theme in light mode.
@@ -15,7 +15,7 @@ palettes for checkboxes and radio buttons.
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/src/plugins/platformthemes/gtk3/qgtk3storage.cpp b/src/plugins/platformthemes/gtk3/qgtk3storage.cpp
-index 55c7c8eff8..1a9f88f6df 100644
+index 0a1fa6ef97..d5d0e2c8e6 100644
 --- a/src/plugins/platformthemes/gtk3/qgtk3storage.cpp
 +++ b/src/plugins/platformthemes/gtk3/qgtk3storage.cpp
 @@ -377,7 +377,6 @@ void QGtk3Storage::createMapping()

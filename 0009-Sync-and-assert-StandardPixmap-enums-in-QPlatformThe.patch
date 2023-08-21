@@ -1,7 +1,7 @@
-From 8c9d7b5f33707803b67c737afa18c80e5a4cf229 Mon Sep 17 00:00:00 2001
+From d0f0010b49eb40477ea42496063766199e857312 Mon Sep 17 00:00:00 2001
 From: Jan Grulich <jgrulich@redhat.com>
 Date: Wed, 26 Jul 2023 13:43:29 +0200
-Subject: [PATCH 12/25] Sync and assert StandardPixmap enums in QPlatformTheme
+Subject: [PATCH 09/22] Sync and assert StandardPixmap enums in QPlatformTheme
  and QStyle
 
 Add missing enum values in QPlatformTheme::standardPixmap to sync with

@@ -1,7 +1,7 @@
-From 3491415f1e2f60cae47273af4810db1bfda81394 Mon Sep 17 00:00:00 2001
+From d998c808ece0fb3e243bb28913a27bbedf0db974 Mon Sep 17 00:00:00 2001
 From: Jan Grulich <jgrulich@redhat.com>
 Date: Thu, 27 Jul 2023 12:41:06 +0200
-Subject: [PATCH 21/25] Change parsing log output in QGtk3Json from qCDebug to
+Subject: [PATCH 18/22] Change parsing log output in QGtk3Json from qCDebug to
  qCInfo
 
 When a palette mapping is imported from a Json file, parsing errors are

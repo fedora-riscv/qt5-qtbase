@@ -1,7 +1,7 @@
 From 240ce954220d713968e608f2766144c7657bceed Mon Sep 17 00:00:00 2001
 From: Jan Grulich <jgrulich@redhat.com>
 Date: Wed, 26 Jul 2023 12:56:06 +0200
-Subject: [PATCH 08/25] Replace QPlatformTheme::Appearance by Qt:Appearance
+Subject: [PATCH 08/22] Replace QPlatformTheme::Appearance by Qt:Appearance
 
 With the introduction of Qt:Appearance, its predecessor in
 QPlatformTheme has become redundant.

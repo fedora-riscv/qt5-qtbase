@@ -1,7 +1,7 @@
-From 544c063ad74bfcc5c8e9f7d6c2f4e7b6301df497 Mon Sep 17 00:00:00 2001
+From b6bf671270aea7bddbb98c69ff395ae649d0edf8 Mon Sep 17 00:00:00 2001
 From: Jan Grulich <jgrulich@redhat.com>
 Date: Wed, 26 Jul 2023 15:38:13 +0200
-Subject: [PATCH 13/25] QGtk3Theme: subscribe to theme hint changes
+Subject: [PATCH 10/22] QGtk3Theme: subscribe to theme hint changes
 
 ---
  .../platformthemes/gtk3/qgtk3theme.cpp        | 20 +++++++++++++++++++

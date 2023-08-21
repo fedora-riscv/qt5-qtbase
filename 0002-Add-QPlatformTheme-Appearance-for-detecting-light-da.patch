@@ -1,7 +1,7 @@
 From 488d73ca92deb669abc724c82dbd3206597107fd Mon Sep 17 00:00:00 2001
 From: Jan Grulich <jgrulich@redhat.com>
 Date: Wed, 26 Jul 2023 12:04:21 +0200
-Subject: [PATCH 02/25] Add QPlatformTheme::Appearance for detecting light/dark
+Subject: [PATCH 02/22] Add QPlatformTheme::Appearance for detecting light/dark
  modes
 
 And implement it on Windows and macOS.

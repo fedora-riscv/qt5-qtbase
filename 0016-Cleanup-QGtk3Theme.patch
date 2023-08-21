@@ -1,7 +1,7 @@
-From e35349100e0f8fc21643c0fa514af5f6f8950097 Mon Sep 17 00:00:00 2001
+From 615966a0e855712898ba92681a08825f4b322e4b Mon Sep 17 00:00:00 2001
 From: Jan Grulich <jgrulich@redhat.com>
 Date: Thu, 27 Jul 2023 12:38:53 +0200
-Subject: [PATCH 19/25] Cleanup QGtk3Theme
+Subject: [PATCH 16/22] Cleanup QGtk3Theme
 
 1. Remove unused include.
 2. Replace unnecessary null checks with asserts.

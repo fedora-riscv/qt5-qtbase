@@ -1,7 +1,7 @@
-From 7b52f959ccc772b399fb32c9a4eabe37dc572db6 Mon Sep 17 00:00:00 2001
+From 410808ea61b30e886830bc8bdc0db562eb0b56b4 Mon Sep 17 00:00:00 2001
 From: Jan Grulich <jgrulich@redhat.com>
 Date: Thu, 27 Jul 2023 12:44:31 +0200
-Subject: [PATCH 25/25] QGtk3Theme: Do not default Active WindowText to button
+Subject: [PATCH 22/22] QGtk3Theme: Do not default Active WindowText to button
  foreground
 
 QGtk3Theme uses the GTK button foreground as a default for the
@@ -32,7 +32,7 @@ Entry Text / Normal Text / qt_fusionPalette
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/plugins/platformthemes/gtk3/qgtk3storage.cpp b/src/plugins/platformthemes/gtk3/qgtk3storage.cpp
-index 0f53d526b8..df7f7c77b8 100644
+index 7775ac66e4..fb4069ba3c 100644
 --- a/src/plugins/platformthemes/gtk3/qgtk3storage.cpp
 +++ b/src/plugins/platformthemes/gtk3/qgtk3storage.cpp
 @@ -538,7 +538,6 @@ void QGtk3Storage::createMapping()

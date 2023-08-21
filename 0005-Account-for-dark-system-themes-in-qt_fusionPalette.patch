@@ -1,7 +1,7 @@
 From 3d8874aaf5384818a51f158cd2880b7976c9a93a Mon Sep 17 00:00:00 2001
 From: Jan Grulich <jgrulich@redhat.com>
 Date: Wed, 26 Jul 2023 12:41:53 +0200
-Subject: [PATCH 05/25] Account for dark system themes in qt_fusionPalette
+Subject: [PATCH 05/22] Account for dark system themes in qt_fusionPalette
 
 On Ubuntu (Gnome), the Fusion style didn't account for when a dark
 theme was set in the system's settings. Neither QGtk3Theme, nor

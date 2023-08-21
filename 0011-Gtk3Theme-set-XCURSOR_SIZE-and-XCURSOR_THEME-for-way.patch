@@ -1,7 +1,7 @@
-From ff4c01410f56001c59ed9628d7365a44019ce85c Mon Sep 17 00:00:00 2001
+From 232211f5867878e64bed10d4dff0f94a6326a94f Mon Sep 17 00:00:00 2001
 From: Jan Grulich <jgrulich@redhat.com>
 Date: Wed, 26 Jul 2023 15:38:38 +0200
-Subject: [PATCH 14/25] Gtk3Theme: set XCURSOR_SIZE and XCURSOR_THEME for
+Subject: [PATCH 11/22] Gtk3Theme: set XCURSOR_SIZE and XCURSOR_THEME for
  wayland sessions
 
 GNOME doesn't set these for Wayland session and without those env

@@ -1,7 +1,7 @@
 From 84b0d114d98c58ecf00e20987321182e8e2ba4c1 Mon Sep 17 00:00:00 2001
 From: Jan Grulich <jgrulich@redhat.com>
 Date: Wed, 26 Jul 2023 12:44:00 +0200
-Subject: [PATCH 06/25] qt_fusionPalette: make links more legible on dark
+Subject: [PATCH 06/22] qt_fusionPalette: make links more legible on dark
  backgrounds
 
 QPalette's default for Link is Qt::blue, which is difficult to read

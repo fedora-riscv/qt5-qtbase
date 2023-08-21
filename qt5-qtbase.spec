@@ -163,23 +163,20 @@ Patch154: 0005-Account-for-dark-system-themes-in-qt_fusionPalette.patch
 Patch155: 0006-qt_fusionPalette-make-links-more-legible-on-dark-bac.patch
 Patch156: 0007-Add-nullptr-check-for-theme-when-initializing-palett.patch
 Patch157: 0008-Replace-QPlatformTheme-Appearance-by-Qt-Appearance.patch
-Patch158: 0009-Rename-QGuiApplicationPrivate-notifyThemeChanged-to-.patch
-Patch159: 0010-Send-ThemeChange-event-to-all-windows-when-system-th.patch
-Patch160: 0011-Propagate-appearance-property-from-QPlatformTheme-to.patch
-Patch161: 0012-Sync-and-assert-StandardPixmap-enums-in-QPlatformThe.patch
-Patch162: 0013-QGtk3Theme-subscribe-to-theme-hint-changes.patch
-Patch163: 0014-Gtk3Theme-set-XCURSOR_SIZE-and-XCURSOR_THEME-for-way.patch
-Patch164: 0015-Gtk3-fix-stack-smashing-on-mismatch-between-bool-and.patch
-Patch165: 0016-Re-implement-palette-standardPixmap-file-icons-fonts.patch
-Patch166: 0017-GTK3-theme-simplify-code.patch
-Patch167: 0018-Fix-checkbox-and-radiobutton-background-in-QGtk3Them.patch
-Patch168: 0019-Cleanup-QGtk3Theme.patch
-Patch169: 0020-Detect-appearance-by-colors-unless-GTK-theme-name-co.patch
-Patch170: 0021-Change-parsing-log-output-in-QGtk3Json-from-qCDebug-.patch
-Patch171: 0022-Document-QGtk3Interface.patch
-Patch172: 0023-Document-QGtk3Storage.patch
-Patch173: 0024-QGtk3Theme-Improve-fixed-font-delivery.patch
-Patch174: 0025-QGtk3Theme-Do-not-default-Active-WindowText-to-butto.patch
+Patch158: 0009-Sync-and-assert-StandardPixmap-enums-in-QPlatformThe.patch
+Patch159: 0010-QGtk3Theme-subscribe-to-theme-hint-changes.patch
+Patch160: 0011-Gtk3Theme-set-XCURSOR_SIZE-and-XCURSOR_THEME-for-way.patch
+Patch161: 0012-Gtk3-fix-stack-smashing-on-mismatch-between-bool-and.patch
+Patch162: 0013-Re-implement-palette-standardPixmap-file-icons-fonts.patch
+Patch163: 0014-GTK3-theme-simplify-code.patch
+Patch164: 0015-Fix-checkbox-and-radiobutton-background-in-QGtk3Them.patch
+Patch165: 0016-Cleanup-QGtk3Theme.patch
+Patch166: 0017-Detect-appearance-by-colors-unless-GTK-theme-name-co.patch
+Patch167: 0018-Change-parsing-log-output-in-QGtk3Json-from-qCDebug-.patch
+Patch168: 0019-Document-QGtk3Interface.patch
+Patch169: 0020-Document-QGtk3Storage.patch
+Patch170: 0021-QGtk3Theme-Improve-fixed-font-delivery.patch
+Patch171: 0022-QGtk3Theme-Do-not-default-Active-WindowText-to-butto.patch
 
 # Latest QGnomePlatform needs to be specified to be used
 Patch200: qtbase-use-qgnomeplatform-as-default-platform-theme-on-gnome.patch
@@ -488,9 +485,6 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %patch -P169 -p1
 %patch -P170 -p1
 %patch -P171 -p1
-%patch -P172 -p1
-%patch -P173 -p1
-%patch -P174 -p1
 %endif
 
 %if 0%{?fedora} < 39

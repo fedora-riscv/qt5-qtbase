@@ -1,7 +1,7 @@
 From 1d693df019b1ebf54980a015000b01ae947f82ee Mon Sep 17 00:00:00 2001
 From: Jan Grulich <jgrulich@redhat.com>
 Date: Wed, 26 Jul 2023 12:26:39 +0200
-Subject: [PATCH 04/25] QGtk3Theme: implement appearance function to detect
+Subject: [PATCH 04/22] QGtk3Theme: implement appearance function to detect
  dark themes
 
 This allows Qt Quick Controls to detect if a dark theme is in use,

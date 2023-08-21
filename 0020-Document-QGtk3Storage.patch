@@ -1,7 +1,7 @@
-From 4d4cb6a17e5890ef1ee7ac0398d7b5ecdf77d48f Mon Sep 17 00:00:00 2001
+From 65aff839101ef829c14b69a815a34eeda00abd3e Mon Sep 17 00:00:00 2001
 From: Jan Grulich <jgrulich@redhat.com>
 Date: Thu, 27 Jul 2023 12:42:49 +0200
-Subject: [PATCH 23/25] Document QGtk3Storage
+Subject: [PATCH 20/22] Document QGtk3Storage
 
 Add internal documentation to header and implementation of
 QGtk3Storage
@@ -11,7 +11,7 @@ QGtk3Storage
  2 files changed, 193 insertions(+), 39 deletions(-)
 
 diff --git a/src/plugins/platformthemes/gtk3/qgtk3storage.cpp b/src/plugins/platformthemes/gtk3/qgtk3storage.cpp
-index c206b4d3b5..0f53d526b8 100644
+index 0b6b8e8523..7775ac66e4 100644
 --- a/src/plugins/platformthemes/gtk3/qgtk3storage.cpp
 +++ b/src/plugins/platformthemes/gtk3/qgtk3storage.cpp
 @@ -24,7 +24,26 @@ QGtk3Storage::QGtk3Storage()
@@ -153,7 +153,7 @@ index c206b4d3b5..0f53d526b8 100644
  {
      clear();
 @@ -209,6 +278,54 @@ void QGtk3Storage::handleThemeChange()
-     QWindowSystemInterface::handleThemeChange();
+     QWindowSystemInterface::handleThemeChange(nullptr);
  }
  
 +/*!

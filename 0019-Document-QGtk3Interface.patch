@@ -1,7 +1,7 @@
-From e22d4e2a63976fe6f88266d8f2bde002b12b0744 Mon Sep 17 00:00:00 2001
+From fa0c84d609a44aa630dbbb498ffe3bf11326647e Mon Sep 17 00:00:00 2001
 From: Jan Grulich <jgrulich@redhat.com>
 Date: Thu, 27 Jul 2023 12:42:04 +0200
-Subject: [PATCH 22/25] Document QGtk3Interface
+Subject: [PATCH 19/22] Document QGtk3Interface
 
 Add internal documentation to header and implementation of
 QGtk3Interface

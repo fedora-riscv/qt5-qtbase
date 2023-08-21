@@ -1,7 +1,7 @@
-From fc0d325fee69cc3fa5f415b1e83592376adeb061 Mon Sep 17 00:00:00 2001
+From dc373fc0d7dc14107e06aca4b5664c830d681494 Mon Sep 17 00:00:00 2001
 From: Jan Grulich <jgrulich@redhat.com>
 Date: Wed, 26 Jul 2023 15:39:31 +0200
-Subject: [PATCH 15/25] Gtk3: fix stack smashing on mismatch between bool and
+Subject: [PATCH 12/22] Gtk3: fix stack smashing on mismatch between bool and
  gboolean
 
 Glib is written in C and predates C99 (though not really, glib 2.0 was
