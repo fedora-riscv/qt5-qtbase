@@ -1,14 +1,14 @@
-From b6bf671270aea7bddbb98c69ff395ae649d0edf8 Mon Sep 17 00:00:00 2001
+From 24b6ad903ab2ed620f8c754aafb727e6aa342aca Mon Sep 17 00:00:00 2001
 From: Jan Grulich <jgrulich@redhat.com>
 Date: Wed, 26 Jul 2023 15:38:13 +0200
-Subject: [PATCH 10/22] QGtk3Theme: subscribe to theme hint changes
+Subject: [PATCH 04/15] QGtk3Theme: subscribe to theme hint changes
 
 ---
  .../platformthemes/gtk3/qgtk3theme.cpp        | 20 +++++++++++++++++++
  1 file changed, 20 insertions(+)
 
 diff --git a/src/plugins/platformthemes/gtk3/qgtk3theme.cpp b/src/plugins/platformthemes/gtk3/qgtk3theme.cpp
-index 2a70d5f3dd..0e940ae690 100644
+index 93520344f8..7540cb43cf 100644
 --- a/src/plugins/platformthemes/gtk3/qgtk3theme.cpp
 +++ b/src/plugins/platformthemes/gtk3/qgtk3theme.cpp
 @@ -40,6 +40,7 @@
@@ -17,9 +17,9 @@ index 2a70d5f3dd..0e940ae690 100644
  #include "qgtk3menu.h"
 +#include "qpa/qwindowsysteminterface.h"
  #include <QVariant>
- #include <QtCore/qregularexpression.h>
  
-@@ -101,6 +102,25 @@ QGtk3Theme::QGtk3Theme()
+ #undef signals
+@@ -100,6 +101,25 @@ QGtk3Theme::QGtk3Theme()
  
      /* Use our custom log handler. */
      g_log_set_handler("Gtk", G_LOG_LEVEL_MESSAGE, gtkMessageHandler, nullptr);

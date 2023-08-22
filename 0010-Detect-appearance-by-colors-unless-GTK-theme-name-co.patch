@@ -1,7 +1,7 @@
-From 8f256a33fa60b249ee6fc7347f917f29a11c1e32 Mon Sep 17 00:00:00 2001
+From f0117fa2110e8b6d71c82272fda1d264e7921a24 Mon Sep 17 00:00:00 2001
 From: Jan Grulich <jgrulich@redhat.com>
 Date: Thu, 27 Jul 2023 12:40:32 +0200
-Subject: [PATCH 17/22] Detect appearance by colors unless GTK theme name
+Subject: [PATCH 10/15] Detect appearance by colors unless GTK theme name
  contains "dark"
 
 QGtk3Theme detects the appearance property by theme name: If the name

@@ -1,7 +1,7 @@
-From 753c0dea114812a2d3b721cb72fda1b49a3c38c2 Mon Sep 17 00:00:00 2001
+From ffab9df46c5f2cb411765f72ecd6f5dcdb62fbb4 Mon Sep 17 00:00:00 2001
 From: Jan Grulich <jgrulich@redhat.com>
 Date: Thu, 27 Jul 2023 11:54:44 +0200
-Subject: [PATCH 13/22] Re-implement palette, standardPixmap, file icons, fonts
+Subject: [PATCH 06/15] Re-implement palette, standardPixmap, file icons, fonts
  in QGtk3Theme
 
 Read theme colors from GTK3 style context and build platform theme
@@ -19,9 +19,9 @@ and file icons.
  src/plugins/platformthemes/gtk3/qgtk3json_p.h |  102 ++
  .../platformthemes/gtk3/qgtk3storage.cpp      |  470 +++++++
  .../platformthemes/gtk3/qgtk3storage_p.h      |  234 ++++
- .../platformthemes/gtk3/qgtk3theme.cpp        |   32 +-
+ .../platformthemes/gtk3/qgtk3theme.cpp        |   23 +
  src/plugins/platformthemes/gtk3/qgtk3theme.h  |    8 +
- 11 files changed, 3161 insertions(+), 3 deletions(-)
+ 11 files changed, 3155 insertions(+)
  create mode 100644 include/QtCore/5.15.10/QtCore/private/qflatmap_p.h
  create mode 100644 src/corelib/tools/qflatmap_p.h
  create mode 100644 src/plugins/platformthemes/gtk3/qgtk3interface.cpp
@@ -3220,10 +3220,10 @@ index 0000000000..57f6aeea96
 +QT_END_NAMESPACE
 +#endif // QGTK3STORAGE_H
 diff --git a/src/plugins/platformthemes/gtk3/qgtk3theme.cpp b/src/plugins/platformthemes/gtk3/qgtk3theme.cpp
-index c01947e402..5d9fc24d71 100644
+index aceacda4b8..ee6e0f3dd9 100644
 --- a/src/plugins/platformthemes/gtk3/qgtk3theme.cpp
 +++ b/src/plugins/platformthemes/gtk3/qgtk3theme.cpp
-@@ -136,6 +136,8 @@ QGtk3Theme::QGtk3Theme()
+@@ -135,6 +135,8 @@ QGtk3Theme::QGtk3Theme()
                  qputenv("XCURSOR_THEME", cursorTheme.toUtf8());
          }
      }
@@ -3232,38 +3232,7 @@ index c01947e402..5d9fc24d71 100644
  }
  
  static inline QVariant gtkGetLongPressTime()
-@@ -185,6 +187,8 @@ QString QGtk3Theme::gtkFontName() const
- 
- Qt::Appearance QGtk3Theme::appearance() const
- {
-+    if (m_storage)
-+        return m_storage->appearance();
-     /*
-         https://docs.gtk.org/gtk3/running.html
- 
-@@ -199,9 +203,9 @@ Qt::Appearance QGtk3Theme::appearance() const
-         to override any other settings.
-     */
-     QString themeName = qEnvironmentVariable("GTK_THEME");
--    const QRegularExpression darkRegex(QStringLiteral("[:-]dark"), QRegularExpression::CaseInsensitiveOption);
-     if (!themeName.isEmpty())
--        return darkRegex.match(themeName).hasMatch() ? Qt::Appearance::Dark : Qt::Appearance::Light;
-+        return themeName.contains("dark", Qt::CaseInsensitive)
-+                ? Qt::Appearance::Dark : Qt::Appearance::Light;
- 
-     /*
-         https://docs.gtk.org/gtk3/property.Settings.gtk-application-prefer-dark-theme.html
-@@ -219,7 +223,8 @@ Qt::Appearance QGtk3Theme::appearance() const
-     */
-     themeName = gtkSetting("gtk-theme-name");
-     if (!themeName.isEmpty())
--        return darkRegex.match(themeName).hasMatch() ? Qt::Appearance::Dark : Qt::Appearance::Light;
-+        return themeName.contains("dark", Qt::CaseInsensitive)
-+                ? Qt::Appearance::Dark : Qt::Appearance::Light;
- 
-     return Qt::Appearance::Unknown;
- }
-@@ -277,4 +282,25 @@ bool QGtk3Theme::useNativeFileDialog()
+@@ -235,4 +237,25 @@ bool QGtk3Theme::useNativeFileDialog()
      return gtk_check_version(3, 15, 5) == nullptr;
  }
  
@@ -3290,7 +3259,7 @@ index c01947e402..5d9fc24d71 100644
 +
  QT_END_NAMESPACE
 diff --git a/src/plugins/platformthemes/gtk3/qgtk3theme.h b/src/plugins/platformthemes/gtk3/qgtk3theme.h
-index 89a3b98994..73f4399894 100644
+index 54296d2ff1..99e896c020 100644
 --- a/src/plugins/platformthemes/gtk3/qgtk3theme.h
 +++ b/src/plugins/platformthemes/gtk3/qgtk3theme.h
 @@ -41,6 +41,7 @@
@@ -3301,7 +3270,7 @@ index 89a3b98994..73f4399894 100644
  
  QT_BEGIN_NAMESPACE
  
-@@ -60,9 +61,16 @@ public:
+@@ -58,9 +59,16 @@ public:
      QPlatformMenu* createPlatformMenu() const override;
      QPlatformMenuItem* createPlatformMenuItem() const override;
  

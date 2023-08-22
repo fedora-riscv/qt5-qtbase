@@ -1,7 +1,7 @@
-From cf96f7cecf8d02722e303687c1f30361a4a55cd0 Mon Sep 17 00:00:00 2001
+From c41101241ce626dd38ee71d5a37c6aeb434eddf4 Mon Sep 17 00:00:00 2001
 From: Jan Grulich <jgrulich@redhat.com>
 Date: Wed, 26 Jul 2023 12:06:29 +0200
-Subject: [PATCH 03/22] Add enum class Qt::Appearance
+Subject: [PATCH 02/15] Add enum class Qt::Appearance
 
 It has been decided to add an appearance property in QStyleHints, which
 will be propagated to classes that do not include QPlatformTheme.

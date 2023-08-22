@@ -1,7 +1,7 @@
-From d0f0010b49eb40477ea42496063766199e857312 Mon Sep 17 00:00:00 2001
+From fb0bc2e9f466c37f398af4a7a374fee2b29f5073 Mon Sep 17 00:00:00 2001
 From: Jan Grulich <jgrulich@redhat.com>
 Date: Wed, 26 Jul 2023 13:43:29 +0200
-Subject: [PATCH 09/22] Sync and assert StandardPixmap enums in QPlatformTheme
+Subject: [PATCH 03/15] Sync and assert StandardPixmap enums in QPlatformTheme
  and QStyle
 
 Add missing enum values in QPlatformTheme::standardPixmap to sync with
@@ -20,7 +20,7 @@ not documented).
  3 files changed, 14 insertions(+)
 
 diff --git a/src/gui/kernel/qplatformtheme.h b/src/gui/kernel/qplatformtheme.h
-index 41213bf32b..210bd40afa 100644
+index 7e6c9d5740..99a30337f5 100644
 --- a/src/gui/kernel/qplatformtheme.h
 +++ b/src/gui/kernel/qplatformtheme.h
 @@ -256,6 +256,15 @@ public:

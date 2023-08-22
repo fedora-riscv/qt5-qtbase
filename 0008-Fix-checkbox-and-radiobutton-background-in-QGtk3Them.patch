@@ -1,7 +1,7 @@
-From 40d1e750fd1b0f646724b383928b8f70a7a3abe8 Mon Sep 17 00:00:00 2001
+From 99fd51406053e789b9e02dd5fdbf63d79cb4d7ff Mon Sep 17 00:00:00 2001
 From: Jan Grulich <jgrulich@redhat.com>
 Date: Thu, 27 Jul 2023 12:36:14 +0200
-Subject: [PATCH 15/22] Fix checkbox and radiobutton background in QGtk3Theme
+Subject: [PATCH 08/15] Fix checkbox and radiobutton background in QGtk3Theme
 
 The background color for radio buttons and checkboxes was not
 correctly read from the current GTK3 theme in light mode.

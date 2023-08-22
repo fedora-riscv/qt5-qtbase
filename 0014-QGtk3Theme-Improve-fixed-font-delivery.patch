@@ -1,7 +1,7 @@
-From dfb10f3d3b689c172e53a94074b696d1eb9e6acd Mon Sep 17 00:00:00 2001
+From 9628ad303ad924255a224fdcc113ff8264172fc7 Mon Sep 17 00:00:00 2001
 From: Jan Grulich <jgrulich@redhat.com>
 Date: Thu, 27 Jul 2023 12:44:11 +0200
-Subject: [PATCH 21/22] QGtk3Theme: Improve fixed font delivery
+Subject: [PATCH 14/15] QGtk3Theme: Improve fixed font delivery
 
 The gtk_fixed widget was used as a reference to obtain a fixed font
 and HeaderViewFont.

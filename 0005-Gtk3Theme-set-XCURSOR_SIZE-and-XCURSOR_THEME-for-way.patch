@@ -1,7 +1,7 @@
-From 232211f5867878e64bed10d4dff0f94a6326a94f Mon Sep 17 00:00:00 2001
+From f9d7c6b4157046a06f4ce04726e743d43ab711a2 Mon Sep 17 00:00:00 2001
 From: Jan Grulich <jgrulich@redhat.com>
 Date: Wed, 26 Jul 2023 15:38:38 +0200
-Subject: [PATCH 11/22] Gtk3Theme: set XCURSOR_SIZE and XCURSOR_THEME for
+Subject: [PATCH 05/15] Gtk3Theme: set XCURSOR_SIZE and XCURSOR_THEME for
  wayland sessions
 
 GNOME doesn't set these for Wayland session and without those env
@@ -17,7 +17,7 @@ Qt Wayland QPA plugin still tries to load from those two envs.
  1 file changed, 15 insertions(+)
 
 diff --git a/src/plugins/platformthemes/gtk3/qgtk3theme.cpp b/src/plugins/platformthemes/gtk3/qgtk3theme.cpp
-index 0e940ae690..8688fe205e 100644
+index 7540cb43cf..aceacda4b8 100644
 --- a/src/plugins/platformthemes/gtk3/qgtk3theme.cpp
 +++ b/src/plugins/platformthemes/gtk3/qgtk3theme.cpp
 @@ -41,6 +41,7 @@
@@ -26,9 +26,9 @@ index 0e940ae690..8688fe205e 100644
  #include "qpa/qwindowsysteminterface.h"
 +#include <QGuiApplication>
  #include <QVariant>
- #include <QtCore/qregularexpression.h>
  
-@@ -121,6 +122,20 @@ QGtk3Theme::QGtk3Theme()
+ #undef signals
+@@ -120,6 +121,20 @@ QGtk3Theme::QGtk3Theme()
      SETTING_CONNECT("gtk-application-prefer-dark-theme");
      SETTING_CONNECT("gtk-theme-name");
  #undef SETTING_CONNECT
