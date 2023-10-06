@@ -10,7 +10,7 @@ React to runtime theme changes.
 Re-implement methods to retrieve GTK3 styled standardPixmaps, fonts
 and file icons.
 ---
- .../5.15.10/QtCore/private/qflatmap_p.h       |    2 +
+ .../5.15.11/QtCore/private/qflatmap_p.h       |    2 +
  src/corelib/tools/qflatmap_p.h                | 1107 +++++++++++++++++
  src/plugins/platformthemes/gtk3/gtk3.pro      |    6 +
  .../platformthemes/gtk3/qgtk3interface.cpp    |  558 +++++++++
@@ -22,7 +22,7 @@ and file icons.
  .../platformthemes/gtk3/qgtk3theme.cpp        |   23 +
  src/plugins/platformthemes/gtk3/qgtk3theme.h  |    8 +
  11 files changed, 3155 insertions(+)
- create mode 100644 include/QtCore/5.15.10/QtCore/private/qflatmap_p.h
+ create mode 100644 include/QtCore/5.15.11/QtCore/private/qflatmap_p.h
  create mode 100644 src/corelib/tools/qflatmap_p.h
  create mode 100644 src/plugins/platformthemes/gtk3/qgtk3interface.cpp
  create mode 100644 src/plugins/platformthemes/gtk3/qgtk3interface_p.h
@@ -31,11 +31,11 @@ and file icons.
  create mode 100644 src/plugins/platformthemes/gtk3/qgtk3storage.cpp
  create mode 100644 src/plugins/platformthemes/gtk3/qgtk3storage_p.h
 
-diff --git a/include/QtCore/5.15.10/QtCore/private/qflatmap_p.h b/include/QtCore/5.15.10/QtCore/private/qflatmap_p.h
+diff --git a/include/QtCore/5.15.11/QtCore/private/qflatmap_p.h b/include/QtCore/5.15.11/QtCore/private/qflatmap_p.h
 new file mode 100644
 index 0000000000..e629799f72
 --- /dev/null
-+++ b/include/QtCore/5.15.10/QtCore/private/qflatmap_p.h
++++ b/include/QtCore/5.15.11/QtCore/private/qflatmap_p.h
 @@ -0,0 +1,2 @@
 +#include "../../../../../src/corelib/tools/qflatmap_p.h"
 +

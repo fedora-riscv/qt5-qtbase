@@ -17,7 +17,7 @@ Qt Wayland QPA plugin still tries to load from those two envs.
  1 file changed, 15 insertions(+)
 
 diff --git a/src/plugins/platformthemes/gtk3/qgtk3theme.cpp b/src/plugins/platformthemes/gtk3/qgtk3theme.cpp
-index 7540cb43cf..aceacda4b8 100644
+index 67fdf7d3..c7ac7804 100644
 --- a/src/plugins/platformthemes/gtk3/qgtk3theme.cpp
 +++ b/src/plugins/platformthemes/gtk3/qgtk3theme.cpp
 @@ -41,6 +41,7 @@
@@ -26,9 +26,9 @@ index 7540cb43cf..aceacda4b8 100644
  #include "qpa/qwindowsysteminterface.h"
 +#include <QGuiApplication>
  #include <QVariant>
+ #include <QGuiApplication>
  
- #undef signals
-@@ -120,6 +121,20 @@ QGtk3Theme::QGtk3Theme()
+@@ -129,6 +130,20 @@ QGtk3Theme::QGtk3Theme()
      SETTING_CONNECT("gtk-application-prefer-dark-theme");
      SETTING_CONNECT("gtk-theme-name");
  #undef SETTING_CONNECT
@@ -49,6 +49,3 @@ index 7540cb43cf..aceacda4b8 100644
  }
  
  static inline QVariant gtkGetLongPressTime()
--- 
-2.41.0
-
