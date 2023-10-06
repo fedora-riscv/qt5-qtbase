@@ -650,7 +650,7 @@ translationdir=%{_qt5_translationdir}
 
 Name: Qt5
 Description: Qt5 Configuration
-Version: 5.15.10
+Version: 5.15.11
 EOF
 
 # rpm macros
