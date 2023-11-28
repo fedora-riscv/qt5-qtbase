@@ -2,16 +2,12 @@
 %global multilib_archs x86_64 %{ix86} %{?mips} ppc64 ppc s390x s390 sparc64 sparcv9
 %global multilib_basearchs x86_64 %{?mips64} ppc64 s390x sparc64
 
-%global openssl -openssl-linked
-
 %if 0%{?fedora} < 29 && 0%{?rhel} < 9
 %ifarch %{ix86}
 %global no_sse2  -no-sse2
 %endif
 %endif
 
-# zstd support
-%global zstd 1
 
 # workaround https://bugzilla.redhat.com/show_bug.cgi?id=1668865
 # for current stable releases
@@ -24,7 +20,11 @@
 %endif
 
 # support qtchooser (adds qtchooser .conf file)
+%if 0%{?flatpak}
+%global qtchooser 0
+%else
 %global qtchooser 1
+%endif
 %if 0%{?qtchooser}
 %global priority 10
 %ifarch %{multilib_basearchs}
@@ -50,21 +50,17 @@
 %global qt_settings 1
 %endif
 
-%global journald -journald
-BuildRequires: make
-BuildRequires: pkgconfig(libsystemd)
-
 %global examples 1
 ## skip for now, until we're better at it --rex
 #global tests 1
 
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
-Version: 5.15.8
-Release: 2.rv64%{?dist}
+Version: 5.15.11
+Release: 7.rv64%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
-License: LGPLv2 with exceptions or GPLv3 with exceptions
+License: LGPL-3.0-only OR GPL-3.0-only WITH Qt-GPL-exception-1.0
 Url:     http://qt-project.org/
 %global  majmin %(echo %{version} | cut -d. -f1-2)
 Source0: https://download.qt.io/official_releases/qt/%{majmin}/%{version}/submodules/%{qt_module}-everywhere-opensource-src-%{version}.tar.xz
@@ -118,36 +114,83 @@ Patch55: qtbase-everywhere-src-5.14.2-no_relocatable.patch
 Patch56: qtbase-everywhere-src-5.15.2-libglvnd.patch
 
 # drop -O3 and make -O2 by default
-Patch61: qt5-qtbase-cxxflag.patch
+Patch57: qt5-qtbase-cxxflag.patch
 
 # support firebird version 3.x
-Patch63: qt5-qtbase-5.12.1-firebird.patch
+Patch58: qt5-qtbase-5.12.1-firebird.patch
 
 # support firebird version 4.x
-Patch64: qt5-qtbase-5.12.1-firebird-4.0.0.patch
+Patch59: qt5-qtbase-5.12.1-firebird-4.0.0.patch
 
 # fix for new mariadb
-Patch65: qtbase-opensource-src-5.9.0-mysql.patch
+Patch60: qtbase-opensource-src-5.9.0-mysql.patch
 
-# python3
-Patch68: qtbase-everywhere-src-5.11.1-python3.patch
+# FIXME This patch is completely meaningless in the context of C++.
+# It is a workaround for a pyside2 build failure with Qt 5.15.9,
+# pyside2 5.15.9, clang 16.0.1 -- the generated code thinks a
+# not otherwise specified "Type" is in fact a
+# QFlags<QOpenGLShader::ShaderTypeBit>, causing many functions
+# looking for a QEvent::Type to be bogus.
+# Since there are no side effects to superfluously specifying
+# QEvent::Type instead of plain "Type" in a QEvent derived class,
+# this workaround is acceptable, if not nice.
+Patch61: qtbase-5.15.10-work-around-pyside2-brokenness.patch
 
-# https://fedoraproject.org/wiki/Changes/Qt_Wayland_By_Default_On_Gnome
-# https://bugzilla.redhat.com/show_bug.cgi?id=1732129
-Patch80: qtbase-use-wayland-on-gnome.patch
+# Bug 1954359 - Many emoji don't show up in Qt apps because qt does not handle 'emoji' font family
+# Patch63: qtbase-cache-emoji-font.patch
 
 # gcc-11
 Patch90: %{name}-gcc11.patch
 
 ## upstream patches
 # https://invent.kde.org/qt/qt/qtbase, kde/5.15 branch
-# git diff v5.15.8-lts-lgpl..HEAD | gzip > kde-5.15-rollup-$(date +%Y%m%d).patch.gz
+# git diff v5.15.11-lts-lgpl..HEAD | gzip > kde-5.15-rollup-$(date +%Y%m%d).patch.gz
 # patch100 in lookaside cache due to large'ish size -- rdieter
-Patch100: kde-5.15-rollup-20230105.patch.gz
+Patch100: kde-5.15-rollup-20231127.patch.gz
 # HACK to make 'fedpkg sources' consider it 'used"
-Source100: kde-5.15-rollup-20230105.patch.gz
+Source100: kde-5.15-rollup-20231127.patch.gz
 
-Patch101: qtbase-5.15.8-fix-missing-qtsan-include.patch
+Patch101: qtbase-5.15.10-fix-missing-qtsan-include.patch
+# Workaround for font rendering issue with cjk-vf-fonts
+# https://bugreports.qt.io/browse/QTBUG-111994
+# https://bugreports.qt.io/browse/QTBUG-112136
+Patch102: qtbase-QTBUG-111994.patch
+Patch103: qtbase-QTBUG-112136.patch
+# IBus input method cannot set panel position correctly with DPI scaling
+# https://bugreports.qt.io/browse/QTBUG-103393
+Patch104: qtbase-QTBUG-103393.patch
+
+# upstream security fixes
+
+## Qt 6 backports for better Gtk/GNOME integration
+# https://fedoraproject.org/wiki/Changes/Qt_Wayland_By_Default_On_Gnome
+# https://bugzilla.redhat.com/show_bug.cgi?id=1732129
+Patch150: 0001-Use-Wayland-by-default-on-GNOME.patch
+
+# https://fedoraproject.org/wiki/Changes/NoCustomQtThemingForWorkstation
+# https://bugzilla.redhat.com/show_bug.cgi?id=2226797
+Patch151: 0002-Add-enum-class-Qt-Appearance.patch
+Patch152: 0003-Sync-and-assert-StandardPixmap-enums-in-QPlatformThe.patch
+Patch153: 0004-QGtk3Theme-subscribe-to-theme-hint-changes.patch
+Patch154: 0005-Gtk3Theme-set-XCURSOR_SIZE-and-XCURSOR_THEME-for-way.patch
+Patch155: 0006-Re-implement-palette-standardPixmap-file-icons-fonts.patch
+Patch156: 0007-GTK3-theme-simplify-code.patch
+Patch157: 0008-Fix-checkbox-and-radiobutton-background-in-QGtk3Them.patch
+Patch158: 0009-Cleanup-QGtk3Theme.patch
+Patch159: 0010-Detect-appearance-by-colors-unless-GTK-theme-name-co.patch
+Patch160: 0011-Change-parsing-log-output-in-QGtk3Json-from-qCDebug-.patch
+Patch161: 0012-Document-QGtk3Interface.patch
+Patch162: 0013-Document-QGtk3Storage.patch
+Patch163: 0014-QGtk3Theme-Improve-fixed-font-delivery.patch
+Patch164: 0015-QGtk3Theme-Do-not-default-Active-WindowText-to-butto.patch
+Patch165: 0016-Fix-memory-leak-in-QGtk3Interface-themename.patch
+Patch166: 0017-Fix-disabled-button-color-in-Linux-x11-wayland.patch
+Patch167: 0018-Fix-inactive-palette-in-gtk3-theme.patch
+Patch168: 0019-Fix-tooltip-palette-issue-in-gtk3-theme.patch
+Patch169: 0020-QGtk3Theme-define-light-midlight-mid-dark-shadow-colors.patch
+
+# Latest QGnomePlatform needs to be specified to be used
+Patch200: qtbase-use-qgnomeplatform-as-default-platform-theme-on-gnome.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -158,8 +201,15 @@ Patch101: qtbase-5.15.8-fix-missing-qtsan-include.patch
 # filter plugin provides
 %global __provides_exclude_from ^%{_qt5_plugindir}/.*\\.so$
 
+%if 0%{?use_clang}
+BuildRequires: clang >= 3.7.0
+%else
+BuildRequires: gcc-c++
+%endif
+BuildRequires: make
 BuildRequires: cups-devel
 BuildRequires: desktop-file-utils
+BuildRequires: double-conversion-devel
 BuildRequires: findutils
 BuildRequires: libjpeg-devel
 BuildRequires: libmng-devel
@@ -167,22 +217,14 @@ BuildRequires: libtiff-devel
 BuildRequires: pkgconfig(alsa)
 # required for -accessibility
 BuildRequires: pkgconfig(atspi-2)
-%if 0%{?use_clang}
-BuildRequires: clang >= 3.7.0
-%else
-BuildRequires: gcc-c++
-%endif
-# http://bugzilla.redhat.com/1196359
-%if 0%{?fedora} || 0%{?rhel} > 6
-%global dbus -dbus-linked
 BuildRequires: pkgconfig(dbus-1)
-%endif
 BuildRequires: pkgconfig(libdrm)
 BuildRequires: pkgconfig(fontconfig)
 BuildRequires: pkgconfig(gl)
 BuildRequires: pkgconfig(glib-2.0)
 BuildRequires: pkgconfig(gtk+-3.0)
 BuildRequires: pkgconfig(libproxy-1.0)
+BuildRequires: pkgconfig(libsctp)
 # xcb-sm
 BuildRequires: pkgconfig(ice) pkgconfig(sm)
 BuildRequires: pkgconfig(libpng)
@@ -190,6 +232,7 @@ BuildRequires: pkgconfig(libudev)
 BuildRequires: openssl-devel
 BuildRequires: pkgconfig(libpulse) pkgconfig(libpulse-mainloop-glib)
 BuildRequires: pkgconfig(libinput)
+BuildRequires: pkgconfig(libsystemd)
 BuildRequires: pkgconfig(xcb-xkb) >= 1.10
 BuildRequires: pkgconfig(xcb-util)
 BuildRequires: pkgconfig(xkbcommon) >= 0.4.1
@@ -210,8 +253,11 @@ BuildRequires: pkgconfig(sqlite3) >= 3.7
 BuildRequires: pkgconfig(harfbuzz) >= 0.9.42
 %endif
 BuildRequires: pkgconfig(icu-i18n)
-BuildRequires: pkgconfig(libpcre2-posix) >= 10.20
+%if 0%{?fedora} > 37 || 0%{?rhel} > 7
+BuildRequires: pkgconfig(libpcre2-16) >= 10.20
+%else
 BuildRequires: pkgconfig(libpcre) >= 8.0
+%endif
 %global pcre -system-pcre
 BuildRequires: pkgconfig(xcb-xkb)
 %else
@@ -220,6 +266,7 @@ BuildRequires: libicu-devel
 %endif
 BuildRequires: pkgconfig(xcb) pkgconfig(xcb-glx) pkgconfig(xcb-icccm) pkgconfig(xcb-image) pkgconfig(xcb-keysyms) pkgconfig(xcb-renderutil)
 BuildRequires: pkgconfig(zlib)
+BuildRequires: pkgconfig(libzstd)
 BuildRequires: perl-generators
 # see patch68
 BuildRequires: python3
@@ -232,9 +279,6 @@ BuildRequires: time
 BuildRequires: xorg-x11-server-Xvfb
 %endif
 
-%if 0%{?zstd}
-BuildRequires: pkgconfig(libzstd)
-%endif
 
 %if 0%{?qtchooser}
 %if 0%{?fedora}
@@ -378,8 +422,9 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 Summary: Qt5 GUI-related libraries
 Requires: %{name}%{?_isa} = %{version}-%{release}
 # where Recommends are supported
-%if 0%{?fedora} || 0%{?rhel} >= 8 
-Recommends: mesa-dri-drivers
+%if 0%{?fedora} || 0%{?rhel} >= 8
+Recommends: mesa-dri-drivers%{?_isa}
+Recommends: qt5-qtwayland%{?_isa}
 %endif
 Obsoletes: qt5-qtbase-x11 < 5.2.0
 Provides:  qt5-qtbase-x11 = %{version}-%{release}
@@ -394,38 +439,70 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %setup -q -n %{qt_module}-everywhere-src-%{version}
 
 ## dowstream patches
-%patch3 -p1 -b .private_api_warning
+%patch -P3 -p1 -b .private_api_warning
 
 ## upstream fixes
 
-%patch50 -p1 -b .QT_VERSION_CHECK
+%patch -P50 -p1 -b .QT_VERSION_CHECK
 # FIXME/TODO : rebase or drop -- rdieter
-#patch51 -p1 -b .hidpi_scale_at_192
-%patch52 -p1 -b .moc_macros
-%patch53 -p1 -b .qt5gui_cmake_isystem_includes
-%patch54 -p1 -b .qmake_LFLAGS
-%patch55 -p1 -b .no_relocatable
-%patch56 -p1 -b .libglvnd
-%patch61 -p1 -b .qt5-qtbase-cxxflag
+#patch -P51 -p1 -b .hidpi_scale_at_192
+%patch -P52 -p1 -b .moc_macros
+%patch -P53 -p1 -b .qt5gui_cmake_isystem_includes
+%patch -P54 -p1 -b .qmake_LFLAGS
+%patch -P55 -p1 -b .no_relocatable
+%patch -P56 -p1 -b .libglvnd
+%patch -P57 -p1 -b .qt5-qtbase-cxxflag
 %if 0%{?fedora} < 35
-%patch63 -p1 -b .firebird
+%patch -P58 -p1 -b .firebird
 %else
-%patch64 -p1 -b .firebird
+%patch -P59 -p1 -b .firebird
 %endif
 %if 0%{?fedora} > 27
-%patch65 -p1 -b .mysql
+%patch -P60 -p1 -b .mysql
 %endif
-%patch68 -p1
+%patch -P61 -p1
+# FIXME seems to break text rendering completely for some people
+# %patch -P63 -p1 -b .cache-emoji-font
 
-%if 0%{?fedora} > 30 || 0%{?rhel} > 8
-%patch80 -p1 -b .use-wayland-on-gnome.patch
-%endif
-
-%patch90 -p1 -b .gcc11
+%patch -P90 -p1 -b .gcc11
 
 ## upstream patches
-%patch100 -p1
-%patch101 -p1
+%patch -P100 -p1
+%patch -P101 -p1
+%patch -P102 -p1
+%patch -P103 -p1
+%patch -P104 -p1
+
+## Qt 6 backports
+%if 0%{?fedora} > 30 || 0%{?rhel} > 8
+%patch -P150 -p1 -b .use-wayland-on-gnome.patch
+%endif
+%if 0%{?fedora} > 38 || 0%{?rhel} > 9
+%patch -P151 -p1
+%patch -P152 -p1
+%patch -P153 -p1
+%patch -P154 -p1
+%patch -P155 -p1
+%patch -P156 -p1
+%patch -P157 -p1
+%patch -P158 -p1
+%patch -P159 -p1
+%patch -P160 -p1
+%patch -P161 -p1
+%patch -P162 -p1
+%patch -P163 -p1
+%patch -P164 -p1
+%patch -P165 -p1
+%patch -P166 -p1
+%patch -P167 -p1
+%patch -P168 -p1
+%patch -P169 -p1
+%endif
+
+%if 0%{?fedora} < 39
+# Use QGnomePlatform by default
+%patch -P200 -p1
+%endif
 
 # move some bundled libs to ensure they're not accidentally used
 pushd src/3rdparty
@@ -504,16 +581,18 @@ export MAKEFLAGS="%{?_smp_mflags}"
   -release \
   -shared \
   -accessibility \
-  %{?dbus}%{!?dbus:-dbus-runtime} \
+  -dbus-linked \
   %{?egl:-egl -eglfs} \
   -fontconfig \
   -glib \
   -gtk \
   %{?ibase} \
   -icu \
-  %{?journald} \
+  -journald \
   -optimized-qmake \
-  %{?openssl} \
+  -openssl-linked \
+  -libproxy \
+  -sctp \
   %{!?examples:-nomake examples} \
   %{!?tests:-nomake tests} \
   -no-pch \
@@ -593,7 +672,7 @@ translationdir=%{_qt5_translationdir}
 
 Name: Qt5
 Description: Qt5 Configuration
-Version: 5.15.8
+Version: 5.15.11
 EOF
 
 # rpm macros
@@ -1109,6 +1188,100 @@ fi
 
 
 %changelog
+* Tue Nov 28 2023 Guoguo <i@qwq.trade> - 5.15.11-7.rv64
+- Update package from upstream
+
+* Mon Nov 27 2023 Jan Grulich <jgrulich@redhat.com> - 5.15.11-7
+- KDE/Qt patchset collection respin
+
+* Tue Nov 14 2023 Jan Grulich <jgrulich@redhat.com> - 5.15.11-6
+- Backport another upstream (Qt6) fixes and improvements to QGtk3Theme
+
+* Thu Nov 09 2023 Jan Grulich <jgrulich@redhat.com> - 5.15.11-5
+- Revert: Fix Qt not showing up emoji by handling emoji font family
+
+* Tue Nov 07 2023 Jan Grulich <jgrulich@redhat.com> - 5.15.11-4
+- Fix Qt not showing up emoji by handling emoji font family
+
+* Mon Oct 16 2023 Jan Grulich <jgrulich@redhat.com> - 5.15.11-3
+- Fix build against libxkbcommon 1.6.0
+
+* Sun Oct 15 2023 Neal Gompa <ngompa@fedoraproject.org> - 5.15.11-2
+- Add qtwayland weak dep to -gui subpackage and use arched weak deps
+
+* Fri Oct 06 2023 Jan Grulich <jgrulich@redhat.com> - 5.15.11-10
+- 5.15.11
+
+* Tue Aug 29 2023 LuK1337 <priv.luk@gmail.com> - 5.15.10-9
+- Apply PySide2 build fix from OpenMandriva
+
+* Tue Aug 22 2023 Jan Grulich <jgrulich@redhat.com> - 5.15.10-8
+- Drop QPlatformTheme::Appearance() backports breaking ABI
+
+* Mon Aug 21 2023 Jan Grulich <jgrulich@redhat.com> - 5.15.10-7
+- Drop unnecessary backports
+
+* Mon Aug 21 2023 Jan Grulich <jgrulich@redhat.com> - 5.15.10-6
+- Backport Qt 6 improvements to QGtkStyle for better Gtk/GNOME integration
+- Use QGnomePlatform by default on F38 and older
+  Resolves: #2226797
+
+* Wed Aug 16 2023 Than Ngo <than@redhat.com> - 5.15.10-5
+- Fixed bz#2232359, CVE-2023-37369 qtbase: buffer overflow in QXmlStreamReader
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 5.15.10-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Jul 19 2023 Yaakov Selkowitz <yselkowi@redhat.com> - 5.15.10-3
+- Use pcre2 in RHEL builds
+- Update pcre2 dependency
+
+* Tue Jul 11 2023 František Zatloukal <fzatlouk@redhat.com> - 5.15.10-2
+- Rebuilt for ICU 73.2
+
+* Mon Jun 12 2023 Jan Grulich <jgrulich@redhat.com> - 5.15.10-1
+- 5.15.10
+
+* Fri Jun 09 2023 Than Ngo <than@redhat.com> - 5.15.9-4
+- Fix #2212744, pcre2 support
+
+* Mon May 15 2023 Jan Grulich <jgrulich@redhat.com> - 5.15.9-3
+- Fix CVE-2023-32762 and CVE-2023-32763
+
+* Fri May 05 2023 Than Ngo <than@redhat.com> - 5.15.9-2
+- backport, IBus input method cannot set panel position correctly with DPI scaling
+
+* Tue Apr 11 2023 Jan Grulich <jgrulich@redhat.com> - 5.15.9-1
+- 5.15.9
+
+* Wed Mar 29 2023 Than Ngo <than@redhat.com> - 5.15.8-10
+- Related bz#2179854, Qt 5 render the Bold style CJK character very thick
+  with Noto CJK variable fonts
+- Fix deprecated patch rpm macro
+
+* Tue Mar 28 2023 Kalev Lember <klember@redhat.com> - 5.15.8-9
+- Disable qtchooser for flatpak builds
+
+* Mon Mar 27 2023 Than Ngo <than@redhat.com> - 5.15.8-8
+- Fix bz#2179854, Qt 5 render the Bold style CJK character very thick
+  with Noto CJK variable fonts
+
+* Mon Mar 20 2023 Than Ngo <than@redhat.com> - 5.15.8-7
+- Fix bz#2178389, Qt application render very thin fonts after
+  switch to VF version of Noto CJK fonts
+
+* Mon Feb 27 2023 Jan Grulich <jgrulich@redhat.com> - 5.15.8-6
+- refresh kde-5.15-rollup patch
+
+* Wed Feb 08 2023 Jan Grulich <jgrulich@redhat.com> - 5.15.8-5
+- Fix possible DOS involving the Qt SQL ODBC driver plugin
+  CVE-2023-24607
+
+* Tue Jan 31 2023 Jan Grulich <jgrulich@redhat.com> - 5.15.8-4
+- migrated to SPDX license
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 5.15.8-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
 * Thu Jan 27 2023 Liu Yang <Yang.Liu.sn@gmail.com> - 5.15.8-2.rv64
 - Fix build on riscv64
 

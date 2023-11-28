@@ -1,8 +1,17 @@
+From dacd0c6b3466258d175e7119a8e4836171400820 Mon Sep 17 00:00:00 2001
+From: Jan Grulich <jgrulich@redhat.com>
+Date: Wed, 26 Jul 2023 12:03:46 +0200
+Subject: [PATCH 01/15] Use Wayland by default on GNOME
+
+---
+ src/gui/kernel/qguiapplication.cpp | 9 +--------
+ 1 file changed, 1 insertion(+), 8 deletions(-)
+
 diff --git a/src/gui/kernel/qguiapplication.cpp b/src/gui/kernel/qguiapplication.cpp
-index b8bfad4f16..676fdfad5e 100644
+index b39b3b4e5e..a217719ea8 100644
 --- a/src/gui/kernel/qguiapplication.cpp
 +++ b/src/gui/kernel/qguiapplication.cpp
-@@ -1376,14 +1376,7 @@ void QGuiApplicationPrivate::createPlatformIntegration()
+@@ -1412,14 +1412,7 @@ void QGuiApplicationPrivate::createPlatformIntegration()
          if (sessionType == QByteArrayLiteral("x11") && !platformName.contains(QByteArrayLiteral("xcb"))) {
              platformName = QByteArrayLiteral("xcb");
          } else if (sessionType == QByteArrayLiteral("wayland") && !platformName.contains(QByteArrayLiteral("wayland"))) {
@@ -18,3 +27,6 @@ index b8bfad4f16..676fdfad5e 100644
          }
      }
  #ifdef QT_QPA_DEFAULT_PLATFORM_NAME
+-- 
+2.41.0
+
